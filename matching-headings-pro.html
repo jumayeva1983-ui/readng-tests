@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Matching Headings Pro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: deep-blue masthead over a pale-blue page; white exam sheets; passage left, list of headings right */
+:root{
+  --bg:#E6EFF8; --band:#0F3A66; --band-2:#164C83; --band-ink:#FFFFFF;
+  --surface:#FFFFFF; --ink:#0E1D2C; --muted:#56697D; --line:#D2DEEA; --soft:#EEF4FA;
+  --accent:#1D5FC4; --accent-ink:#FFFFFF; --accent-soft:#E0EBFA;
+  --good:#14784A; --good-soft:#DFF3E7; --miss:#4A5970; --miss-soft:#ECF0F5;
+  --hl:#C9EED7; --hl-ink:#0B3A22;
+  --f-ui:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-read:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#091725; --band:#0A2A4A; --band-2:#123B66; --band-ink:#FFFFFF;
+  --surface:#0F2235; --ink:#E3ECF5; --muted:#98AEC3; --line:#213850; --soft:#132A41;
+  --accent:#6EA6F0; --accent-ink:#071422; --accent-soft:#16304E; --good:#5CCB93; --good-soft:#123327; --miss:#A7B5C8; --miss-soft:#1A2B3E;
+  --hl:#1C4B35; --hl-ink:#DDF7E8; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#091725; --band:#0A2A4A; --band-2:#123B66; --band-ink:#FFFFFF;
+  --surface:#0F2235; --ink:#E3ECF5; --muted:#98AEC3; --line:#213850; --soft:#132A41;
+  --accent:#6EA6F0; --accent-ink:#071422; --accent-soft:#16304E; --good:#5CCB93; --good-soft:#123327; --miss:#A7B5C8; --miss-soft:#1A2B3E;
+  --hl:#1C4B35; --hl-ink:#DDF7E8; color-scheme:dark }
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.6 var(--f-ui)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:20;background:var(--band)}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1320px;margin:0 auto;padding-left:max(20px, env(safe-area-inset-left, 0px));padding-right:max(20px, env(safe-area-inset-right, 0px))}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3{text-wrap:balance;margin:0}
+
+.masthead{background:var(--band);color:var(--band-ink)}
+.masthead .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:14px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:20px;letter-spacing:-.01em}
+.logo{width:34px;height:34px;border-radius:8px;background:var(--band-2);display:grid;place-items:center;font:700 13px/1 var(--f-ui);letter-spacing:.02em}
+.nav{display:flex;gap:4px}
+.nav button{border:0;background:none;color:inherit;opacity:.78;padding:9px 14px;border-radius:8px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:8px}
+.nav button:hover{opacity:1;background:var(--band-2)}
+.nav button[aria-current="page"]{opacity:1;background:var(--band-2)}
+.badge{background:var(--band-ink);color:var(--band);font-size:12px;font-weight:700;border-radius:999px;padding:1px 8px;line-height:1.5}
+
+.btn{border:1px solid var(--line);background:var(--surface);padding:11px 18px;border-radius:8px;cursor:pointer;font-weight:600;font-size:16px;line-height:1.2}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{border-color:var(--line)}
+.btn.sm{padding:8px 12px;font-size:15px}
+.btn.big{padding:14px 22px;font-size:17px}
+.btn.danger{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn:disabled{opacity:.5;cursor:default}
+
+main{padding-block:28px 64px}
+.hero{margin-bottom:24px}
+.hero h1{font-size:clamp(32px,4.5vw,44px);letter-spacing:-.02em;line-height:1.1}
+.sub{margin:8px 0 0;color:var(--muted);font-size:19px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:24px 0 0;max-width:760px}
+.stats.wide{grid-template-columns:repeat(4,minmax(0,1fr));max-width:none}
+.stats div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.stats dt{font-size:14px;color:var(--muted);font-weight:500}
+.stats dd{margin:4px 0 0;font-size:32px;font-weight:700;font-variant-numeric:tabular-nums}
+.stats small{font-size:17px;color:var(--muted);font-weight:500;margin-left:4px}
+.resume{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--accent-soft);border-radius:var(--r);padding:14px 18px;margin-bottom:20px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.seg{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;cursor:pointer;font-size:16px;font-weight:500;color:var(--muted)}
+.seg[aria-pressed="true"]{background:var(--band);border-color:var(--band);color:var(--band-ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tno{font-size:14px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.lv{font-size:13px;font-weight:600;border-radius:999px;padding:3px 10px;background:var(--accent-soft);color:var(--accent)}
+.lv2{background:var(--good-soft);color:var(--good)}
+.lv3{background:var(--band);color:var(--band-ink)}
+.tcard h3{font:600 23px/1.25 var(--f-read)}
+.meta{margin:0;color:var(--muted);font-size:16px}
+.score{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;min-height:24px}
+.bar{flex:1;height:8px;background:var(--soft);border-radius:4px;overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--good);border-radius:4px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+
+.testbar{position:sticky;top:env(safe-area-inset-top, 0px);z-index:10;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;box-shadow:0 6px 18px -14px rgba(10,40,80,.5)}
+.tt{display:flex;flex-direction:column;min-width:0;flex:1}
+.tt b{font-size:18px;overflow:hidden;text-overflow:ellipsis}
+.tb-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.count{font-size:15px;color:var(--muted);font-weight:500}
+.clock{font:700 22px/1 var(--f-ui);font-variant-numeric:tabular-nums;background:var(--soft);padding:8px 12px;border-radius:8px}
+.clock.low{background:var(--accent);color:var(--accent-ink)}
+
+.result{background:var(--band);color:var(--band-ink);border-radius:var(--r);padding:20px 24px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;margin-bottom:18px;scroll-margin-top:100px}
+.rs{display:flex;flex-direction:column}
+.big{font-size:42px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.big small{font-size:22px;opacity:.75}
+.big.alt{opacity:.9}
+.rl{font-size:15px;opacity:.8;margin-top:6px}
+.ra{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-left:auto}
+.result .btn{border-color:transparent}
+.result .btn:not(.primary){background:var(--band-2);color:var(--band-ink)}
+.result .btn.primary{background:var(--band-ink);color:var(--band)}
+.result .muted{color:var(--band-ink);opacity:.85}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
+.passage{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:30px 34px;min-width:0}
+.instr{margin:0 0 18px;color:var(--muted);font-size:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.passage h2{font:600 30px/1.2 var(--f-read);margin-bottom:8px}
+.para{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;padding-block:20px;border-top:1px solid var(--line);scroll-margin-top:100px}
+.passage h2 + .para{border-top:0}
+.pl{width:34px;height:34px;border-radius:8px;background:var(--band);color:var(--band-ink);display:grid;place-items:center;font-weight:700;font-size:16px;margin-top:4px}
+.pb{min-width:0;display:flex;flex-direction:column;gap:14px}
+.ptext{margin:0;font:400 20px/1.75 var(--f-read);max-width:72ch}
+mark.ev{background:var(--hl);color:var(--hl-ink);padding:2px 3px;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.pick{display:flex;flex-direction:column;gap:6px}
+.pick label{font-size:14px;font-weight:600;color:var(--muted)}
+.pick select{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--soft);font-size:17px;cursor:pointer}
+.pick select:disabled{cursor:default;opacity:1}
+.para.ok .pick select{border-color:var(--good);background:var(--good-soft)}
+.para.bad .pick select{border-color:var(--miss);background:var(--miss-soft);text-decoration:line-through}
+.para.redo .pick select{border-color:var(--accent);background:var(--accent-soft)}
+.para.ok .pl{background:var(--good)}
+.para.bad .pl{background:var(--miss)}
+.fb{border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;font-size:17px}
+.fb p{margin:0}
+.fb.good{background:var(--good-soft)}
+.fb.miss{background:var(--miss-soft)}
+.fh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mk{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--surface)}
+.good .mk{background:var(--good)} .miss .mk{background:var(--miss)}
+.good .fh b{color:var(--good)}
+.trap{font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;color:var(--ink)}
+.your{color:var(--muted)}
+.hd b{font-weight:700;margin-right:6px;color:var(--ink)}
+.hd span{color:var(--ink)}
+
+.panel{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 96px);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 12px;max-height:calc(100vh - 120px);overflow:auto}
+.panel summary{font-weight:700;font-size:19px;cursor:pointer;list-style:none;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.panel summary::-webkit-details-marker{display:none}
+.hlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.hlist li{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:6px;align-items:start;padding:9px 6px;border-radius:6px;font-size:17px;line-height:1.45}
+.hlist .rn{font-weight:700;color:var(--accent)}
+.hlist li.used{opacity:.4}
+.hlist li.used .ht{text-decoration:line-through}
+.to{font-weight:700;font-size:14px;background:var(--good-soft);color:var(--good);border-radius:6px;padding:2px 8px}
+.to.none{background:var(--soft);color:var(--muted)}
+.dn{margin:4px 0 0;font-size:14px;color:var(--muted);line-height:1.45}
+
+.bar-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.mlist{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.mrow{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;padding:16px 20px;border-top:1px solid var(--line)}
+.mrow:first-child{border-top:0}
+.mi{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 320px}
+.mi b{font:600 20px/1.3 var(--f-read)}
+.mv{font-size:16px;color:var(--muted)}
+.mr{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.empty{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.empty p{margin:0;font-size:18px}
+
+.drill{display:flex;flex-direction:column;gap:16px;max-width:900px}
+.passage.single{padding:22px 26px}
+.passage.single .para{border-top:0;padding-block:4px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:6px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:13px 14px;cursor:pointer;font-size:17px;line-height:1.4}
+.opt .rn{font-weight:700;color:var(--accent)}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--miss);background:var(--miss-soft);text-decoration:line-through}
+.opt:disabled{cursor:default}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;margin-top:16px}
+.card h2{font-size:21px;margin-bottom:14px}
+.lrow{display:grid;grid-template-columns:150px minmax(80px,1fr) 56px 80px;gap:14px;align-items:center;padding-block:8px;font-size:16px}
+.traps{display:flex;flex-direction:column;gap:12px}
+.trow2{display:grid;grid-template-columns:minmax(200px,1.2fr) minmax(80px,1fr) 40px;gap:14px;align-items:center}
+.tl{display:flex;flex-direction:column}
+.tl b{font-size:16px} .tl span{font-size:14px;color:var(--muted)}
+.trow2 .bar i{background:var(--accent)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:16px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.reset{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px}
+
+@media (max-width: 1000px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .panel{position:static;max-height:none;order:-1}
+  .stats.wide{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width: 620px){
+  body{font-size:17px}
+  .wrap{padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+  .stats{grid-template-columns:1fr}
+  .stats.wide{grid-template-columns:1fr 1fr}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .passage{padding:20px 18px}
+  .para{grid-template-columns:minmax(0,1fr);gap:8px}
+  .ptext{font-size:19px}
+  .testbar{gap:8px;padding:10px 12px}
+  .tt{flex:1 1 100%;order:-1}
+  .tb-right{flex:1;justify-content:flex-end;gap:8px}
+  .count{display:none}
+  .clock{font-size:18px;padding:6px 9px}
+  .testbar .btn.ghost{padding:8px 4px}
+  .testbar .btn.primary{padding:9px 14px}
+  .result{gap:18px}
+  .ra{margin-left:0}
+  .lrow{grid-template-columns:1fr auto;gap:6px}
+  .lrow .bar{grid-column:1 / -1;grid-row:2}
+  .trow2{grid-template-columns:1fr auto}
+  .trow2 .bar{grid-column:1 / -1;grid-row:2}
+  .nav button{padding:8px 10px}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;scroll-behavior:auto!important} }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap">
+  <div class="brand"><span class="logo" aria-hidden="true">i–x</span>Matching Headings</div>
+  <nav class="nav" aria-label="Sections">
+    <button data-act="nav" data-v="home">Tests</button>
+    <button data-act="nav" data-v="mistakes">Mistakes <span class="badge" id="mbadge" hidden>0</span></button>
+    <button data-act="nav" data-v="progress">Progress</button>
+  </nav>
+</div></header>
+<main class="wrap" id="app"></main>
+<script>
+const T = [];
+T.push({ id:"bees", lvl:1, title:"Bees on the Rooftops",
+H:{ i:"A hobby that has spread across cities", ii:"Honey that tastes of its neighbourhood", iii:"Too many hives for too few flowers", iv:"The surprising health of city bees", v:"How beekeepers avoid being stung", vi:"Training and rules for new keepers", vii:"Why bees are disappearing worldwide", viii:"Planting for all pollinators", ix:"The cost of setting up a hive" },
+D:{ v:["assumption","Stings are never discussed; safety appears only briefly in Paragraph E as one part of a course."], vii:["broad","The passage is about bees in cities; a worldwide decline is not discussed."], ix:["assumption","No paragraph mentions the price of hives or equipment."] },
+P:[
+["A","Twenty years ago, a beehive on a city roof would have seemed strange, even slightly alarming, to most people. Bees were associated with orchards, meadows and quiet country gardens, not with traffic lights and office blocks. Today, however, hives sit on top of hotels, offices, schools and even opera houses in cities around the world, and in some capitals the number of hives has multiplied several times within a decade. [[What began as an unusual hobby for a few enthusiasts has become a familiar part of urban life]], and in some neighbourhoods it is now easier to buy local honey than local bread.","i","The paragraph describes how urban beekeeping has grown from a rare hobby into a common sight.",{ ii:["wordmatch","Local honey is mentioned only as a final example of how common hives have become."] }],
+["B","Many people assume that bees would struggle in a city, surrounded by traffic, pollution and concrete. It seems natural to imagine them searching in vain for flowers among car parks and shopping streets. [[In fact, city colonies often do better than those in the countryside.]] Gardens, parks, balconies, cemeteries and roadside trees provide a wide variety of flowers from early spring to late autumn, while modern farmland may offer only one crop that flowers for a few weeks before the fields become, for a bee, almost a desert. City bees are also less exposed to the chemicals sprayed on fields, and the warmer temperatures of built-up areas allow them to remain active for longer each year.","iv","After 'In fact', the paragraph makes the surprising point that city colonies often thrive more than rural ones.",{ vii:["assumption","The paragraph says city bees do well; it says nothing about bees disappearing worldwide."] }],
+["C","The variety of city flowers also affects the honey itself. [[Honey from a city roof often has a more complex flavour than honey from a single crop]], because the bees collect nectar from dozens of different plants rather than one. Beekeepers report that hives only a few kilometres apart can produce honey of quite different colours and tastes, depending on which parks, avenues and gardens are nearby: a hive near lime trees may produce pale, fragrant honey, while one close to a large park may produce something darker and stronger. Some restaurants now advertise honey from their own street, and a few hotels offer guests a jar from the roof above their room.","ii","The paragraph explains that city honey reflects nearby flowers, so each area produces its own flavour.",{ iv:["neighbour","Flower variety links back to Paragraph B, but here the focus is the honey's taste, not the bees' health."] }],
+["D","[[However, the popularity of urban beekeeping has created a new problem.]] In some central districts, the number of hives has grown so quickly that there are no longer enough flowers to feed them all. A single colony can contain tens of thousands of bees, each visiting hundreds of flowers a day, so even a modest increase in hives places heavy demands on local plants. When food is scarce, honeybees compete with wild bees and other insects, which may be pushed out of the area altogether. Researchers in several European cities have warned that adding more hives can do more harm than good, particularly for rare wild species that depend on a small number of plants.","iii","The paragraph explains that too many hives are now competing for a limited supply of flowers.",{ viii:["focus","Wild insects are mentioned as victims of the problem; the solution of planting appears in Paragraph F."] }],
+["E","Partly for this reason, a number of cities now ask new beekeepers to register their hives and to complete a basic course before they begin. [[The courses teach how to keep a colony healthy, how to prevent swarms and how to work safely near neighbours]], since a swarm settling on a busy pavement can cause considerable alarm. Registration, meanwhile, allows officials to see where hives are concentrated and to advise newcomers to look elsewhere if an area is already crowded. Experienced keepers often act as mentors during a beginner's first year, visiting the hive regularly and helping with the inspections that keep disease under control.","vi","The paragraph covers the registration and training now expected of new beekeepers.",{ v:["detail","Working safely is one topic of the course; the paragraph is about training and registration in general."] }],
+["F","Many experts now argue that the best way to help bees is not to keep more of them but to grow more food for them. [[Planting flowering trees, shrubs and wild meadows benefits honeybees and wild pollinators alike]], and requires no special equipment or training. Even a window box or a narrow strip beside a pavement can provide useful food if it contains the right plants. Some cities have replaced short grass in parks and along roads with meadows that are cut only once or twice a year, and residents are encouraged to choose plants that flower at different times, so that food is available throughout the season rather than in a single burst.","viii","The paragraph recommends planting flowers that support all pollinators instead of adding hives.",{ vi:["wordmatch","Training is mentioned only to show that planting is easy; training is the topic of Paragraph E."] }]
+]});
+
+T.push({ id:"sleep", lvl:1, title:"Why Teenagers Sleep Late",
+H:{ i:"A shift in the body clock", ii:"Schools that start later", iii:"Screens make the problem worse", iv:"A popular explanation for late mornings", v:"Effects on learning and mood", vi:"What families can do at home", vii:"The ideal number of hours for adults", viii:"Why exams should be held in the afternoon", ix:"What dreams can tell us" },
+D:{ vii:["wordmatch","Adults are not discussed; the hours mentioned in Paragraph B refer to teenagers."], viii:["assumption","Exams are never discussed; Paragraph C mentions marks and Paragraph E mentions school start times."], ix:["assumption","Dreams are not mentioned anywhere in the passage."] },
+P:[
+["A","Parents and teachers have long complained that teenagers stay up too late at night and then cannot get out of bed in the morning. Weekend lie-ins that last until lunchtime, and pupils who yawn through the first lesson of the day, are familiar sights in many homes and schools. [[Such behaviour is commonly seen as a sign of laziness or poor discipline]], and many adults believe that a firm bedtime, strictly enforced, would quickly solve the problem. Advice columns and parenting guides have repeated this view for generations, often blaming a simple lack of willpower. Sleep scientists, however, see the situation rather differently.","iv","Most of the paragraph describes the common adult belief that late mornings are caused by laziness. The last sentence only introduces the scientists' view.",{ i:["neighbour","The final sentence points ahead to the scientific explanation, which is developed in Paragraph B."] }],
+["B","[[During adolescence, the body's internal clock shifts later.]] The hormone that makes people feel sleepy is released later in the evening than it was in childhood, so many teenagers are simply not tired at ten o'clock, however early they go to bed. This change appears to be a normal part of development, and it has been observed in young people in many different countries and cultures. Their need for sleep, however, does not decrease: most still require eight to ten hours a night. The result is a mismatch between the time their bodies want to sleep and the time they must wake up for school, which leaves many of them short of rest throughout the week.","i","The paragraph explains a biological change in the timing of sleep during adolescence.",{ vii:["wordmatch","Hours of sleep are mentioned, but for teenagers, and only as a supporting detail."] }],
+["C","[[This mismatch has consequences that go well beyond tiredness.]] Students who regularly sleep too little find it harder to concentrate and to remember what they have learned, since much of the work of storing new information in memory takes place during sleep. Their marks may suffer as a result, particularly in subjects that require sustained attention. Lack of sleep is also linked to irritability, low mood and anxiety, and it increases the risk of accidents, particularly among young drivers who are already inexperienced on the road. Teachers often notice the effects first, in pupils who seem withdrawn or easily upset during morning lessons.","v","The paragraph lists the effects of too little sleep on study and on emotional well-being.",{ viii:["assumption","Marks are mentioned, but the paragraph never suggests changing the time of exams."] }],
+["D","Modern technology adds to the difficulty. Phones and tablets are often used in bed, sometimes until the moment a teenager falls asleep, and [[the bright light from their screens can delay sleepiness even further]]. This light signals to the brain that it is still daytime, holding back the natural rise in sleepiness that should come in the evening. Messages and notifications that arrive late at night also keep the brain alert, while games and videos are designed to be hard to stop. Many young people report checking their phones during the night, which breaks up the sleep they do manage to get.","iii","The paragraph explains how devices used at night delay sleep.",{ i:["neighbour","Screens delay sleepiness, but the natural body-clock shift belongs to Paragraph B; here the cause is technology."] }],
+["E","Some schools have responded by changing their timetables. [[Where the school day has been moved later, even by thirty minutes to an hour, studies have generally found that students sleep longer]] and attend more regularly, and some schools have reported fewer pupils arriving late. Teachers in these schools often describe classes that are more alert during the first lessons of the day. The change is not always popular, however, because it affects bus schedules, parents' working hours and after-school activities such as sport, which may have to finish later in the evening.","ii","The paragraph is about schools moving their start times and the results.",{ viii:["focus","The paragraph concerns the start of the school day, not the timing of exams."] }],
+["F","[[Families can also help.]] Keeping devices out of the bedroom, agreeing on a regular time to stop using screens and getting plenty of morning daylight can all make it easier for teenagers to fall asleep at a reasonable hour. A calm routine in the evening, such as reading or listening to quiet music, may also help the body prepare for rest. Experts advise against very late nights at weekends, since sleeping until midday can shift the body clock even later and make Monday mornings harder still. Above all, they suggest that parents treat late sleeping as a biological challenge rather than a battle of wills.","vi","The paragraph gives practical advice for families at home.",{ iii:["detail","Screens appear as one piece of advice; the paragraph as a whole is about steps families can take."] }]
+]});
+
+T.push({ id:"ebikes", lvl:1, title:"The Electric Bicycle Boom",
+H:{ i:"An assisted ride, not a motorbike", ii:"Opening cycling to new groups", iii:"Still a form of exercise", iv:"Benefits that depend on what is replaced", v:"New risks on the road and at home", vi:"Cities must adapt", vii:"Why e-bikes cost more than cars", viii:"The end of the traditional bicycle", ix:"Racing professionally on electric bikes" },
+D:{ vii:["wordmatch","Paragraph F says e-bikes are expensive, but nothing compares their cost with cars."], viii:["degree","The passage describes growth in e-bike use but never claims ordinary bicycles will disappear."], ix:["assumption","Racing and professional sport are not discussed."] },
+P:[
+["A","Electric bicycles have become one of the fastest-growing forms of transport in many countries, and in some European markets they now account for a large share of all new bicycles sold. Despite their name, however, most are not motorbikes in disguise. [[An e-bike's motor only assists the rider, adding power when the pedals are turned and switching off above a set speed]], which in Europe is usually 25 kilometres per hour. The rider still has to pedal, but hills and headwinds become far less tiring, and journeys that would leave a cyclist hot and exhausted can be completed in ordinary clothes. A battery, usually charged from a household socket, provides enough power for several days of typical commuting.","i","The paragraph explains that an e-bike helps the rider pedal rather than replacing pedalling.",{ viii:["assumption","Sales growth is mentioned, but the paragraph never says ordinary bicycles will disappear."] }],
+["B","[[This extra help has brought cycling within reach of people who had given it up or never started.]] Older riders, people with long commutes and parents carrying children or shopping are among the most enthusiastic buyers. Some people with health conditions that make ordinary cycling difficult have also found that an e-bike allows them to ride again. In hilly cities, where cycling was once limited to the very fit, e-bikes have made the bicycle a practical choice for ordinary journeys, and cargo versions with large boxes at the front are increasingly used for the school run and for small deliveries.","ii","The paragraph describes the new groups of people who can now cycle.",{ vi:["wordmatch","Cities are mentioned only as places with hills; the paragraph is about riders, not changes to streets."] }],
+["C","Some critics argue that riding an e-bike is a kind of cheating that offers little exercise, since the motor does part of the work. [[Research suggests otherwise: although each trip is easier, e-bike owners tend to ride more often and over longer distances than conventional cyclists, so their total physical activity can be similar.]] Many also use their bikes for trips they would previously have made by car, adding regular movement to their daily routine. For people who would otherwise not cycle at all, the health benefit is clear, and even a moderate level of effort, repeated every day, can bring real improvements in fitness.","iii","After the critics' view, the paragraph argues that e-bike riders still get significant exercise.",null],
+["D","E-bikes are often promoted as a cleaner alternative to the car, and when they replace car journeys they do reduce traffic, noise and emissions. A short trip to work or the shops by car produces far more pollution per kilometre than the same trip by e-bike, even when the electricity used to charge the battery is taken into account. [[The benefit, however, depends on which trips they replace.]] If people use them instead of walking, ordinary cycling or public transport, the gain for the environment is much smaller, and in some cases there may be no gain at all. For this reason, researchers are cautious about general claims and prefer to study how e-bikes are actually used.","iv","The paragraph says the environmental benefit depends on whether e-bikes replace car trips or greener ones.",null],
+["E","[[The growth of e-bikes has also raised safety concerns.]] Higher average speeds mean that collisions with pedestrians or other cyclists can be more serious, especially on crowded paths that were designed for walkers. Older riders, who make up a large share of e-bike users, may also be more vulnerable if they fall. There have also been fires caused by cheap or damaged batteries, often while they were being charged indoors overnight, and such fires can spread quickly through a flat. Many countries are now considering stricter standards for batteries and chargers, and fire services advise owners to buy from reliable sellers.","v","The paragraph covers dangers on the road and battery fires at home.",{ vi:["neighbour","Stricter standards are mentioned at the end, but city planning is the topic of Paragraph F."] }],
+["F","[[To make the most of e-bikes, cities will need to adapt their streets.]] Many cycle lanes were designed for slower riders and are too narrow for one bicycle to overtake another safely, a problem that becomes more serious when riders travel at very different speeds. Secure parking is also essential, since e-bikes are expensive and attractive to thieves, and many owners will not leave them on the street. Some cities are adding charging points at stations and workplaces, while others are building covered bike shelters near homes. Planners argue that such changes cost little compared with new roads and can encourage many more people to leave the car at home.","vi","The paragraph describes the changes cities must make: wider lanes, secure parking and charging points.",{ vii:["wordmatch","E-bikes are called expensive only to explain why secure parking matters; there is no comparison with cars."] }]
+]});
+
+T.push({ id:"museums", lvl:1, title:"Museums Beyond the Walls",
+H:{ i:"A sudden move online", ii:"Bringing hidden objects into view", iii:"Reaching people far away", iv:"What a screen cannot show", v:"The price of going digital", vi:"Two kinds of visit working together", vii:"Why museum visitor numbers are falling", viii:"The history of museum architecture", ix:"Protecting objects from damage" },
+D:{ vii:["opposite","Paragraph F suggests that online collections encourage real visits; no fall in numbers is described."], viii:["assumption","Museum buildings and their design are not discussed."], ix:["wordmatch","Paragraph B mentions storage only to explain why many objects are hidden; conservation is not discussed."] },
+P:[
+["A","When museums around the world closed their doors in 2020, many had little experience of presenting their collections online. Their websites were often limited to opening hours, ticket prices and a few photographs of famous works. [[Within weeks, they had to find new ways to reach visitors through screens]]: curators recorded video tours from empty galleries, educators moved workshops and lectures online, and collections that had existed only in internal databases were opened to the public. Some museums experimented with live-streamed events and online quizzes, while others invited the public to recreate famous paintings at home and share the results.","i","The paragraph describes how museums quickly moved their activities online when they had to close.",{ vii:["assumption","The closures were temporary; the paragraph does not discuss a long-term fall in visitors."] }],
+["B","[[One lasting benefit has been greater access to objects that visitors never normally see.]] Large museums typically display only a small fraction of their collections, while the rest remains in storage, sometimes because there is not enough space and sometimes because items are thought to interest only specialists. High-quality photographs and three-dimensional scans now allow anyone to examine items that might otherwise stay in boxes for decades. Visitors can zoom in on details that would be invisible behind glass, and researchers can study objects held in several different countries without travelling.","ii","The paragraph explains that digital images reveal stored objects that are rarely on display.",{ ix:["wordmatch","Storage is mentioned only as the place where hidden objects are kept; protecting them is not the topic."] }],
+["C","[[Online collections have also attracted people who could never travel to the museum itself.]] Students in distant countries, people with disabilities and those who cannot afford the journey can now explore collections from home, and teachers can build lessons around objects held on the other side of the world. For small communities whose own history is held in museums far away, online access can also mean seeing important objects for the first time. However, online visitors tend to behave differently from those in the building: most look at only a few pages and leave within minutes.","iii","The paragraph is about new audiences who cannot visit in person.",{ iv:["detail","The final sentence about short online visits is a minor point; the paragraph is mainly about new audiences."] }],
+["D","Yet many curators insist that a digital image is no substitute for the real thing. [[A photograph cannot convey the size of a huge painting, the texture of a carved surface or the experience of standing in front of an object that is thousands of years old.]] Colours on a screen are rarely accurate, and a sculpture seen from a single angle loses much of its character. There is also something about the shared atmosphere of a gallery, the quiet and the presence of other people, that cannot easily be reproduced at home. For these reasons, few museums see online collections as a replacement for a visit.","iv","The paragraph argues that screens cannot reproduce the physical experience of seeing real objects.",{ vi:["neighbour","The last sentence touches on online and real visits, but how they work together is developed in Paragraph F."] }],
+["E","[[Digitisation is also expensive.]] Photographing and describing thousands of objects requires specialist equipment and skilled staff, and each item must be handled carefully, measured and recorded in detail. Once created, the files must be stored, protected and updated for years as formats and technology change. Large national museums can often find the money, sometimes with help from governments or private donors, but small local museums may struggle to digitise more than a handful of items. Copyright rules create a further obstacle, since some modern works cannot be shown online at all without the permission of the artist or the artist's family.","v","The paragraph focuses on the costs and obstacles of putting collections online.",null],
+["F","[[Most museums now see the physical and the digital as working together.]] Online collections can spark curiosity that leads people to visit in person, while visitors can use apps and websites to learn more after they leave, or to plan a route through the galleries before they arrive. Some museums allow visitors to save favourite objects during a visit and explore them in greater depth later at home. The most successful institutions treat the website not as a separate museum but as a doorway into the real one, and they measure success not only by the number of clicks but by the number of people who eventually come through the door.","vi","The paragraph describes online and in-person visits supporting each other.",{ vii:["opposite","The paragraph suggests online collections lead people to visit, not that visitor numbers are falling."] }]
+]});
+
+T.push({ id:"debris", lvl:1, title:"The Problem of Space Debris",
+H:{ i:"A crowded region above our heads", ii:"Small objects, serious damage", iii:"A chain reaction that feeds itself", iv:"Thousands of new satellites", v:"Clean-up ideas still being tested", vi:"Rules that are hard to enforce", vii:"The first human in space", viii:"Debris falling on cities", ix:"Why satellites are no longer needed" },
+D:{ vii:["wordmatch","Paragraph A mentions the first satellite, not the first person in space."], viii:["assumption","The passage discusses danger in orbit; debris falling on cities is not mentioned."], ix:["opposite","Paragraph D shows that more satellites are being launched than ever."] },
+P:[
+["A","Since the first satellite was launched in 1957, humans have sent thousands of objects into orbit around the Earth, for purposes ranging from weather forecasting and navigation to television and scientific research. [[Many of these are no longer working, and together with spent rocket stages and countless fragments from explosions and collisions, they form a growing cloud of debris.]] Space agencies track tens of thousands of objects larger than a tennis ball, while millions of smaller pieces are too small to follow. Most of this material is concentrated in the orbits that are most useful to humans, which means that the busiest regions of space are also the most polluted.","i","The paragraph describes the large and growing amount of debris orbiting the Earth.",{ vii:["wordmatch","The first satellite, not the first person, is mentioned only as a starting point in time."] }],
+["B","[[Even a tiny piece of debris can cause serious damage.]] Objects in low orbit travel at around 28,000 kilometres per hour, so a fragment only a centimetre across can strike with enormous force, and even flecks of paint have been known to chip the windows of spacecraft. Satellites are protected by shields, but these can stop only the smallest particles. The International Space Station has had to change its orbit on a number of occasions to avoid approaching debris, and its crew have sometimes sheltered in their return spacecraft as a precaution while a fragment passed close by.","ii","The paragraph explains why even very small fragments are dangerous: they travel at extreme speed.",{ viii:["assumption","The danger described is to spacecraft in orbit, not to people on the ground."] }],
+["C","Scientists are particularly worried about collisions between large objects, such as two satellites or a satellite and an old rocket body. [[Each collision produces thousands of new fragments, which in turn increase the chance of further collisions.]] In 2009, for example, an active communications satellite collided with a dead one, scattering debris that remains in orbit today. If such events become more frequent, the process could continue on its own, even if no further launches took place. In the worst case, some orbits could become so crowded with debris that they would be too dangerous to use for generations.","iii","The paragraph describes how collisions create more debris in a self-reinforcing chain.",{ ii:["neighbour","Damage from small fragments was the topic of Paragraph B; here the focus is the chain reaction."] }],
+["D","The problem is becoming more urgent because of the rapid increase in launches. For decades, relatively few satellites were launched each year, most of them by governments. [[Now several companies are placing thousands of small satellites in low orbit]] to provide internet access around the world, and the number of active satellites has risen sharply in only a few years. These networks offer real benefits, especially for remote regions without other connections, but each new satellite adds to the traffic that operators must manage, and astronomers complain that their reflections already interfere with observations of the night sky.","iv","The paragraph is about the large new satellite networks that are crowding orbit.",{ ix:["opposite","The paragraph describes growing demand for satellites, not a declining need."] }],
+["E","[[Engineers have proposed many ways of removing debris, but none has yet been used on a large scale.]] Ideas include catching old satellites with nets or harpoons, attaching small engines that push them down into the atmosphere, and using magnets to collect them. Others have suggested using lasers on the ground to slow fragments so that they fall and burn up. Test missions have shown that some of these methods can work, but removing even one object is complex and expensive, since each target is moving at high speed and may be spinning unpredictably.","v","The paragraph reviews clean-up methods that are still experimental.",{ vi:["focus","The paragraph is about technical solutions, not regulations."] }],
+["F","Many experts believe that prevention is more realistic than cleaning up. International guidelines ask operators to bring satellites down within a set period after their missions end, so that they burn up in the atmosphere, or to move them into little-used 'graveyard' orbits, and new satellites are increasingly designed with this in mind. [[These guidelines are not always followed, however, and there is no single authority with the power to enforce them.]] Each country licenses its own launches, and agreement between the major space powers has proved difficult to achieve.","vi","The paragraph explains that rules exist but are difficult to enforce internationally.",{ v:["neighbour","Clean-up is mentioned only for contrast; this paragraph is about rules for prevention."] }]
+]});
+T.push({ id:"fourday", lvl:2, title:"The Four-Day Working Week",
+H:{ i:"An idea moving from theory to trials", ii:"Doing the same work in less time", iii:"Healthier, less stressed employees", iv:"Jobs that need people every day", v:"Not all shorter weeks are equal", vi:"A tool for attracting staff", vii:"Questions the trials cannot yet answer", viii:"Governments make the shorter week compulsory", ix:"Longer holidays for all workers", x:"Why productivity always falls" },
+D:{ viii:["degree","All the trials described were voluntary; no compulsory law is mentioned."], ix:["assumption","Holidays are not discussed; the extra free time comes from a shorter week."], x:["opposite","Paragraph B argues that output can be maintained in fewer days."] },
+P:[
+["A","For most of the last century, the five-day working week was taken for granted in many countries, having replaced the six-day week that was common in earlier generations. Few people questioned it, and debates about working time focused mainly on overtime and flexible hours. [[Recently, however, the idea of a four-day week with no loss of pay has moved from the margins into serious debate]], and companies and public bodies in a number of countries have run trials to test it. Some of these trials involved dozens of organisations, from small software firms to local councils, and many of those that took part have decided to keep the shorter week permanently.","i","The paragraph explains that the four-day week has become a serious topic, with real trials taking place.",{ viii:["degree","Trials are voluntary; nothing says a government has made the shorter week compulsory."] }],
+["B","The main argument for the change concerns productivity. [[Supporters claim that many employees can complete the same amount of work in four days]], because much of a typical working week is lost to unnecessary meetings, interruptions and tiredness. Studies of office work suggest that people are rarely productive for every hour they spend at their desks, and that concentration falls sharply during long days. During trials, some firms shortened meetings, reduced internal emails and set aside periods of uninterrupted work, in which staff were not expected to answer messages. Several reported that output was maintained, and in some cases improved, despite the reduction in hours.","ii","The paragraph argues that the same work can be done in fewer days by cutting wasted time.",{ x:["opposite","The paragraph argues that output can be maintained, not that productivity falls."] }],
+["C","Participants in trials have frequently reported improvements in their well-being. [[Many say they feel less stressed and less exhausted]], sleep better and have more time for family, exercise and other commitments, such as caring for children or elderly relatives. Some describe using the extra day for household tasks, which frees the weekend for genuine rest. Employers have also reported fewer days lost to sickness and lower rates of burnout, a condition that has become a growing concern in many professions.","iii","The paragraph reports positive effects on workers' health and stress.",{ ix:["assumption","The extra free time comes from the shorter week, not from longer holidays."] }],
+["D","[[The model is harder to apply in some sectors, however.]] Hospitals, schools, shops and public transport must be staffed every day, and simply closing on Fridays is not an option: patients still need care, and passengers still need trains. In these settings, a four-day week usually means organising rotas so that different employees take different days off, which may require hiring additional staff and raises costs considerably. Where workers are already scarce, as in nursing, this may simply not be possible. Some public services have experimented with the idea on a small scale, but extending it across an entire workforce remains a considerable challenge.","iv","The paragraph explains why services that operate every day find a four-day week difficult.",null],
+["E","It is also important to distinguish between different versions of the idea. [[Some employers have simply squeezed five days of hours into four longer days]], which keeps total working time the same: an employee might work ten hours a day instead of eight. This arrangement has existed for decades in some industries and is popular with workers who value a long weekend. Critics point out, however, that it can increase fatigue, particularly in demanding jobs, and that it is not what most campaigners mean by a four-day week. For them, the essential feature is a real reduction in hours with no reduction in pay.","v","The paragraph separates a genuine cut in hours from squeezing the same hours into four days.",{ iii:["opposite","Longer days may increase fatigue, the opposite of the well-being gains in Paragraph C."] }],
+["F","For many employers, the shorter week is attractive for reasons that have little to do with productivity. [[In industries where skilled workers are scarce, offering a four-day week can help a company recruit and keep staff]], since few competitors offer the same benefit. Replacing an experienced employee can be expensive once the costs of advertising, interviewing and training are added together, so even a small reduction in the number of people leaving can save a company a considerable sum. Several firms in trials reported that job applications increased after they announced the change, and some said they were able to attract candidates who would otherwise have chosen larger competitors.","vi","The paragraph explains that employers use the four-day week to recruit and keep staff.",{ ii:["turn","The first sentence explicitly moves away from productivity, which was the topic of Paragraph B."] }],
+["G","[[Despite encouraging results, important questions remain.]] Most trials have been short, often lasting only six months, and the companies taking part volunteered, so they may have been especially suited to the change. Their managers were likely to be enthusiastic, which may also have influenced the outcome. It is unclear whether the benefits will last once the novelty has worn off, or whether they would be repeated across an entire economy that includes factories, farms and hospitals. Economists point out that the effects on wages, prices and international competitiveness can only be judged over many years.","vii","The paragraph lists the limits of the evidence so far.",{ viii:["degree","An economy-wide change is raised only as an open question, not as a law."] }]
+]});
+
+T.push({ id:"fashion", lvl:2, title:"The True Cost of Fast Fashion",
+H:{ i:"Speed as a business model", ii:"A rapid and flexible supply chain", iii:"A heavy toll on water and rivers", iv:"Clothes with short lives", v:"The human cost of cheap clothing", vi:"Shoppers look for alternatives", vii:"Laws that make producers responsible", viii:"The collapse of the fashion industry", ix:"How to design a successful collection", x:"Recycling solves the waste problem" },
+D:{ viii:["opposite","The passage describes a large, growing industry; even second-hand alternatives remain small."], ix:["assumption","No paragraph gives advice on designing clothes."], x:["degree","Paragraph D says only a very small proportion of clothing is recycled into new fibre."] },
+P:[
+["A","Not long ago, clothing companies typically released new collections a few times a year, timed to the seasons: spring and summer, autumn and winter. [[Today, so-called fast fashion brands can move a design from sketch to shop in a matter of weeks]], offering a constant stream of new styles at low prices. Some of the largest brands add new items to their stores and websites several times a week. The aim is to encourage customers to visit often and buy frequently, since there is always something new on the rails, and since popular items may sell out and never return. For shoppers, clothing has become less a long-term purchase than a regular, inexpensive treat.","i","The paragraph defines fast fashion as a model built on speed and constant novelty.",{ ix:["assumption","Designs are mentioned, but the paragraph does not explain how to create a successful collection."] }],
+["B","[[This speed depends on a highly flexible system of production.]] Instead of ordering large quantities months in advance, brands place small initial orders with factories, often in countries where labour is cheap, and monitor sales closely, sometimes hour by hour. Styles that sell well are reordered within days, while those that do not are quickly dropped, so that little money is wasted on unpopular designs. Information from online shops and social media allows companies to spot trends almost as soon as they appear. The result is a system that reacts to customer demand far more quickly than the traditional fashion calendar ever could.","ii","The paragraph describes the fast, flexible production system that makes the model possible.",{ v:["detail","Cheap labour is mentioned in passing; the paragraph is about how production is organised."] }],
+["C","The environmental price of cheap clothing is considerable. [[Growing cotton requires large amounts of water, and the dyes and chemicals used in processing often end up in rivers]] near factories, where they can harm wildlife and the communities that depend on the water for drinking and farming. Treating fabric with colour and special finishes can require further large volumes of water. Many low-cost garments are made from synthetic fibres such as polyester, which are derived from oil and shed tiny plastic particles every time they are washed. The industry is also a significant source of greenhouse gases, much of it from the energy used in production.","iii","The paragraph describes damage to water supplies and rivers caused by clothing production.",null],
+["D","Fast fashion also produces enormous amounts of waste. [[Because clothes are cheap, many are worn only a few times before being thrown away.]] When an item costs less than a meal in a restaurant, there is little reason to repair it or keep it for years. Much of the clothing donated to charity cannot be sold locally and is shipped abroad in large bundles, where a large share is of such poor quality that it ends up in landfill. Turning old garments into new fibre is technically difficult, especially when fabrics are blends of several materials, and only a very small proportion of clothing is recycled in this way.","iv","The paragraph is about how quickly clothes are discarded and where they end up.",{ x:["opposite","The paragraph says that very little clothing is recycled into new fibre."] }],
+["E","[[The workers who make the clothes often pay the highest price.]] Wages in many garment factories are low, working hours are long, and safety standards can be poor, with crowded buildings, blocked exits and little protection from dangerous chemicals. Many workers are young women, some of whom have moved from rural areas in search of employment. The collapse of a factory building in Bangladesh in 2013, which killed more than a thousand people, drew worldwide attention to these conditions and led to new safety agreements between brands and unions. Campaigners argue, however, that progress has been uneven and that pressure to cut costs and deliver quickly remains intense.","v","The paragraph focuses on low wages and unsafe conditions for garment workers.",{ viii:["wordmatch","The 'collapse' refers to a factory building, not to the fashion industry as a whole."] }],
+["F","[[Some consumers are changing their habits.]] Second-hand clothing has become fashionable, particularly among younger shoppers, who often see buying used items as both stylish and responsible. Online platforms now make it easy to buy and sell used garments, and some fashion brands have even started selling second-hand versions of their own products. Clothing rental services, which allow customers to borrow outfits for special occasions, and repair workshops that extend the life of favourite items are also growing. These alternatives remain small compared with the market for new clothes, but their growth suggests that attitudes may be starting to shift.","vi","The paragraph describes shoppers turning to second-hand, rental and repair.",{ viii:["opposite","The market for new clothes is still described as large; the industry is not collapsing."] }],
+["G","[[Governments are also beginning to act.]] Some have proposed or introduced rules that make producers responsible for the clothes they sell after they are discarded, for example by requiring them to pay for collection and recycling. France has banned companies from destroying unsold goods, a practice that had allowed brands to protect their image by burning or shredding surplus stock. Other proposals include taxes on the cheapest garments and labels showing the environmental impact of each item. Supporters hope that such measures will force brands to consider the whole life of a garment, not just its price.","vii","The paragraph covers new laws that make producers take responsibility for waste.",{ iv:["neighbour","Discarded clothes were the subject of Paragraph D; here the focus is on the laws."] }]
+]});
+
+T.push({ id:"desal", lvl:2, title:"Drinking the Sea",
+H:{ i:"Turning the sea into a water supply", ii:"How salt is removed", iii:"Cheaper, but still costly", iv:"A salty waste product", v:"Clean power to cut emissions", vi:"Small units for remote places", vii:"One option among many", viii:"The world's great rivers are drying up", ix:"Salt as a valuable product", x:"A technology with no environmental impact" },
+D:{ viii:["assumption","Rivers are mentioned only as a cheaper source of water in Paragraph C."], ix:["opposite","Paragraph D presents brine as a harmful waste, not something valuable."], x:["opposite","Paragraphs D and E describe harm to marine life and high energy use."] },
+P:[
+["A","As populations grow and droughts become more frequent, many regions are running short of fresh water. Underground supplies are being used faster than rain can replace them, and reservoirs in some areas fall to worrying levels in dry summers. [[One response has been to take water from the sea and remove the salt.]] Desalination has long been essential in parts of the Middle East, where rainfall is scarce and energy has been cheap, and it is now increasingly used in countries such as Australia, Spain and the United States. Thousands of plants are now in operation worldwide, supplying water to many millions of people.","i","The paragraph introduces desalination as a growing response to water shortages.",{ viii:["assumption","Water shortages are mentioned, but rivers drying up are not discussed."] }],
+["B","Early desalination plants mostly worked by heating seawater until it evaporated and then collecting the fresh water as it condensed, much as rain forms from water vapour in the atmosphere. This method is reliable but consumes enormous amounts of heat. [[Today, most new plants use a process called reverse osmosis, in which seawater is pushed at high pressure through membranes with pores so fine that salt cannot pass through.]] The membranes must be protected from sand, algae and other material, so the water is first filtered and treated, and the membranes themselves are cleaned and replaced regularly.","ii","The paragraph explains the technical methods used to separate salt from water.",{ v:["assumption","Heat is used in older plants, but renewable power is not mentioned here."] }],
+["C","Reverse osmosis requires large amounts of energy, mainly to drive the high-pressure pumps that force water through the membranes. In the early years of the technology, this made desalinated water extremely expensive. [[Improvements in membranes and in devices that recover energy from the outgoing water have reduced costs considerably over recent decades.]] Larger plants have also benefited from economies of scale. [[Even so, desalinated water usually remains more expensive than water taken from rivers or underground sources]], and the cost rises further when the plant is far from where the water is needed and it must be pumped inland or uphill.","iii","The paragraph explains that costs have fallen, yet desalinated water is still relatively expensive.",null],
+["D","[[Desalination also produces a by-product: brine, a highly concentrated salt solution.]] For every litre of fresh water, plants typically discharge a larger volume of brine back into the sea, often through long pipes that carry it away from the shore. Because brine is heavier than ordinary seawater, it tends to sink and spread along the sea floor, where many plants and animals live. Near the outlets, the extra salt and the chemicals used to clean equipment can harm marine life, especially where currents are weak and the brine is not quickly diluted. Engineers are testing ways to spread the brine more widely, but the problem grows as more plants are built.","iv","The paragraph is about the salty waste that plants return to the sea and its effects.",{ ix:["opposite","Brine is presented as a harmful waste, not as something valuable."] }],
+["E","Because desalination uses so much electricity, its contribution to climate change depends on where that electricity comes from. A plant powered by coal or gas adds to the very emissions that make droughts more likely, a contradiction that critics are quick to point out. [[Some newer plants are powered by solar or wind energy, which greatly reduces their emissions.]] In sunny desert regions, where water is scarce and sunshine is abundant, this combination is particularly attractive, although plants must find ways to keep operating when the sun is not shining, for example by storing energy or producing extra water during the day.","v","The paragraph describes using renewable energy to reduce the climate impact of desalination.",{ iii:["neighbour","Electricity use links to Paragraph C, but here the issue is emissions, not cost."] }],
+["F","[[Not all desalination happens in giant coastal plants.]] Small units, some no larger than a shipping container, can supply villages, islands and hotels that are far from mains water, and many ships produce their own drinking water in the same way. These systems are more expensive per litre than large plants, but they can be cheaper than transporting water over long distances by boat or lorry. Portable systems are also sent to disaster zones, where storms or earthquakes have damaged normal supplies and clean water is urgently needed to prevent the spread of disease.","vi","The paragraph focuses on small and portable units for remote or emergency use.",null],
+["G","Desalination is sometimes presented as the answer to the world's water problems, but most experts are more cautious. [[In many places, repairing leaking pipes, recycling wastewater and using water more efficiently are cheaper ways of increasing supply.]] In some cities, a significant proportion of treated water is lost through leaks before it ever reaches a tap. Farming, which uses most of the world's fresh water, could also become far more efficient with better irrigation. Desalination is best seen as one tool among several, used where other options have been exhausted or where no other reliable source exists.","vii","The paragraph argues that desalination is one option among several, often after cheaper measures.",{ iii:["focus","Cost is mentioned, but the paragraph compares desalination with other solutions rather than discussing its own price."] }]
+]});
+
+T.push({ id:"habit", lvl:2, title:"The Science of Habit",
+H:{ i:"Behaviour on autopilot", ii:"A three-part loop", iii:"The importance of place", iv:"Longer than people think", v:"Self-control as routine, not struggle", vi:"Small barriers, big effects", vii:"Products designed to be hard to put down", viii:"Habits that can never be changed", ix:"The role of genes in personality", x:"Twenty-one days to a new habit" },
+D:{ viii:["opposite","Paragraphs C and F show how habits can be changed."], ix:["assumption","Genes and personality are not discussed."], x:["opposite","Paragraph D rejects the 21-day claim."] },
+P:[
+["A","Much of what people do each day is not the result of conscious decisions. Brushing teeth, making coffee, checking a phone or taking the same route to work are usually done without any real thought. [[Researchers estimate that a large share of everyday behaviour is habitual]], carried out in the same way and in the same places with little reflection. Far from being a weakness, this is efficient: by handling routine tasks automatically, the brain frees attention for problems that genuinely require thinking. A person who had to decide consciously how to tie their shoes every morning would be exhausted before leaving the house.","i","The paragraph explains that much daily behaviour happens automatically, which saves mental effort.",null],
+["B","Psychologists often describe a habit as a loop with three parts. [[A cue, such as a time of day or a place, triggers a routine, and the routine is followed by a reward]] that makes it more likely to be repeated. Arriving home might be the cue, switching on the television the routine and relaxation the reward. At first, the behaviour requires a decision, but over many repetitions the link between cue and routine becomes so strong that the behaviour starts almost automatically, sometimes before the person is aware of it. At this point, the reward may no longer even be necessary to keep the habit going.","ii","The paragraph describes the cue, routine and reward cycle that forms habits.",{ iii:["detail","Place is given only as one example of a cue."] }],
+["C","Because habits are tied to cues in the environment, [[the places where people live and work play a powerful role in maintaining them]]. The sofa, the kitchen and the route to the office all contain signals that trigger familiar behaviour. This explains why people who travel often find that their usual habits disappear, only to return as soon as they get home. It also explains why major life changes, such as moving house or starting a new job, can be good moments to adopt new behaviour: old cues disappear, and for a while, choices become more deliberate again.","iii","The paragraph explains how surroundings keep habits going, and why a new place offers a chance to change.",{ vi:["neighbour","Deliberately adding or removing effort is the topic of Paragraph F; here the focus is the role of place."] }],
+["D","A popular claim holds that a new habit takes twenty-one days to form, and the figure appears in countless self-help books and websites. [[Research suggests the reality is longer and far more variable.]] In one well-known study, participants chose a simple daily behaviour, such as drinking a glass of water after breakfast or going for a short walk, and reported each day how automatic it felt. On average, it took about two months before the behaviour became automatic, and some participants took much longer, depending on the person and on how difficult the behaviour was. Missing a single day, interestingly, made little difference to the overall result.","iv","The paragraph corrects the popular 21-day claim, showing that habits usually take longer to form.",{ x:["turn","The 21-day claim appears in the first sentence only to be rejected."] }],
+["E","It is often assumed that people with strong self-control succeed by constantly resisting temptation, refusing biscuits and forcing themselves to study through sheer determination. [[Studies of such people suggest something different: they rely heavily on routines that keep them away from temptation in the first place]], so they need to use willpower less often. They may, for example, study at the same time every day, or simply avoid keeping unhealthy food at home. Self-control, in this sense, is less a daily battle than a matter of well-designed habits, which explains why people who appear highly disciplined often report that their good behaviour feels easy.","v","The paragraph argues that self-controlled people depend on routines rather than constant resistance.",{ ix:["assumption","The paragraph discusses behaviour and routines; inherited traits are not mentioned."] }],
+["F","Breaking a bad habit through willpower alone rarely works, because the cues that trigger it remain in place. [[A more effective approach is to make the unwanted behaviour harder and the desired behaviour easier]]: keeping a phone in another room, for example, or laying out sports clothes the night before. Even a delay of a few seconds can interrupt an automatic routine and give the conscious mind a chance to intervene. Similarly, placing fruit at eye level or a book beside the bed makes healthier choices more likely. Small amounts of effort, added or removed, can have a surprisingly large effect on what people actually do.","vi","The paragraph explains that adding or removing small amounts of effort can change behaviour.",{ v:["neighbour","Willpower is mentioned only in the opening; the paragraph is about adjusting effort."], viii:["opposite","The paragraph explains how habits can be changed."] }],
+["G","[[Businesses have long understood the power of habit, and many digital products are deliberately designed to become part of users' daily routines.]] Notifications act as cues, and unpredictable rewards, such as new messages or likes, encourage people to check again and again, in the same way that uncertain rewards keep gamblers playing. Features such as endless scrolling remove natural stopping points, so that users continue for longer than they intended. Critics argue that these techniques take advantage of the same mechanisms that people struggle to control in their own lives, and some designers have begun to call for products that respect users' time.","vii","The paragraph describes how products use cues and rewards to create habits in users.",{ ii:["wordmatch","Cues and rewards appear again, but here they are tools used by companies, not a description of how habits form."] }]
+]});
+
+T.push({ id:"micro", lvl:2, title:"Microplastics Everywhere",
+H:{ i:"Small pieces with many origins", ii:"Found in the most remote places", iii:"Moving up the food chain", iv:"Unanswered questions about health", v:"Hidden sources on roads and in wardrobes", vi:"Bans and filters", vii:"Stopping plastic at the source", viii:"Proof that microplastics cause disease", ix:"The invention of plastic", x:"Machines that will clean the oceans" },
+D:{ viii:["degree","Paragraph D says the health effects are still unclear."], ix:["assumption","The origins of plastic as a material are not discussed."], x:["opposite","Paragraph G says removing microplastics from the open ocean is practically impossible."] },
+P:[
+["A","The term microplastics refers to plastic fragments smaller than five millimetres, roughly the size of a lentil or smaller. [[Some are produced at this size deliberately, while others form when larger items such as bottles and bags break down]] under sunlight and waves. Plastic does not decay in the way that wood or paper does; instead, it breaks into ever smaller pieces that may persist for centuries. Tiny fibres from clothing and dust from car tyres are also counted, which means microplastics come from a surprisingly wide range of sources, both on land and at sea.","i","The paragraph defines microplastics and lists the different ways they are formed.",{ ix:["assumption","The paragraph defines microplastics; the invention of plastic is not discussed."] }],
+["B","[[Microplastics have now been found almost everywhere scientists have looked.]] They have been detected in the deepest ocean trenches, in Arctic sea ice and in the snow of high mountains, places that most people imagine to be untouched by human activity. Some are carried long distances by wind and fall with rain, so that even areas far from cities receive a steady supply. Rivers carry particles from inland areas to the coast, and ocean currents then spread them across entire seas. Scientists have also found them in soils, where they may affect the worms and microorganisms that keep the ground fertile.","ii","The paragraph shows that microplastics have reached even the most remote environments.",null],
+["C","Because they are so small, microplastics are easily eaten by plankton and other tiny animals at the base of the food chain, which often mistake them for food. [[From there, they pass to fish, shellfish and the animals that eat them]], and they have been found in the stomachs of seabirds, seals and whales. Humans take them in through seafood, drinking water and even salt, as well as by breathing in particles from the air indoors. Particles have been detected in samples of human blood and other tissues, confirming that they can enter the body.","iii","The paragraph traces how microplastics pass from tiny organisms to larger animals and humans.",{ viii:["degree","The paragraph shows that particles are present in the body, not that they cause illness."] }],
+["D","[[What this means for human health is still unclear.]] Laboratory studies suggest that high doses can cause inflammation and other damage in animals, and plastics may carry harmful chemicals, either added during manufacture or picked up from the environment. However, the doses used in such experiments are often far higher than those people actually receive. Measuring the very small amounts present in real diets is difficult, and samples are easily contaminated by plastic in the laboratory itself, from clothing, equipment or even the air. Many scientists therefore call for better methods before firm conclusions are drawn.","iv","The paragraph explains that the health effects are uncertain and hard to measure.",{ viii:["degree","The paragraph stresses uncertainty; nothing has been proven."] }],
+["E","Public campaigns have often focused on plastic bags, bottles and straws, which are easy to see on beaches and in the sea. [[Some of the largest sources of microplastics, however, are far less visible.]] Washing synthetic clothes releases thousands of fibres in a single load, many of them too small to be caught by water treatment plants. The gradual wearing down of car tyres produces large quantities of plastic dust that is washed from roads into rivers whenever it rains, and some studies suggest that tyres may be among the most important sources of all. Paint from buildings, roads and ships adds further particles.","v","The paragraph identifies clothing fibres and tyre dust as large but overlooked sources.",{ i:["neighbour","Fibres and tyre dust were listed in Paragraph A; here the point is that these large sources are overlooked."] }],
+["F","[[Some governments have begun to act on specific sources.]] Several countries have banned the tiny plastic beads once common in face washes and toothpastes, which were washed straight down the drain. France has passed a law intended to require filters that capture fibres in new washing machines, and similar measures are being discussed elsewhere. Engineers are also developing tyres that wear down more slowly and road surfaces that trap particles before they reach drains. Each of these measures tackles only part of the problem, but together they could significantly reduce the amount of plastic released each year.","vi","The paragraph describes bans and technical measures aimed at particular sources.",{ x:["focus","These measures stop particles before they are released; none removes plastic from the ocean."] }],
+["G","Some projects aim to remove plastic from the sea, using floating barriers or nets towed by boats, and these can collect large items such as fishing nets and containers. Collecting particles smaller than a grain of rice from the open ocean, however, is practically impossible, and attempts to filter seawater on a large scale would also capture plankton and other marine life. [[Most scientists therefore argue that the only lasting solution is to reduce the amount of plastic produced and released in the first place.]] This means designing products that last longer, using less plastic in packaging and ensuring that waste is collected and managed properly.","vii","The paragraph argues that prevention, not clean-up, is the realistic answer.",{ x:["turn","Ocean clean-up is mentioned first only to be dismissed as impractical."] }]
+]});
+T.push({ id:"language", lvl:3, title:"Learning a Language as an Adult",
+H:{ i:"A widely held assumption", ii:"Faster at first, not in the long run", iii:"Why an early start at school may achieve little", iv:"What adults bring to the task", v:"Obstacles that are practical and emotional", vi:"Being understood matters more than sounding native", vii:"Age is not the deciding factor", viii:"The brain stops developing at twelve", ix:"The best textbooks for adult learners", x:"Adults can never achieve fluency" },
+D:{ viii:["degree","The passage never mentions brain development or a specific age limit."], ix:["assumption","Study strategies are mentioned in Paragraph D, but no textbooks are discussed."], x:["opposite","The passage argues that adults can learn successfully: it is never too late to start."] },
+P:[
+["A","It is widely believed that children learn languages effortlessly while adults struggle. A child who moves to a new country seems to pick up the language within months, while the parents may still be searching for words years later. [[This view has been reinforced by the influential idea of a 'critical period': a window in early life after which learning a language to a native level becomes difficult or impossible.]] Parents who enrol toddlers in language classes and adults who give up after a few lessons are often acting on this belief, and education systems in many countries have introduced foreign languages earlier and earlier in primary school.","i","The paragraph presents the widespread belief that childhood is the best time to learn a language.",{ viii:["degree","The 'critical period' is presented as an idea; nothing is said about the brain stopping development at a specific age."] }],
+["B","The research picture is more complicated. [[Studies of immigrants suggest that those who arrive as young children are more likely eventually to sound like native speakers, yet adults and teenagers usually make faster progress in the early months.]] Older learners grasp grammar and vocabulary more quickly at first, partly because they can understand explanations and apply rules deliberately. Children, by contrast, learn slowly and gradually, absorbing the language through constant exposure in play and at school. Their advantage appears only after many years of immersion, and even then it is most visible in pronunciation and in a subtle feel for what sounds natural.","ii","The paragraph shows that adults progress faster at first, while young children tend to do better eventually.",{ x:["degree","Adults are said to progress faster at first; the paragraph never says they cannot become fluent."] }],
+["C","These findings, however, concern people living in a new country and surrounded by the language every day. [[In classrooms, where pupils may receive only two or three hours a week, the benefits of an early start appear much smaller.]] A few hours of lessons cannot provide anything like the vast quantity of exposure that immersion offers. Several studies comparing children who began a foreign language at different ages in school found that later starters often caught up within a few years, and sometimes overtook those who had started earlier. Early lessons may still have value, for example in building positive attitudes, but they rarely produce the dramatic advantage that parents expect.","iii","The paragraph argues that with limited lesson time, starting young brings little advantage.",{ ii:["neighbour","Faster early progress was the subject of Paragraph B; here the point is that early school lessons achieve little."] }],
+["D","[[Adults also bring resources that children lack.]] They can read and write, use dictionaries and grammar explanations, and reflect consciously on how a language works, comparing it with languages they already know. Many have learned other skills before and can apply effective study strategies, such as spacing their practice or testing themselves rather than simply rereading notes. Adults also tend to know what they want to use the language for, whether for work, travel or study, and can focus on the vocabulary and situations that matter most to them. These advantages help to explain their rapid progress in the early stages.","iv","The paragraph lists strengths that adult learners possess.",{ ix:["assumption","Dictionaries and grammar explanations are mentioned, but no textbooks are recommended."] }],
+["E","Their difficulties are often less to do with ability than with circumstances. [[Adults usually have less time to study, fewer opportunities to hear and use the language, and a stronger fear of making mistakes in public.]] Work and family responsibilities leave little energy for lessons, and many adults spend most of their day using their first language. Embarrassment can lead them to avoid speaking altogether, which deprives them of exactly the practice they need. Children, in contrast, are often less self-conscious and are surrounded by classmates who expect them to join in, whether or not their grammar is correct.","v","The paragraph explains that adults' problems come from limited time and exposure, and from anxiety.",{ x:["opposite","The paragraph says adults' problems are not mainly about ability."] }],
+["F","Pronunciation is the area where age seems to matter most: few people who start as adults lose their accent completely, however long they live abroad. [[Yet researchers increasingly argue that the goal should be intelligibility rather than a native-like accent.]] Many highly successful speakers of a second language, including well-known writers, scientists and politicians, have a clear foreign accent but are easily understood, and listeners quickly adapt to them. Teaching, it is argued, should therefore concentrate on the features of pronunciation that cause real misunderstanding, rather than on removing every trace of an accent.","vi","After 'Yet', the paragraph argues that being understood matters more than sounding native.",{ x:["turn","The opening admits that accents remain, but the main point is that this does not prevent success."] }],
+["G","[[Taken together, the evidence suggests that age is only one factor among many, and rarely the decisive one.]] Motivation, the amount of contact with the language, the quality of teaching and the learner's opportunities to use the language in real situations often predict success more reliably. An adult who studies regularly and seeks out conversation may well outperform a child who receives a few lessons a week. For adults, the practical message is encouraging: it is never too late to start, and many of the obstacles they face can be reduced by planning study time and finding supportive settings in which to practise.","vii","The paragraph concludes that factors other than age are usually more important.",{ i:["opposite","The paragraph rejects the belief described in Paragraph A rather than presenting it."] }]
+]});
+
+T.push({ id:"navigation", lvl:3, title:"How Animals Find Their Way",
+H:{ i:"Journeys of astonishing precision", ii:"Using the sun and an internal clock", iii:"Lessons from the night sky", iv:"An invisible map in the Earth itself", v:"Following a familiar scent", vi:"Instinct for the young, experience for the old", vii:"Navigation disrupted by human activity", viii:"Why animals migrate in winter", ix:"Tracking animals with satellites", x:"Animals that never leave home" },
+D:{ viii:["focus","The passage explains how animals navigate, not why they migrate."], ix:["assumption","Satellite tracking is never mentioned."], x:["opposite","Every paragraph concerns animals that travel."] },
+P:[
+["A","Every year, billions of animals make journeys that would challenge a human with a map and a compass. [[Some travel thousands of kilometres and arrive at exactly the place they set out from]]: Arctic terns fly between the polar regions, salmon return from the ocean to the stream where they hatched, and sea turtles come back to nest on the beaches where they were born, often after many years at sea. Even small songbirds weighing less than a coin may cross deserts and seas on their way to distant feeding grounds. How they achieve such precision has puzzled naturalists for centuries, and only in recent decades have scientists begun to understand the senses involved.","i","The paragraph highlights how far, and how accurately, some animals travel.",{ viii:["focus","The paragraph describes the journeys themselves, not the reasons for migrating."] }],
+["B","[[One of the simplest tools animals use is the sun.]] Because the sun moves across the sky during the day, an animal can only use it as a compass if it also knows the time: at sunrise the sun lies roughly in the east, but by midday it has moved a long way across the sky. Experiments with birds and honeybees have shown that they combine the sun's position with an internal clock, adjusting their direction as the hours pass. When researchers shifted birds' internal clocks by keeping them under artificial light, the birds set off in predictably wrong directions, confirming that timing is essential to the system.","ii","The paragraph explains how animals use the sun together with a sense of time.",{ iii:["neighbour","The sky is involved, but stars and night-time navigation belong to Paragraph C."] }],
+["C","Many songbirds migrate at night, when the sun is not available and the air is cooler and calmer. [[Planetarium experiments have shown that some species learn the pattern of stars around the point in the sky that stays still as the Earth turns]], and use it to find north. Remarkably, this knowledge is not inherited in detail: young birds must observe the night sky while they are growing. Birds raised under an artificial sky that rotated around a different star oriented themselves to that star instead, showing that they learn the centre of rotation rather than any particular pattern.","iii","The paragraph describes how night-flying birds learn to navigate by the stars.",null],
+["D","[[Perhaps the most mysterious sense is the ability to detect the Earth's magnetic field.]] The field varies in strength and angle from place to place, and sea turtles, for example, appear to recognise these local values, which gives them a kind of map. Young turtles placed in tanks that reproduce the magnetic conditions of distant locations swim in the direction that would carry them home. How animals sense magnetism, however, remains a matter of debate: some scientists believe that particles of a magnetic mineral act like tiny compass needles, while others suggest that special molecules in the eye are involved, and several competing explanations are still being tested.","iv","The paragraph is about the magnetic sense that gives animals a kind of map.",null],
+["E","Close to home, other senses take over. Magnetic and celestial cues may bring an animal to the right region, but they are rarely precise enough to identify a single river or nest. [[Salmon appear to recognise the chemical scent of the river in which they were born]], allowing them to choose the right stream among many as they swim upriver. Experiments in which young salmon were exposed to particular chemicals, and later returned to streams containing them, support this idea. Some seabirds also seem to use smell to find their way across open water, perhaps by detecting the odours of feeding areas carried on the wind.","v","The paragraph explains how animals use smell to find home in the final stage of a journey.",{ i:["neighbour","Salmon returning home were introduced in Paragraph A; here the focus is the sense of smell they use."] }],
+["F","[[A classic experiment revealed a difference between young and experienced migrants.]] Thousands of birds caught during their autumn migration were moved hundreds of kilometres sideways and released. Adults corrected their course and reached their usual winter grounds, apparently aware that they had been displaced. Young birds on their first journey, however, kept flying in the same inherited direction and ended up somewhere new. The results suggest that first-time migrants follow a simple programme of direction and distance, while experienced birds have learned a map that allows them to correct mistakes.","vi","The paragraph contrasts inherited direction in young birds with learned navigation in adults.",{ ix:["assumption","Birds were caught and moved, but tracking technology is not mentioned."] }],
+["G","[[Human activity is increasingly interfering with these abilities.]] Bright lights along coasts can draw newly hatched turtles away from the sea, towards roads and buildings, and city lighting confuses birds migrating at night, causing many to collide with tall structures. Some experiments have even suggested that electronic noise from human equipment can disrupt birds' magnetic sense. In response, some coastal towns now dim their lights during the turtle nesting season, and a few cities switch off decorative lighting on skyscrapers during the main migration periods.","vii","The paragraph describes how light and electronic noise disturb animal navigation.",{ iv:["wordmatch","The magnetic sense is mentioned only as something humans disrupt; it is explained in Paragraph D."] }]
+]});
+
+T.push({ id:"crowds", lvl:3, title:"The Wisdom of Crowds",
+H:{ i:"A surprise at a country fair", ii:"Errors that cancel each other out", iii:"When the crowd stops thinking independently", iv:"How early votes shape later opinion", v:"Putting collective judgement to work", vi:"Questions crowds cannot answer", vii:"Asking first, discussing later", viii:"Experts are always wrong", ix:"The history of opinion polls", x:"Larger groups always decide better" },
+D:{ viii:["degree","Paragraph E says crowds often did better than specialists, which is far from saying experts are always wrong."], ix:["assumption","Opinion polls are not discussed."], x:["degree","Paragraphs C and F describe situations where groups perform poorly."] },
+P:[
+["A","In 1906, the scientist Francis Galton visited a country fair in England where visitors paid to guess the weight of an ox once it had been slaughtered and prepared. Galton, who doubted the judgement of ordinary people, collected the entries afterwards, expecting to find evidence of their poor estimates. Some of the people who entered were butchers and farmers, but most had no special knowledge of cattle. [[To his surprise, the middle value of the roughly 800 guesses was almost exactly the true weight]], closer than the great majority of individual estimates. Galton published his findings in a scientific journal, admitting that the result reflected better on popular judgement than he had expected.","i","The paragraph tells how the combined guesses of a crowd proved surprisingly accurate.",{ ix:["assumption","Galton collected guesses at a fair; opinion polls are not discussed."] }],
+["B","[[The explanation lies in how errors behave when many independent estimates are combined.]] Each guess contains some truth and some error. If people's mistakes are unrelated, some will guess too high and others too low, and there is no reason for the errors to lean in one direction. When the estimates are averaged, much of the error cancels out, leaving a figure closer to the truth than most individuals manage. The larger and more varied the group, the more completely this cancelling tends to work. The same principle explains why scientists repeat measurements and take an average rather than relying on a single reading.","ii","The paragraph explains that independent errors balance each other out when averaged.",null],
+["C","This effect depends on two conditions: the crowd must be diverse, and its members must judge independently. [[When people are influenced by one another, their errors tend to point in the same direction]], and the average simply reflects a shared mistake. In experiments where participants were told others' estimates before giving their own, the range of answers narrowed and people became more confident, yet the group's accuracy did not improve. A group that hears a confident opinion before forming its own may end up less accurate than its members would have been alone.","iii","The paragraph explains that crowds lose accuracy when members influence each other.",{ x:["opposite","The paragraph shows that a group can be less accurate than its members alone."] }],
+["D","Online ratings offer a clear example. [[In one experiment on a news website, comments that randomly received an early positive vote were significantly more likely to attract further positive votes later.]] Comments given an early negative vote, by contrast, showed no lasting effect, as other readers tended to correct it. Initial opinions, in other words, can snowball, so that ratings reflect the order in which people voted as much as the quality of the item. Similar effects have been observed with music downloads, where songs that appeared popular early on went on to become far more successful than songs of similar quality.","iv","The paragraph shows how early online votes influence later ones.",{ iii:["broad","This describes the general principle of Paragraph C; Paragraph D gives a specific case about early votes."] }],
+["E","Despite these risks, organisations have found practical ways to use collective judgement. [[Some combine the forecasts of many people to predict sales, project deadlines or economic trends]], either by averaging their estimates or by allowing them to trade on the likely outcome, as in a market. In forecasting competitions, the averaged predictions of large groups of carefully selected volunteers have often outperformed those of individual specialists. Some companies have also asked their own staff to estimate when projects will be finished, at times obtaining more realistic dates than official plans.","v","The paragraph describes practical uses of combined forecasts.",{ viii:["degree","The paragraph says crowds have often outperformed specialists, not that experts are always wrong."] }],
+["F","The method has clear limits, however. [[Averaging works only when individuals possess at least some relevant knowledge]]; combining many uninformed guesses about a technical question, such as the safe dose of a new drug, simply produces an uninformed average. Crowds may also share the same biases, for example overestimating dramatic risks, in which case their errors do not cancel out. Nor can a crowd settle questions of value, such as what is fair or beautiful, where there is no single correct answer to find. On such matters, a vote may tell us what most people prefer, but not what is true.","vi","The paragraph explains the kinds of questions where crowds fail.",{ x:["opposite","The paragraph sets out situations where groups do not produce good answers."] }],
+["G","[[The research has practical lessons for meetings and committees.]] Instead of opening with a discussion, which allows the most senior or confident voices to dominate, a group can first collect each member's view privately, in writing. Quieter members, who may hold important information, are then more likely to contribute. Only then should people discuss the results, so that independent information is not lost before it has been shared. Some organisations also ask members to explain their reasoning briefly, which helps the group to identify where disagreements come from rather than simply counting opinions.","vii","The paragraph recommends collecting private opinions before group discussion.",{ iii:["neighbour","Loss of independence was explained in Paragraph C; here the focus is a practical method for meetings."] }]
+]});
+
+T.push({ id:"rewild", lvl:3, title:"The Case for Rewilding",
+H:{ i:"Letting nature take the lead", ii:"A famous case under re-examination", iii:"Grazing animals as habitat makers", iv:"Tension with those who work the land", v:"New sources of income", vi:"Doubts about the whole idea", vii:"Rewilding on a smaller scale", viii:"Proof that predators control every ecosystem", ix:"Building new parks in cities", x:"Recreating the landscape of the distant past" },
+D:{ viii:["degree","Paragraph B says later research found other factors also mattered."], ix:["assumption","Urban parks are not discussed."], x:["opposite","Paragraph F argues that there is no single natural state to return to."] },
+P:[
+["A","Traditional conservation has often focused on protecting particular species or managing habitats carefully, for example by cutting grass, removing scrub or controlling water levels to maintain the conditions that rare plants and animals require. Such work is effective but demands constant effort and funding. [[Rewilding takes a different approach: it aims to restore natural processes and then allow nature to manage itself]] with as little human intervention as possible. Rivers may be allowed to flood, trees to fall and decay, and vegetation to develop without a fixed plan. This often involves bringing back animals that have disappeared from a region, since their feeding and movement shape the landscape.","i","The paragraph defines rewilding as restoring natural processes and then stepping back.",{ x:["assumption","The paragraph speaks of restoring processes, not of recreating a historical landscape."] }],
+["B","The best-known example is the return of wolves to Yellowstone National Park in the United States in 1995, some seventy years after they had been eliminated there. Early studies reported that wolves reduced the number of elk and changed their behaviour, allowing young trees along rivers to recover and setting off a chain of effects that reached birds, beavers and even the shape of the riverbanks. The story became famous worldwide as a demonstration of the power of predators. [[More recent research, however, suggests that the story is more complicated]], since other factors, including hunting by humans, drought and the growth of bear populations, also played a role.","ii","The paragraph presents the famous wolf example and explains that newer research questions the original story.",{ viii:["degree","The paragraph ends by saying other factors also mattered, so it proves nothing about every ecosystem."] }],
+["C","In Europe, rewilding projects have often relied on large grazing animals rather than predators, partly because predators are difficult to accept in crowded landscapes. On one former farm in southern England, where intensive agriculture had stopped being profitable, free-roaming cattle, ponies, pigs and deer were introduced, and [[their grazing, trampling and rooting created a mixture of open ground, scrub and woodland]]. The result was a constantly changing patchwork rather than a uniform forest. Rare birds and insects that had vanished from the area soon returned, and some species were recorded there in greater numbers than almost anywhere else in the country.","iii","The paragraph shows how grazing animals shaped a varied set of habitats.",null],
+["D","[[Bringing back large animals inevitably creates conflict with people who live and work nearby.]] Farmers fear for their sheep and cattle when wolves or lynx return, and some feel that decisions are being made by people in cities who will not bear the consequences. Beavers can flood fields and damage trees by blocking streams, while large herbivores may wander onto roads. Many schemes now offer compensation for losses or pay for protective fences and guard dogs, but trust between conservationists and rural communities is often fragile, and a single incident can undo years of careful negotiation.","iv","The paragraph is about conflict between rewilding and farming communities.",{ vii:["wordmatch","Beavers appear here as a cause of conflict; their positive role is discussed in Paragraph G."] }],
+["E","For some rural areas, however, rewilding has brought unexpected benefits. [[Visitors pay to watch wildlife, stay in local guesthouses and join guided walks]], creating jobs in places where farming had become unprofitable and young people were leaving. Safari-style tours, photography holidays and nature festivals have all appeared in regions that once had little to offer tourists. In such cases, wild animals can be worth more alive than the land was under cultivation, and some landowners have found that income from visitors is more reliable than income from crops or livestock.","v","The paragraph describes rewilding creating income through wildlife tourism.",{ iv:["neighbour","The opening 'however' contrasts with the conflict in Paragraph D; this paragraph is about benefits."] }],
+["F","Not everyone is convinced. [[Critics argue that rewilding can sweep away cultural landscapes, such as traditional meadows and hedgerows, that people value and that support their own wildlife.]] Some of the most species-rich habitats in Europe were created by centuries of farming, and they may disappear if management stops. Others point out that there is no single 'natural' state to return to, since landscapes have always changed, and that the results of releasing animals are hard to predict. A project designed to restore one kind of habitat may produce something quite different, with consequences that are difficult to reverse.","vi","The paragraph sets out several criticisms of rewilding.",{ x:["opposite","The paragraph says there is no single natural state to return to."] }],
+["G","[[Rewilding need not involve vast areas or dangerous predators.]] Releasing beavers into small streams has been shown to slow floodwater and create wetlands that support insects, frogs and birds, and in some places this has reduced flooding in villages downstream. Farmers can leave field edges to grow wild, and gardeners can let parts of their lawns become meadows or leave dead wood for insects. Supporters argue that thousands of such small projects, taken together, could make a significant difference, especially if they are connected so that wildlife can move between them.","vii","The paragraph focuses on small-scale rewilding projects.",{ ix:["assumption","Gardens are mentioned, but not new parks in cities."] }]
+]});
+
+T.push({ id:"antibiotics", lvl:3, title:"The Rise of Antibiotic Resistance",
+H:{ i:"A foundation of modern medicine", ii:"Evolution at work", iii:"Overuse in clinics and on farms", iv:"An empty pipeline", v:"Ordinary infections become dangerous again", vi:"Looking beyond conventional drugs", vii:"A problem that ignores borders", viii:"Bacteria that are harmless to humans", ix:"Antibiotics that cure viral infections", x:"Companies racing to develop new antibiotics" },
+D:{ viii:["assumption","The passage is about harmful bacteria; harmless species are not discussed."], ix:["opposite","Paragraph C says antibiotics have no effect on viral infections."], x:["opposite","Paragraph D says companies have little financial reason to develop antibiotics."] },
+P:[
+["A","Before antibiotics became widely available in the 1940s, a scratch, a sore throat or a difficult childbirth could lead to a fatal infection, and doctors had few effective treatments to offer. [[Since then, these drugs have become one of the foundations of modern medicine]]: routine operations, cancer treatment, organ transplants and the care of premature babies all depend on the ability to prevent or cure bacterial infections. Many procedures that are now considered safe would carry a serious risk of death without them. It is therefore no exaggeration to say that much of the progress of modern medicine rests on these drugs.","i","The paragraph explains how essential antibiotics have become to modern medical care.",null],
+["B","[[Resistance is a natural consequence of evolution.]] When bacteria are exposed to an antibiotic, most die, but a few may carry random genetic changes that allow them to survive. These survivors multiply, and since bacteria can divide every twenty minutes or so in favourable conditions, a resistant population can develop remarkably quickly. Bacteria can also pass genes directly to one another, so resistance can spread rapidly, even between different species. Resistance was observed soon after the first antibiotics came into use, and the scientists who developed them warned that careless use would make the problem worse.","ii","The paragraph explains how resistance develops through survival of the fittest and gene sharing.",{ viii:["assumption","The paragraph explains how resistance spreads; it does not discuss whether bacteria are harmful."] }],
+["C","Human behaviour has greatly accelerated this process. [[Antibiotics are frequently prescribed for colds and other viral infections, against which they have no effect]], often because patients expect a prescription or doctors are uncertain of the cause. In some countries, they can be bought without a prescription at all, and every unnecessary course gives bacteria another opportunity to develop resistance. In agriculture, large quantities have been given to healthy animals, sometimes simply to make them grow faster, a practice that some regions, including the European Union, have now banned.","iii","The paragraph describes unnecessary use of antibiotics in medicine and in farming.",{ ix:["opposite","The paragraph states that antibiotics have no effect on viral infections."] }],
+["D","At the same time, the supply of new drugs has slowed dramatically. In the middle decades of the twentieth century, new classes of antibiotics were discovered at a rapid pace. [[Very few genuinely new classes, however, have reached patients in recent decades.]] For pharmaceutical companies, developing an antibiotic is expensive and offers poor returns: patients take it for days rather than years, and doctors are encouraged to keep new drugs in reserve for the most serious cases, which limits sales. Several large companies have therefore abandoned antibiotic research altogether, leaving the field largely to small firms and universities.","iv","The paragraph explains why few new antibiotics are being developed.",{ x:["opposite","The paragraph says companies have little financial reason to develop new antibiotics."] }],
+["E","The consequences are already visible. [[Infections of the urinary tract, lungs and blood that were once easily treated now sometimes require several attempts with different drugs, or cannot be cured at all.]] Patients may spend longer in hospital, and doctors may be forced to use older drugs with more serious side effects. Infections acquired in hospitals are of particular concern, since vulnerable patients are exposed to resistant bacteria. One major study estimated that resistant bacteria were directly responsible for more than a million deaths worldwide in a single year.","v","The paragraph shows that once-simple infections are becoming hard or impossible to treat.",null],
+["F","[[Researchers are exploring alternatives to conventional antibiotics.]] One approach uses phages, viruses that infect and kill specific bacteria while leaving human cells unharmed. Phages were studied in the early twentieth century but were largely forgotten in many countries once antibiotics arrived. Other researchers are developing substances that disarm bacteria rather than killing them, which may put less pressure on bacteria to evolve resistance. Still others aim to prevent infections in the first place, for example through new vaccines, so that fewer antibiotics are needed.","vi","The paragraph outlines alternative approaches such as phages and vaccines.",{ ix:["wordmatch","Viruses are mentioned as a weapon against bacteria, not as infections that antibiotics cure."], viii:["wordmatch","It is the phages, not the bacteria, that leave human cells unharmed."] }],
+["G","Because resistant bacteria travel with people, animals and food, [[no country can solve the problem alone]]. A resistant strain that emerges in one hospital can appear on another continent within months, carried by travellers who show no symptoms. Experts therefore call for international cooperation to monitor resistance, regulate the use of antibiotics in farming and share the costs of developing new treatments, perhaps by paying companies a fixed reward for successful new drugs rather than relying on sales. Without such coordination, the efforts of individual countries may be undone by weaker controls elsewhere.","vii","The paragraph argues that resistance is a global problem that requires cooperation.",{ iii:["detail","Farming regulation is one of several areas of cooperation; the paragraph's focus is international action."] }]
+]});
+
+/* ---------- reference data ---------- */
+const LEVELS = { 1:"Band 5.5–6.5", 2:"Band 6.5–7.5", 3:"Band 8–9" };
+const TRAPS = {
+  wordmatch:["Word match","The heading repeats a word from the paragraph, but the idea is different."],
+  detail:["Too narrow","The heading covers only one example or detail."],
+  broad:["Too broad","The heading states a general principle, not this paragraph's specific point."],
+  turn:["Turn signal","The heading matches an opening idea that the paragraph then rejects."],
+  opposite:["Opposite meaning","The heading says the reverse of what the paragraph says."],
+  focus:["Wrong focus","Right topic, wrong angle: cause or effect, problem or solution."],
+  neighbour:["Neighbouring paragraph","The idea is mainly developed in another paragraph."],
+  degree:["Overstatement","The heading makes a stronger claim than the text."],
+  assumption:["Not in the text","Plausible, but the passage never says it."],
+  other:["Misplaced heading","This heading belongs to another paragraph."],
+  blank:["No answer","No heading was chosen."]
+};
+const TRAP_ORDER = ["wordmatch","detail","broad","turn","opposite","focus","neighbour","degree","assumption","other"];
+const WORDS = ["","one","two","three","four","five","six","seven","eight","nine","ten"];
+
+T.forEach((t, i) => {
+  t.no = i + 1; t.ans = {}; t.pm = {};
+  t.P = t.P.map(p => ({ L:p[0], t:p[1], a:p[2], why:p[3], tr:p[4] || {} }));
+  t.P.forEach(p => { t.ans[p.a] = p.L; t.pm[p.L] = p; });
+  t.mins = Math.round(t.P.length * 1.5);
+});
+const TBY = {}; T.forEach(t => TBY[t.id] = t);
+const TOTAL_P = T.reduce((a, t) => a + t.P.length, 0);
+
+/* ---------- helpers ---------- */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const txt = (t, hl) => { const e = esc(t); return hl ? e.replace(/\[\[(.+?)\]\]/g, '<mark class="ev">$1</mark>') : e.replace(/\[\[|\]\]/g, ""); };
+const pad = n => (n < 10 ? "0" : "") + n;
+const clock = s => pad(Math.floor(s / 60)) + ":" + pad(s % 60);
+const pct = (a, b) => b ? Math.round(a * 100 / b) : 0;
+const two = n => (n < 10 ? "0" : "") + n;
+const head = (t, k) => '<span class="hd"><b>' + k + "</b><span>" + esc(t.H[k]) + "</span></span>";
+function trapOf(t, p, v){
+  if (!v) return ["blank", ""];
+  if (p.tr[v]) return p.tr[v];
+  if (t.ans[v]) return ["other", "This heading matches Paragraph " + t.ans[v] + "."];
+  if (t.D[v]) return t.D[v];
+  return ["other", ""];
+}
+
+/* ---------- storage ---------- */
+const KEY = "mh-pro-v1";
+const blank = () => ({ tests:{}, miss:{}, traps:{}, answered:0, firstOk:0, resolved:0 });
+let db = blank();
+try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.tests) db = Object.assign(blank(), s); } } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch(e) {} };
+function logAnswer(t, p, v, first){
+  const key = t.id + ":" + p.L;
+  if (first) db.answered++;
+  if (v === p.a) {
+    if (first) db.firstOk++;
+    if (db.miss[key]) { delete db.miss[key]; db.resolved++; }
+  } else {
+    const k = trapOf(t, p, v)[0];
+    if (k !== "blank") db.traps[k] = (db.traps[k] || 0) + 1;
+    const prev = db.miss[key];
+    db.miss[key] = { id:t.id, L:p.L, v, k, n:(prev ? prev.n : 0) + 1, at:Date.now() };
+  }
+}
+
+/* ---------- state ---------- */
+const S = { view:"home", lvl:0, run:null, timer:null, drill:null, confirm:false };
+
+/* ---------- test run ---------- */
+function startTest(id, timed){
+  stopTimer();
+  const t = TBY[id];
+  S.run = { id, timed, sel:{}, st:{}, round:0, reveal:false, t0:Date.now(), left:t.mins * 60, used:null, score:null };
+  S.view = "test"; render(); window.scrollTo(0, 0);
+  S.timer = setInterval(tick, 1000);
+}
+function stopTimer(){ if (S.timer) { clearInterval(S.timer); S.timer = null; } }
+function elapsed(){ return Math.floor((Date.now() - S.run.t0) / 1000); }
+function clockText(){ const r = S.run; if (r.used != null) return clock(r.used); return r.timed ? clock(r.left) : clock(elapsed()); }
+function tick(){
+  const r = S.run; if (!r) return stopTimer();
+  if (r.timed && r.round === 0) { r.left--; if (r.left <= 0) { r.left = 0; submit(); return; } }
+  const el = document.getElementById("clock");
+  if (el) { el.textContent = clockText(); el.classList.toggle("low", r.timed && r.round === 0 && r.left <= 60); }
+}
+function submit(){
+  const r = S.run; if (!r) return;
+  const t = TBY[r.id], first = r.round === 0;
+  r.round++;
+  t.P.forEach(p => {
+    if (r.st[p.L] === "ok") return;
+    const v = r.sel[p.L] || "";
+    r.st[p.L] = v === p.a ? "ok" : "bad";
+    r.last = r.last || {}; r.last[p.L] = v;
+    logAnswer(t, p, v, first);
+  });
+  if (first) {
+    r.score = t.P.filter(p => r.st[p.L] === "ok").length;
+    r.used = elapsed(); if (r.timed) r.used = Math.min(r.used, t.mins * 60);
+    const prev = db.tests[t.id] || { n:0, best:0 };
+    db.tests[t.id] = { n:prev.n + 1, best:Math.max(prev.best, r.score), last:r.score, total:t.P.length, at:Date.now() };
+    stopTimer();
+    if (r.timed) r.reveal = true;
+  }
+  if (t.P.every(p => r.st[p.L] === "ok")) r.reveal = true;
+  save(); render();
+  const b = document.getElementById("result"); if (b) b.scrollIntoView({ block:"start" });
+}
+function retry(){
+  const r = S.run, t = TBY[r.id];
+  t.P.forEach(p => { if (r.st[p.L] === "bad") { delete r.st[p.L]; r.sel[p.L] = ""; } });
+  render();
+  const f = document.querySelector(".pick select:not([disabled])"); if (f) { f.closest(".para").scrollIntoView({ block:"start" }); f.focus({ preventScroll:true }); }
+}
+
+/* ---------- views ---------- */
+function homeView(){
+  const done = Object.keys(db.tests).filter(id => TBY[id]).length;
+  const nMiss = Object.keys(db.miss).length;
+  let h = '<section class="hero"><h1>Matching Headings</h1><p class="sub">15 tests · ' + TOTAL_P + ' paragraphs · IELTS Academic Reading format</p>';
+  h += '<dl class="stats"><div><dt>Tests completed</dt><dd>' + done + '<small>/ ' + T.length + '</small></dd></div><div><dt>First-attempt accuracy</dt><dd>' + (db.answered ? pct(db.firstOk, db.answered) + "%" : "—") + '</dd></div><div><dt>Mistakes to review</dt><dd>' + nMiss + "</dd></div></dl></section>";
+  if (S.run && S.run.round === 0) h += '<div class="resume"><span>Test in progress: <b>' + esc(TBY[S.run.id].title) + '</b></span><button class="btn primary" data-act="resume">Continue</button></div>';
+  h += '<div class="filters" role="group" aria-label="Level">' + [0,1,2,3].map(l => '<button class="seg" data-act="lvl" data-v="' + l + '" aria-pressed="' + (S.lvl === l) + '">' + (l ? LEVELS[l] : "All levels") + "</button>").join("") + "</div>";
+  h += '<div class="grid">' + T.filter(t => !S.lvl || t.lvl === S.lvl).map(t => {
+    const r = db.tests[t.id];
+    return '<article class="tcard"><div class="trow"><span class="tno">Test ' + two(t.no) + '</span><span class="lv lv' + t.lvl + '">' + LEVELS[t.lvl] + '</span></div><h3>' + esc(t.title) + '</h3><p class="meta">' + t.P.length + " paragraphs · " + Object.keys(t.H).length + " headings · " + t.mins + " min</p>" +
+      '<div class="score">' + (r ? '<div class="bar"><i style="width:' + pct(r.best, r.total) + '%"></i></div><span>Best ' + r.best + "/" + r.total + "</span>" : '<span class="muted">Not attempted</span>') + "</div>" +
+      '<div class="acts"><button class="btn primary" data-act="start" data-id="' + t.id + '">Practice</button><button class="btn" data-act="start" data-id="' + t.id + '" data-timed="1">Timed · ' + t.mins + " min</button></div></article>";
+  }).join("") + "</div>";
+  return h;
+}
+
+function testView(){
+  const r = S.run, t = TBY[r.id];
+  const answered = t.P.filter(p => r.sel[p.L]).length;
+  const open = t.P.some(p => !r.st[p.L]);
+  const last = t.P[t.P.length - 1].L;
+  let h = '<div class="testbar"><button class="btn ghost" data-act="home">← All tests</button><div class="tt"><span class="tno">Test ' + two(t.no) + " · " + (r.timed ? "Timed" : "Practice") + "</span><b>" + esc(t.title) + '</b></div><div class="tb-right">';
+  if (open) h += '<span class="count" id="count">' + answered + " / " + t.P.length + " answered</span>";
+  h += '<span class="clock" id="clock">' + clockText() + "</span>";
+  if (open) h += '<button class="btn primary" data-act="submit">' + (r.round ? "Check again" : "Submit") + "</button>";
+  h += "</div></div>";
+  if (r.round) h += resultBanner(t, r);
+  h += '<div class="layout"><article class="passage"><p class="instr">The reading passage has ' + WORDS[t.P.length] + " paragraphs, <b>A–" + last + "</b>. Choose the correct heading for each paragraph from the list of headings.</p><h2>" + esc(t.title) + "</h2>";
+  h += t.P.map(p => paraHTML(t, r, p)).join("");
+  h += "</article>" + headingsPanel(t, r) + "</div>";
+  return h;
+}
+function resultBanner(t, r){
+  const ok = t.P.filter(p => r.st[p.L] === "ok").length, bad = t.P.length - ok;
+  const pending = t.P.filter(p => !r.st[p.L]).length;
+  let h = '<section class="result" id="result"><div class="rs"><span class="big">' + r.score + '<small> / ' + t.P.length + '</small></span><span class="rl">First attempt · ' + pct(r.score, t.P.length) + "% · " + clock(r.used) + "</span></div>";
+  if (r.round > 1 || (!pending && ok > r.score)) h += '<div class="rs"><span class="big alt">' + ok + "<small> / " + t.P.length + '</small></span><span class="rl">After review</span></div>';
+  h += '<div class="ra">';
+  if (pending) h += '<span class="muted">Choose new headings for the highlighted paragraphs, then select Check again.</span>';
+  else if (bad && !r.reveal) h += '<button class="btn primary" data-act="retry">Retry incorrect (' + bad + ')</button><button class="btn" data-act="reveal">Show answers</button>';
+  else { const nx = T[t.no % T.length]; h += '<button class="btn primary" data-act="start" data-id="' + nx.id + '">Next test →</button><button class="btn" data-act="start" data-id="' + t.id + '"' + (r.timed ? ' data-timed="1"' : "") + '>Restart</button><button class="btn ghost" data-act="home">All tests</button>'; }
+  return h + "</div></section>";
+}
+function paraHTML(t, r, p){
+  const st = r.st[p.L], v = r.sel[p.L] || "";
+  const show = st === "ok" || (st === "bad" && r.reveal);
+  const cls = st === "ok" ? " ok" : st === "bad" ? " bad" : (r.round ? " redo" : "");
+  let h = '<section class="para' + cls + '" id="p-' + p.L + '"><div class="pl">' + p.L + '</div><div class="pb"><p class="ptext">' + txt(p.t, show) + "</p>";
+  h += '<div class="pick"><label for="s-' + p.L + '">Heading for paragraph ' + p.L + '</label><select id="s-' + p.L + '" data-l="' + p.L + '"' + (st ? " disabled" : "") + '><option value="">Select a heading</option>' +
+    Object.keys(t.H).map(k => '<option value="' + k + '"' + (v === k ? " selected" : "") + ">" + k + ".  " + esc(t.H[k]) + "</option>").join("") + "</select></div>";
+  if (st === "ok") h += '<div class="fb good"><div class="fh"><span class="mk">✓</span><b>Correct</b></div><p>' + esc(p.why) + "</p></div>";
+  if (st === "bad") {
+    const v0 = (r.last || {})[p.L] || "", tr = trapOf(t, p, v0);
+    h += '<div class="fb miss"><div class="fh"><span class="mk">✕</span><b>' + (v0 ? "Incorrect" : "No answer") + "</b>" + (tr[0] !== "blank" ? '<span class="trap">' + TRAPS[tr[0]][0] + "</span>" : "") + "</div>";
+    if (v0) h += '<p class="your">Your answer: ' + head(t, v0) + "</p>" + (tr[1] ? "<p>" + esc(tr[1]) + "</p>" : "");
+    if (r.reveal) h += '<p class="your">Correct answer: ' + head(t, p.a) + "</p><p>" + esc(p.why) + "</p>";
+    h += "</div>";
+  }
+  return h + "</div></section>";
+}
+function headingsPanel(t, r){
+  const used = new Set(Object.values(r.sel).filter(Boolean));
+  const done = r.round && r.reveal;
+  let h = '<aside class="panel"><details open><summary>List of Headings</summary><ol class="hlist" id="hlist">';
+  h += Object.keys(t.H).map(k => {
+    let tag = "", note = "";
+    if (done) { if (t.ans[k]) tag = '<span class="to">' + t.ans[k] + "</span>"; else { tag = '<span class="to none">—</span>'; note = '<p class="dn">Not used. ' + esc(t.D[k][1]) + "</p>"; } }
+    return '<li data-k="' + k + '" class="' + (!done && used.has(k) ? "used" : "") + '"><span class="rn">' + k + '</span><span class="ht">' + esc(t.H[k]) + note + "</span>" + tag + "</li>";
+  }).join("");
+  return h + "</ol></details></aside>";
+}
+
+/* ---------- mistakes & review ---------- */
+function missList(){ return Object.values(db.miss).filter(m => TBY[m.id]).sort((a, b) => TBY[a.id].no - TBY[b.id].no || a.L.localeCompare(b.L)); }
+function mistakesView(){
+  const list = missList();
+  let h = '<section class="hero"><h1>Mistakes</h1><p class="sub">Paragraphs you answered incorrectly. Answer one correctly in review or in a test to clear it.</p></section>';
+  if (!list.length) return h + '<div class="empty"><p>No mistakes to review.</p><button class="btn primary" data-act="home">Go to tests</button></div>';
+  h += '<div class="bar-actions"><button class="btn primary big" data-act="drill">Review ' + list.length + " mistake" + (list.length > 1 ? "s" : "") + '</button><span class="muted">' + db.resolved + " cleared so far</span></div>";
+  h += '<div class="mlist">' + list.map(m => { const t = TBY[m.id]; return '<div class="mrow"><div class="mi"><span class="tno">Test ' + two(t.no) + " · Paragraph " + m.L + "</span><b>" + esc(t.title) + '</b><span class="mv">' + (m.v ? "Your answer: " + m.v + ". " + esc(t.H[m.v]) : "No answer") + '</span></div><div class="mr"><span class="trap">' + TRAPS[m.k][0] + '</span>' + (m.n > 1 ? '<span class="muted">' + m.n + "× missed</span>" : "") + '<button class="btn sm" data-act="start" data-id="' + t.id + '">Open test</button></div></div>'; }).join("") + "</div>";
+  return h;
+}
+function startDrill(){
+  const items = missList().map(m => [m.id, m.L]);
+  for (let i = items.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [items[i], items[j]] = [items[j], items[i]]; }
+  S.drill = { items, i:0, pick:null, ok:0 };
+  S.view = "drill"; render(); window.scrollTo(0, 0);
+}
+function drillView(){
+  const d = S.drill;
+  if (d.i >= d.items.length) return '<section class="hero"><h1>Review complete</h1><p class="sub">' + d.ok + " of " + d.items.length + ' answered correctly.</p></section><div class="acts"><button class="btn primary" data-act="mistakes">Back to mistakes</button><button class="btn" data-act="home">All tests</button></div>';
+  const [id, L] = d.items[d.i], t = TBY[id], p = t.pm[L], picked = d.pick;
+  let h = '<div class="testbar"><button class="btn ghost" data-act="mistakes">← Mistakes</button><div class="tt"><span class="tno">Review · ' + (d.i + 1) + " of " + d.items.length + "</span><b>" + esc(t.title) + " · Paragraph " + L + '</b></div><div class="tb-right"><span class="count">' + d.ok + " correct</span></div></div>";
+  h += '<div class="drill"><article class="passage single"><section class="para"><div class="pl">' + L + '</div><div class="pb"><p class="ptext">' + txt(p.t, picked != null) + "</p></div></section></article>";
+  h += '<div class="opts" role="group" aria-label="Headings">' + Object.keys(t.H).map(k => {
+    let c = ""; if (picked != null) { if (k === p.a) c = " right"; else if (k === picked) c = " wrong"; }
+    return '<button class="opt' + c + '" data-act="dpick" data-k="' + k + '"' + (picked != null ? " disabled" : "") + '><span class="rn">' + k + "</span><span>" + esc(t.H[k]) + "</span></button>";
+  }).join("") + "</div>";
+  if (picked != null) {
+    const ok = picked === p.a, tr = trapOf(t, p, picked);
+    h += '<div class="fb ' + (ok ? "good" : "miss") + '"><div class="fh"><span class="mk">' + (ok ? "✓" : "✕") + "</span><b>" + (ok ? "Correct" : "Incorrect") + "</b>" + (!ok ? '<span class="trap">' + TRAPS[tr[0]][0] + "</span>" : "") + "</div>" + (!ok && tr[1] ? "<p>" + esc(tr[1]) + "</p>" : "") + "<p>" + esc(p.why) + '</p></div><div class="acts"><button class="btn primary" data-act="dnext">' + (d.i + 1 < d.items.length ? "Next paragraph →" : "Finish") + "</button></div>";
+  }
+  return h + "</div>";
+}
+
+/* ---------- progress ---------- */
+function progressView(){
+  const ids = Object.keys(db.tests).filter(id => TBY[id]);
+  let h = '<section class="hero"><h1>Progress</h1><p class="sub">Saved in this browser.</p></section>';
+  if (!db.answered) return h + '<div class="empty"><p>No results yet. Complete a test to see your progress.</p><button class="btn primary" data-act="home">Go to tests</button></div>';
+  h += '<dl class="stats wide"><div><dt>Tests completed</dt><dd>' + ids.length + "<small>/ " + T.length + '</small></dd></div><div><dt>First-attempt accuracy</dt><dd>' + pct(db.firstOk, db.answered) + '%</dd></div><div><dt>Paragraphs answered</dt><dd>' + db.answered + '</dd></div><div><dt>Mistakes cleared</dt><dd>' + db.resolved + "</dd></div></dl>";
+  h += '<section class="card"><h2>By level</h2>' + [1,2,3].map(l => {
+    const ts = T.filter(t => t.lvl === l), d = ts.filter(t => db.tests[t.id]);
+    const s = d.reduce((a, t) => a + db.tests[t.id].best, 0), tot = d.reduce((a, t) => a + t.P.length, 0);
+    return '<div class="lrow"><span>' + LEVELS[l] + '</span><div class="bar"><i style="width:' + pct(s, tot) + '%"></i></div><span class="num">' + (d.length ? pct(s, tot) + "%" : "—") + '</span><span class="muted">' + d.length + "/" + ts.length + " tests</span></div>";
+  }).join("") + "</section>";
+  const rows = TRAP_ORDER.map(k => [k, db.traps[k] || 0]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
+  if (rows.length) {
+    const max = rows[0][1];
+    h += '<section class="card"><h2>Traps that caught you</h2><div class="traps">' + rows.map(([k, n]) => '<div class="trow2"><div class="tl"><b>' + TRAPS[k][0] + "</b><span>" + TRAPS[k][1] + '</span></div><div class="bar"><i style="width:' + pct(n, max) + '%"></i></div><span class="num">' + n + "</span></div>").join("") + "</div></section>";
+  }
+  h += '<section class="card"><h2>Tests</h2><div class="tbl"><table><thead><tr><th>Test</th><th>Level</th><th>Best</th><th>Last</th><th>Attempts</th></tr></thead><tbody>' + T.filter(t => db.tests[t.id]).map(t => { const r = db.tests[t.id]; return "<tr><td>" + two(t.no) + ". " + esc(t.title) + "</td><td>" + LEVELS[t.lvl] + '</td><td class="num">' + r.best + "/" + r.total + '</td><td class="num">' + r.last + "/" + r.total + '</td><td class="num">' + r.n + "</td></tr>"; }).join("") + "</tbody></table></div></section>";
+  h += '<div class="reset">' + (S.confirm ? '<span>Delete all results and mistakes?</span><button class="btn danger" data-act="reset2">Delete</button><button class="btn" data-act="reset0">Cancel</button>' : '<button class="btn ghost" data-act="reset1">Reset progress</button>') + "</div>";
+  return h;
+}
+
+/* ---------- render & events ---------- */
+function render(){
+  const v = S.view;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-current", b.dataset.v === v || (v === "test" && b.dataset.v === "home") || (v === "drill" && b.dataset.v === "mistakes") ? "page" : "false"));
+  const n = Object.keys(db.miss).filter(k => TBY[k.split(":")[0]]).length;
+  const badge = document.getElementById("mbadge"); badge.textContent = n; badge.hidden = !n;
+  document.getElementById("app").innerHTML = v === "test" ? testView() : v === "mistakes" ? mistakesView() : v === "drill" ? drillView() : v === "progress" ? progressView() : homeView();
+}
+function keep(fn){ const y = window.scrollY; fn(); render(); window.scrollTo(0, y); }
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b || b.disabled) return;
+  const d = b.dataset;
+  switch (d.act) {
+    case "nav": S.view = d.v; S.confirm = false; if (d.v !== "test" && S.run && S.run.round > 0) { stopTimer(); } render(); window.scrollTo(0, 0); break;
+    case "home": S.view = "home"; render(); window.scrollTo(0, 0); break;
+    case "mistakes": S.view = "mistakes"; render(); window.scrollTo(0, 0); break;
+    case "lvl": keep(() => { S.lvl = +d.v; }); break;
+    case "start": startTest(d.id, !!d.timed); break;
+    case "resume": S.view = "test"; render(); break;
+    case "submit": submit(); break;
+    case "retry": retry(); break;
+    case "reveal": keep(() => { S.run.reveal = true; }); break;
+    case "drill": startDrill(); break;
+    case "dpick": keep(() => { const dr = S.drill, [id, L] = dr.items[dr.i], t = TBY[id], p = t.pm[L]; dr.pick = d.k; if (d.k === p.a) dr.ok++; logAnswer(t, p, d.k, false); save(); }); break;
+    case "dnext": S.drill.i++; S.drill.pick = null; render(); window.scrollTo(0, 0); break;
+    case "reset1": keep(() => { S.confirm = true; }); break;
+    case "reset0": keep(() => { S.confirm = false; }); break;
+    case "reset2": db = blank(); save(); S.confirm = false; render(); break;
+  }
+});
+document.addEventListener("change", e => {
+  const s = e.target; if (!s.matches("select[data-l]") || !S.run) return;
+  const r = S.run, t = TBY[r.id];
+  r.sel[s.dataset.l] = s.value;
+  const used = new Set(Object.values(r.sel).filter(Boolean));
+  document.querySelectorAll("#hlist li").forEach(li => li.classList.toggle("used", used.has(li.dataset.k)));
+  const c = document.getElementById("count"); if (c) c.textContent = t.P.filter(p => r.sel[p.L]).length + " / " + t.P.length + " answered";
+});
+
+render();
+
+</script>
+</body>
+</html>
