@@ -1,0 +1,1132 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TFNG Reading Trenajori</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<style>
+/* Layout: imtihon kitobchasi — chapda matn varagʻi, oʻngda OMR javoblar varagʻi; isbot marker bilan belgilanadi */
+:root{
+  --paper:#EEF1F5; --sheet:#FFFFFF; --ink:#151D2C; --muted:#586376; --line:#D5DBE4; --soft:#E6EAF0;
+  --pencil:#2B4BD3; --pencil-ink:#FFFFFF; --pencil-soft:#E3E8FC;
+  --marker:#FFE27A; --marker-ink:#2E2500; --ngmark:#D8E3F4;
+  --ok:#17744B; --ok-soft:#DDF2E6; --bad:#B23C27; --bad-soft:#FAE4DE;
+  --f-read:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-ui:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0F131B; --sheet:#171C27; --ink:#E5E9F1; --muted:#9AA4B6; --line:#2B3345; --soft:#1F2533;
+  --pencil:#8AA2FF; --pencil-ink:#0F131B; --pencil-soft:#222B4A;
+  --marker:#6A5717; --marker-ink:#FFF3CC; --ngmark:#22304A;
+  --ok:#55C792; --ok-soft:#17301F; --bad:#F08C76; --bad-soft:#3A1F1A; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --paper:#0F131B; --sheet:#171C27; --ink:#E5E9F1; --muted:#9AA4B6; --line:#2B3345; --soft:#1F2533;
+  --pencil:#8AA2FF; --pencil-ink:#0F131B; --pencil-soft:#222B4A;
+  --marker:#6A5717; --marker-ink:#FFF3CC; --ngmark:#22304A;
+  --ok:#55C792; --ok-soft:#17301F; --bad:#F08C76; --bad-soft:#3A1F1A; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--f-ui);margin:0;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--paper)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pencil);outline-offset:2px}
+.mono{font:500 11.5px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.small{font-size:13.5px;color:var(--muted)}
+.wrap{max-width:1240px;margin:0 auto}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--paper);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:12px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand b{font:600 19px/1 var(--f-read);letter-spacing:-.01em}
+.brand .key{display:inline-flex;gap:3px}
+.brand .key i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--ink);display:inline-block}
+.brand .key i:nth-child(2){background:var(--ink)}
+.tabs{display:flex;gap:4px}
+.tabs button{border:0;background:none;padding:7px 12px;border-radius:var(--r);cursor:pointer;color:var(--muted);font-weight:500}
+.tabs button[aria-current="page"]{background:var(--sheet);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.tabs button:hover{color:var(--ink)}
+
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--sheet);padding:8px 14px;border-radius:var(--r);cursor:pointer;font-weight:500;line-height:1.2}
+.btn:hover:not(:disabled){border-color:var(--muted)}
+.btn.primary{background:var(--pencil);border-color:var(--pencil);color:var(--pencil-ink)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08)}
+.btn.ghost{background:transparent}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:var(--sheet)}
+.btn:disabled{opacity:.45;cursor:default}
+.link{border:0;background:none;color:var(--pencil);cursor:pointer;padding:0;font-weight:500;text-decoration:underline;text-underline-offset:3px}
+
+/* library */
+.intro{padding-block:32px 8px;max-width:760px}
+.intro h1{font:600 clamp(30px,5vw,46px)/1.05 var(--f-read);letter-spacing:-.02em;margin:0 0 12px;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--muted);margin:0;max-width:62ch}
+.progress-line{display:flex;gap:20px;margin-top:14px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.progress-line b{color:var(--ink)}
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-block:24px}
+.qc{text-align:left;border:1px solid var(--line);background:var(--sheet);border-radius:var(--r);padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.qc b{font-weight:600}
+.qc span{font-size:13.5px;color:var(--muted)}
+.qc:hover:not(:disabled){border-color:var(--pencil)}
+.qc:disabled{opacity:.55;cursor:default}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.seg{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--sheet);flex-wrap:wrap}
+.seg button{border:0;background:none;padding:7px 12px;cursor:pointer;color:var(--muted);font-size:13.5px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.plist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);background:var(--sheet)}
+.prow{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:16px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.prow:first-child{border-top:0}
+.pinfo{min-width:0;flex:1 1 320px}
+.pinfo h3{font:500 20px/1.25 var(--f-read);margin:6px 0 2px}
+.pmeta{font-size:13px;color:var(--muted)}
+.pact{display:flex;gap:8px;flex-wrap:wrap}
+.bar{height:4px;background:var(--soft);border-radius:2px;margin:10px 0 4px;max-width:280px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pencil)}
+.tag{font:500 10.5px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;padding:4px 7px;border-radius:3px;border:1px solid currentColor;display:inline-block}
+.t-IELTS{color:var(--pencil)} .t-TOEFL{color:var(--ok)} .t-SAT{color:var(--bad)}
+.foot{font-size:12.5px;color:var(--muted);max-width:80ch;margin-top:24px}
+.empty{padding:20px;color:var(--muted)}
+
+/* session */
+.sbar{display:flex;align-items:center;gap:14px;padding-block:14px;flex-wrap:wrap}
+.stitle{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.stitle b{font:500 17px/1.2 var(--f-read)}
+.clockwrap{display:flex;align-items:baseline;gap:8px}
+.clock,.score{font:500 22px/1 var(--f-mono)}
+.clock.low{color:var(--bad)}
+.strip{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.sq{width:30px;height:30px;border:1px solid var(--line);background:var(--sheet);border-radius:4px;font:500 12px/1 var(--f-mono);cursor:pointer;color:var(--muted)}
+.sq.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.sq.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.sq.cur{box-shadow:0 0 0 2px var(--ink)}
+.sgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+.passage{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:22px 26px;position:sticky;top:calc(env(safe-area-inset-top, 0px) + 72px);max-height:calc(100vh - 96px);overflow:auto;min-width:0}
+.ph{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:6px}
+.ptitle{font:600 24px/1.2 var(--f-read);margin:10px 0 4px;text-wrap:balance}
+.para{font:400 17.5px/1.62 var(--f-read);margin:14px 0;position:relative;padding-left:30px;max-width:66ch;border-radius:4px;transition:background .2s}
+.para .pl{position:absolute;left:0;top:3px;font:600 12px/1 var(--f-mono);color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:3px 5px}
+.para.focus{background:var(--pencil-soft);box-shadow:-6px 0 0 var(--pencil-soft),6px 0 0 var(--pencil-soft)}
+mark.ev{background:var(--marker);color:var(--marker-ink);padding:1px 2px;border-radius:2px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+mark.ev.ng{background:var(--ngmark);color:var(--ink);text-decoration:underline dashed var(--muted);text-underline-offset:4px}
+.qpane{min-width:0}
+.qcard{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px}
+.qh{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.instr{font-size:13.5px;color:var(--muted);margin:0 0 6px}
+.stmt{font:500 21px/1.4 var(--f-read);margin:0 0 18px;text-wrap:pretty}
+.bubbles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bub{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--sheet);border-radius:var(--r);padding:10px 12px;cursor:pointer;text-align:left;position:relative}
+.bub .o{width:30px;height:30px;flex:none;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;font:600 11px/1 var(--f-mono)}
+.bub .w{font-weight:600;font-size:13.5px;letter-spacing:.02em}
+.bub kbd{position:absolute;right:8px;top:6px;font:400 10px/1 var(--f-mono);color:var(--muted)}
+.bub:hover:not(:disabled){border-color:var(--ink)}
+.bub.sel .o{background:var(--ink);color:var(--sheet)}
+.bub.right{border-color:var(--ok);background:var(--ok-soft)}
+.bub.right .o{border-color:var(--ok);background:var(--ok);color:var(--sheet)}
+.bub.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.bub.wrong .o{border-color:var(--bad);background:var(--bad);color:var(--sheet)}
+.bub:disabled{cursor:default}
+.bubbles.sm .bub{padding:6px 8px;gap:6px}
+.bubbles.sm .bub .o{width:24px;height:24px;font-size:10px}
+.bubbles.sm .bub .w{font-size:12px}
+.bubbles.sm kbd{display:none}
+.hintrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.hint{margin:0;font-size:14px;flex:1 1 240px}
+.kbdnote{font-size:12px;color:var(--muted)}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+
+/* feedback */
+.fb{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:14px}
+.verdict{font-weight:600;padding:9px 12px;border-radius:var(--r)}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)}
+.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+.fsec h4{margin:0 0 6px;font:500 11.5px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fsec p{margin:0;max-width:65ch}
+.fsec blockquote{margin:0;font:400 16.5px/1.5 var(--f-read);padding:8px 12px;background:var(--marker);color:var(--marker-ink);border-radius:4px}
+.fsec blockquote.ng{background:var(--ngmark);color:var(--ink)}
+.note{font-size:13.5px;color:var(--muted);margin-top:6px!important}
+.miss p{border-left:3px solid var(--bad);padding-left:10px}
+.tree{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;counter-reset:s}
+.tree .st{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;font-size:14px;counter-increment:s}
+.tree .q::before{content:counter(s) ". ";font-family:var(--f-mono);color:var(--muted)}
+.tree .st.yes{border-color:var(--pencil);background:var(--pencil-soft)}
+.tree .st.skip{opacity:.45}
+.tree .r b{font-family:var(--f-mono);font-weight:600}
+.trapcard{border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;background:var(--paper)}
+.trapcard .th{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.trapcard p{margin:6px 0 10px}
+.eyebrow{font:500 10.5px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pencil)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.rulefull{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.rulefull p,.tb p{margin:0 0 10px;max-width:68ch}
+.lab{display:inline-block;font:500 10.5px/1 var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-right:6px;min-width:62px}
+.sig{font-size:14px;margin-bottom:10px}
+.exbox{border:1px solid var(--line);border-radius:var(--r);background:var(--sheet);padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:14px;margin-bottom:10px}
+.exbox .en{font-family:var(--f-read);font-size:15.5px}
+.chk{font-size:14px}
+
+/* exam list */
+.erow{border-top:1px solid var(--line);padding-block:14px;display:flex;flex-direction:column;gap:10px}
+.erow:first-of-type{border-top:0}
+.erow.ok .en{background:var(--ok);color:var(--sheet);border-color:var(--ok)}
+.erow.bad .en{background:var(--bad);color:var(--sheet);border-color:var(--bad)}
+.eq{display:flex;gap:10px;align-items:flex-start}
+.eq p{margin:0;font:400 17px/1.45 var(--f-read)}
+.eq .en{flex:none;width:26px;height:26px;border:1px solid var(--line);border-radius:4px;display:grid;place-items:center;font:500 12px/1 var(--f-mono)}
+.erow .btn{align-self:flex-start}
+
+/* finish & stats */
+.finish{padding-block:32px;max-width:720px}
+.finish h1{font:600 64px/1 var(--f-read);margin:8px 0}
+.tlist{padding-left:18px} .tlist li{margin-bottom:8px}
+.rsec{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin-top:16px}
+.rsec h2{font:600 22px/1.2 var(--f-read);margin:0 0 12px}
+.rsec.reset{background:transparent;border-style:dashed}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px/1.2 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.dtree{display:flex;flex-direction:column;align-items:center;gap:8px}
+.node{border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;text-align:center;max-width:520px;background:var(--paper);font-size:14.5px}
+.node.dq{border-color:var(--ink);font-weight:600;background:var(--sheet)}
+.arrow{color:var(--muted)}
+.branch{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:520px}
+.leaf{border:1px solid var(--line);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;font-size:13px;color:var(--muted)}
+.leaf b{font:600 15px/1.2 var(--f-mono);color:var(--ink)}
+.leaf.f{border-color:var(--bad);background:var(--bad-soft)} .leaf.t{border-color:var(--ok);background:var(--ok-soft)} .leaf.ng{border-color:var(--pencil);background:var(--pencil-soft)}
+.leaf.go{justify-content:center;font-size:18px}
+.algo{padding-left:22px;margin:0;display:flex;flex-direction:column;gap:6px;max-width:70ch}
+.traps{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r)}
+.trap{border-top:1px solid var(--line)} .trap:first-child{border-top:0}
+.trap summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;padding:12px 14px;list-style:none;align-items:baseline;flex-wrap:wrap}
+.trap summary::-webkit-details-marker{display:none}
+.trap summary .tn{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.trap summary .tn::before{content:"+";font-family:var(--f-mono);color:var(--muted);width:12px}
+.trap[open] summary .tn::before{content:"−"}
+.trap .ts{font-size:12.5px;color:var(--muted)}
+.trap .tb{padding:0 14px 16px 36px}
+.trap .short{font-weight:500}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.kpis div{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.kpis b{font:600 30px/1 var(--f-read)}
+.hbars{display:flex;flex-direction:column;gap:8px}
+.hb{display:grid;grid-template-columns:minmax(120px,190px) minmax(60px,1fr) auto auto;gap:10px;align-items:center;font-size:14px}
+.track{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--ok)}
+.track.weak i{background:var(--bad)}
+.hv{font-size:13px;color:var(--muted);white-space:nowrap}
+.insight{margin-top:14px;border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;background:var(--paper)}
+.insight p{margin:6px 0 0}
+.wlist{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column}
+.wlist li{border-top:1px solid var(--line);padding-block:10px}
+.wlist p{margin:4px 0;font-family:var(--f-read);font-size:16px}
+
+@media (max-width: 900px){
+  .sgrid{grid-template-columns:minmax(0,1fr)}
+  .passage{position:relative;top:0;max-height:52vh;padding:16px 18px}
+  .para{font-size:16.5px}
+  .stmt{font-size:19px}
+}
+@media (max-width: 560px){
+  .bubbles{grid-template-columns:1fr}
+  .bubbles.sm{grid-template-columns:repeat(3,1fr)}
+  .bubbles.sm .bub .w{display:none}
+  .bubbles.sm .bub{justify-content:center}
+  .kpis{grid-template-columns:1fr}
+  .hb{grid-template-columns:1fr auto auto}
+  .hb .track{grid-column:1 / -1;grid-row:2}
+  .branch{grid-template-columns:1fr}
+  .tabs button{padding:7px 9px}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;scroll-behavior:auto!important} }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="key" aria-hidden="true"><i></i><i></i><i></i></span><b>TFNG Trenajori</b></div>
+    <nav class="tabs" aria-label="Boʻlimlar">
+      <button data-act="tab" data-v="lib">Matnlar</button>
+      <button data-act="tab" data-v="rules">Qoidalar</button>
+      <button data-act="tab" data-v="stats">Natijalar</button>
+    </nav>
+  </header>
+  <main id="view"></main>
+</div>
+<script>
+// Barcha matnlar ushbu trenajor uchun yozilgan original matnlar (IELTS, TOEFL va SAT uslubida).
+const PASSAGES = [
+{
+  id: "p1", exam: "IELTS", level: 2, title: "The Revival of Ancient Grains", topic: "Qishloq xoʻjaligi",
+  paras: [
+    "Over the past fifteen years, grains such as emmer, einkorn and spelt — collectively described as “ancient grains” because they have changed little through selective breeding — have moved from health-food shops into mainstream supermarkets. Sales in the United Kingdom alone rose almost threefold between 2010 and 2020, although they still represent less than two per cent of the total flour market.",
+    "Much of the appeal is nutritional. Einkorn, for instance, contains higher levels of protein and of the antioxidant lutein than modern bread wheat. Many consumers also believe that ancient grains are easier to digest, and some people who report sensitivity to modern wheat say they tolerate spelt better. Clinical trials, however, have so far produced inconsistent results, and spelt contains gluten in quantities comparable to those in ordinary wheat, making it unsuitable for people with coeliac disease.",
+    "For farmers, the picture is more complicated. Ancient grains generally yield between a third and a half less than modern varieties, and their tall, slender stalks are prone to falling over in heavy rain. Their husks must also be removed in a separate process before milling, which adds to costs. On the other hand, they typically require less fertiliser and can thrive on poorer soils where modern wheat would struggle.",
+    "Some agricultural scientists see these grains as a genetic resource rather than a commercial crop in their own right. By crossing them with modern wheat, breeders hope to introduce traits such as drought tolerance into high-yielding varieties. Whether consumers will continue to pay premium prices for the original grains once such hybrids are available remains an open question."
+  ],
+  qs: [
+    {s:"Ancient grains have been altered relatively little by selective breeding.", a:"T", p:0, kw:"selective breeding", ev:"because they have changed little through selective breeding", trap:"paraphrase", lv:1,
+     ex:"Matn: “changed little through selective breeding”. Bayonot: “altered relatively little” — “changed little” ning sinonimi. Mavzu ham, maʼno ham bir xil, faqat soʻzlar almashgan."},
+    {s:"UK sales of ancient grains more than tripled between 2010 and 2020.", a:"F", p:0, kw:"2010", ev:"rose almost threefold between 2010 and 2020", trap:"quantifier", lv:3,
+     ex:"“almost threefold” — deyarli uch barobar, yaʼni uch barobardan sal KAM. “more than tripled” — uch barobardan KOʻP. Bitta kichik soʻz (almost ↔ more than) miqdorni teskari qilgan → FALSE."},
+    {s:"Einkorn contains more protein than any other ancient grain.", a:"NG", p:1, kw:"protein", ev:"Einkorn, for instance, contains higher levels of protein and of the antioxidant lutein than modern bread wheat.", trap:"superlative", lv:2,
+     ex:"Matn einkornni faqat zamonaviy bugʻdoy (modern bread wheat) bilan solishtiradi. Boshqa qadimiy donlar (emmer, spelt) bilan solishtirish yoʻq — na tasdiq, na inkor → NOT GIVEN."},
+    {s:"Scientific studies have confirmed that spelt is easier to digest than modern wheat.", a:"F", p:1, kw:"digest", ev:"Clinical trials, however, have so far produced inconsistent results", trap:"hedging", lv:2,
+     ex:"“Hazm qilish oson” degani — isteʼmolchilar ishonchi (Many consumers also believe). Matnning oʻzi esa klinik sinovlar natijasi bir-biriga zid ekanini aytadi, yaʼni hali tasdiqlanmagan. Matn hukm chiqargan, “confirmed” daʼvosi unga zid → FALSE."},
+    {s:"Spelt contains considerably less gluten than ordinary wheat.", a:"F", p:1, kw:"gluten", ev:"spelt contains gluten in quantities comparable to those in ordinary wheat", trap:"comparison", lv:2,
+     ex:"“comparable” — taqqoslasha boʻladigan, deyarli teng. “considerably less” — ancha kam. Qiyoslash matnga zid → FALSE."},
+    {s:"Ancient grains are more resistant to pests than modern varieties.", a:"NG", p:2, kw:"On the other hand", ev:"On the other hand, they typically require less fertiliser and can thrive on poorer soils where modern wheat would struggle.", trap:"specificity", lv:2,
+     ex:"Matnda qadimiy donlarning faqat ikki afzalligi sanalgan: kam oʻgʻit va kambagʻal tuproqqa chidamlilik. Zararkunandalar (pests) haqida hech narsa yoʻq. Bayonot yangi detal qoʻshgan → NOT GIVEN."},
+    {s:"Ancient grains can do well in soil conditions that would cause difficulties for modern wheat.", a:"T", p:2, kw:"poorer soils", ev:"can thrive on poorer soils where modern wheat would struggle", trap:"paraphrase", lv:2,
+     ex:"thrive = do well; would struggle = would cause difficulties. Ikki sinonim bir vaqtda ishlatilgan, maʼno oʻzgarmagan → TRUE."},
+    {s:"Breeders aim to transfer certain characteristics of ancient grains into modern wheat.", a:"T", p:3, kw:"breeders", ev:"By crossing them with modern wheat, breeders hope to introduce traits such as drought tolerance into high-yielding varieties.", trap:"paraphrase", lv:2,
+     ex:"hope to = aim to; traits = characteristics; introduce into = transfer into. Uch soʻzning hammasi sinonim bilan almashtirilgan → TRUE."},
+    {s:"Prices of ancient grains are expected to fall once hybrid varieties become available.", a:"NG", p:3, kw:"hybrids", ev:"Whether consumers will continue to pay premium prices for the original grains once such hybrids are available remains an open question.", trap:"assumption", lv:3,
+     ex:"Matn kelajakni ochiq qoldiradi: “remains an open question”. Narx tushishi kutilyaptimi — aytilmagan. Matn narx tushmaydi ham demaydi, shuning uchun FALSE emas. Bu kelajak haqidagi taxmin → NOT GIVEN."}
+  ]
+},
+{
+  id: "p2", exam: "IELTS", level: 2, title: "Ice Cores: Archives of Past Climates", topic: "Iqlimshunoslik",
+  paras: [
+    "Deep beneath the surface of Antarctica and Greenland lie layers of ice that have accumulated, snowfall by snowfall, over hundreds of thousands of years. By drilling cylinders of this ice — known as ice cores — and analysing them in laboratories, scientists can reconstruct the planet's climate across timescales far longer than any written record. The oldest continuous core so far recovered, drilled at Dome C in East Antarctica, covers roughly 800,000 years.",
+    "The value of ice cores lies partly in the air they contain. As snow is compressed into ice, tiny bubbles of atmosphere become trapped, preserving a sample of the air at the time. Measurements from these bubbles show that carbon dioxide concentrations rose and fell in step with temperature through successive ice ages, but at no point in the 800,000-year record did they approach present-day levels.",
+    "Temperature itself is estimated indirectly, from the ratio of heavy to light forms of oxygen and hydrogen in the ice. This method is generally reliable, but it becomes less precise in the deepest sections, where the layers are thinned and distorted by the weight of the ice above. Dating these sections therefore relies partly on computer models of ice flow.",
+    "Ice cores also record more sudden events. Layers of volcanic ash and sulphate allow researchers to identify major eruptions, sometimes to within a single year, while spikes in dust indicate periods when the climate was drier and windier. Several research teams are now searching for sites where ice older than one million years may survive, though no such core has yet been extracted."
+  ],
+  qs: [
+    {s:"Ice cores can provide information about periods far earlier than human written records.", a:"T", p:0, kw:"written record", ev:"across timescales far longer than any written record", trap:"paraphrase", lv:1,
+     ex:"“far longer than any written record” — har qanday yozma manbadan ancha uzoq davr. Bayonot buni “far earlier than written records” deb qayta ifodalagan → TRUE."},
+    {s:"The Dome C core was the first ice core to be drilled in East Antarctica.", a:"NG", p:0, kw:"Dome C", ev:"The oldest continuous core so far recovered, drilled at Dome C in East Antarctica, covers roughly 800,000 years.", trap:"sequence", lv:2,
+     ex:"Matn Dome C yadrosini “eng qadimgi” (oldest) deydi — bu muzning yoshi haqida. “first ... to be drilled” esa burgʻulash tartibi haqida. Eng qadimgi ≠ birinchi burgʻulangan. Tartib aytilmagan → NOT GIVEN."},
+    {s:"Carbon dioxide levels over the past 800,000 years were at times higher than they are today.", a:"F", p:1, kw:"present-day", ev:"at no point in the 800,000-year record did they approach present-day levels", trap:"negation", lv:2,
+     ex:"“at no point ... did they approach” — hech qachon hozirgi darajaga hatto yaqinlashmagan. Demak, undan yuqori boʻlishi umuman mumkin emas. Inkor (at no point) bayonotga zid → FALSE."},
+    {s:"Carbon dioxide and temperature changed together during past ice ages.", a:"T", p:1, kw:"in step", ev:"carbon dioxide concentrations rose and fell in step with temperature through successive ice ages", trap:"paraphrase", lv:1,
+     ex:"“rose and fell in step with” — birga oʻsib, birga kamaygan = “changed together” → TRUE."},
+    {s:"Rising carbon dioxide caused the temperature increases at the end of each ice age.", a:"NG", p:1, kw:"in step", ev:"carbon dioxide concentrations rose and fell in step with temperature through successive ice ages", trap:"causal", lv:3,
+     ex:"Matn faqat ikkisi BIRGA oʻzgarganini aytadi (in step). Qaysi biri sabab, qaysi biri oqibat — aytilmagan. Bogʻliqlik ≠ sabab. Bayonot matnda yoʻq sabab–oqibat munosabatini qoʻshgan → NOT GIVEN."},
+    {s:"The method used to estimate past temperatures is equally accurate throughout the core.", a:"F", p:2, kw:"precise", ev:"it becomes less precise in the deepest sections", trap:"generalization", lv:2,
+     ex:"Matn: eng chuqur qismlarda usul aniqligi pasayadi. “equally accurate throughout” — butun yadro boʻylab bir xil aniq. Bu umumlashtirish matndagi istisnoga zid → FALSE."},
+    {s:"The age of the deepest ice is determined entirely by computer models.", a:"F", p:2, kw:"computer models", ev:"Dating these sections therefore relies partly on computer models of ice flow.", trap:"absolute", lv:2,
+     ex:"partly = qisman; entirely = butunlay. Kuchaytiruvchi soʻz matndagi chegarani buzgan → FALSE."},
+    {s:"A high concentration of dust in the ice points to a time of drier weather.", a:"T", p:3, kw:"dust", ev:"spikes in dust indicate periods when the climate was drier and windier", trap:"paraphrase", lv:1,
+     ex:"spikes in dust = chang miqdorining keskin ortishi; indicate = points to. Bayonot matndagi ikki belgidan bittasini (drier) olgan — bu yetarli, chunki aytilgani matnda bor → TRUE."},
+    {s:"Scientists expect to find ice older than one million years within the next decade.", a:"NG", p:3, kw:"one million", ev:"Several research teams are now searching for sites where ice older than one million years may survive, though no such core has yet been extracted.", trap:"time", lv:2,
+     ex:"Matn faqat qidiruv davom etayotganini va hali topilmaganini aytadi. Qachon topilish kutilishi (within the next decade) haqida hech narsa yoʻq → NOT GIVEN."}
+  ]
+},
+{
+  id: "p3", exam: "IELTS", level: 3, title: "The Psychology of Choice Overload", topic: "Psixologiya",
+  paras: [
+    "In a widely cited experiment conducted in a Californian supermarket in 1995, shoppers were offered samples of jam from a display of either six or twenty-four varieties. The larger display attracted more visitors, yet those who saw only six varieties were roughly ten times more likely to make a purchase. The finding was quickly taken up in business books and marketing seminars as evidence that offering too many options discourages people from choosing at all — a phenomenon labelled “choice overload”.",
+    "Subsequent research has complicated this picture. A 2010 analysis that combined the results of fifty studies found that, on average, the size of an assortment had virtually no effect on whether people made a choice or how satisfied they were with it. The effect appeared in some studies, disappeared in others, and occasionally reversed, with larger assortments leading to greater satisfaction.",
+    "More recent work has therefore shifted from asking whether choice overload exists to asking when it occurs. A later review identified several conditions that make it more likely: when the options are difficult to compare, when the decision-maker has no clear prior preference, and when the person feels under time pressure. Experts in a field, by contrast, appear largely immune, since they can quickly discard unsuitable options.",
+    "Not all psychologists accept this conditional view. Some argue that the original effect was inflated by small sample sizes and that, once these are taken into account, little remains to be explained. Others maintain that the phenomenon is real but too context-dependent to offer reliable guidance to retailers."
+  ],
+  qs: [
+    {s:"More shoppers stopped at the display offering twenty-four varieties.", a:"T", p:0, kw:"larger display", ev:"The larger display attracted more visitors", trap:"paraphrase", lv:1,
+     ex:"The larger display — 24 xil murabbo qoʻyilgan stend. “attracted more visitors” — koʻproq xaridor yaqinlashgan (= stopped at) → TRUE."},
+    {s:"The smaller display resulted in more jam being sold overall.", a:"NG", p:0, kw:"ten times", ev:"those who saw only six varieties were roughly ten times more likely to make a purchase", trap:"assumption", lv:3,
+     ex:"Matn sotib olish EHTIMOLI haqida gapiradi, umumiy sotuv hajmi haqida emas. Katta stendga koʻproq odam kelgan, lekin qancha koʻp — nomaʼlum. Umumiy sotuv matnda tilga olinmagan; uni hisob-kitob bilan ham topib boʻlmaydi → NOT GIVEN. Qoida: bayonot matnda tilga olinmagan mavzu haqida boʻlsa — NOT GIVEN tomonga qarang."},
+    {s:"The 1995 jam study was the first experiment to investigate choice overload.", a:"NG", p:0, kw:"1995", ev:"In a widely cited experiment conducted in a Californian supermarket in 1995", trap:"sequence", lv:2,
+     ex:"Matn tajribani “widely cited” (koʻp iqtibos keltirilgan, mashhur) deydi, “birinchi” demaydi. Mashhur ≠ birinchi. Undan oldin boshqa tajriba boʻlganmi — aytilmagan → NOT GIVEN."},
+    {s:"The 2010 analysis found that larger assortments consistently reduced customer satisfaction.", a:"F", p:1, kw:"2010", ev:"the size of an assortment had virtually no effect on whether people made a choice or how satisfied they were with it", trap:"generalization", lv:2,
+     ex:"Tahlil natijasi: ortacha deyarli hech qanday taʼsir yoʻq, baʼzan esa teskari natija boʻlgan. “consistently reduced” — doimo kamaytirgan — matnga zid → FALSE."},
+    {s:"In a few studies, people were more satisfied when offered more options.", a:"T", p:1, kw:"reversed", ev:"occasionally reversed, with larger assortments leading to greater satisfaction", trap:"paraphrase", lv:2,
+     ex:"occasionally = baʼzan (= in a few studies); larger assortments leading to greater satisfaction = tanlov koʻp boʻlganda qoniqish yuqoriroq → TRUE."},
+    {s:"Choice overload is less likely to occur when people already know what they want.", a:"T", p:2, kw:"prior preference", ev:"when the decision-maker has no clear prior preference", trap:"negation", lv:3,
+     ex:"Matn: oldindan aniq tanlov boʻlmasa (no clear prior preference), choice overload ehtimoli ORTADI. Bayonot buni teskari tomondan aytadi: odam nima istashini bilsa, ehtimol KAMROQ. Mavzu bir xil — choice overload yuz berish sharti; faqat inkor orqali ifodalangan → TRUE."},
+    {s:"Experts are completely unaffected by choice overload.", a:"F", p:2, kw:"Experts", ev:"Experts in a field, by contrast, appear largely immune", trap:"absolute", lv:2,
+     ex:"largely immune = asosan taʼsirlanmaydi; completely = butunlay. “largely” istisnoga joy qoldiradi, “completely” uni yoʻqqa chiqaradi. Ustiga “appear” — ehtiyotkor ifoda → FALSE."},
+    {s:"All psychologists now agree that choice overload occurs only under certain conditions.", a:"F", p:3, kw:"Not all", ev:"Not all psychologists accept this conditional view.", trap:"quantifier", lv:1,
+     ex:"Matn ochiq aytadi: hamma psixologlar emas (Not all). “All ... agree” — zid → FALSE."},
+    {s:"Small sample sizes exaggerated the results of the original jam study.", a:"NG", p:3, kw:"sample sizes", ev:"Some argue that the original effect was inflated by small sample sizes", trap:"opinion", lv:3,
+     ex:"Bu baʼzi psixologlarning FIKRI (Some argue). Matn bu fikrni na tasdiqlaydi, na rad etadi; yonida qarshi fikr ham keltirilgan. Bayonot fikrni fakt sifatida bergan → NOT GIVEN. (Agar bayonot “Some psychologists think...” deb boshlanganda edi — TRUE boʻlardi.)"},
+    {s:"Some psychologists believe the effect exists but is of limited practical use to shops.", a:"T", p:3, kw:"retailers", ev:"Others maintain that the phenomenon is real but too context-dependent to offer reliable guidance to retailers.", trap:"attribution", lv:2,
+     ex:"Fikr egasi toʻgʻri: Others (= some psychologists) maintain (= believe). is real = exists; too context-dependent to offer reliable guidance to retailers = doʻkonlar uchun amaliy foydasi cheklangan → TRUE."}
+  ]
+},
+{
+  id: "p4", exam: "IELTS", level: 2, title: "Desert Locusts", topic: "Biologiya",
+  paras: [
+    "For most of their lives, desert locusts are solitary insects, avoiding one another and causing little damage. When rain follows a prolonged drought, however, vegetation grows rapidly and locust numbers increase. As the vegetation later dries out, the insects are forced into ever smaller patches of green, and the frequent physical contact triggers a remarkable transformation: within a few hours their behaviour changes, and over successive generations their colour and body shape alter as well. They become “gregarious”, seeking each other out and eventually forming swarms.",
+    "Swarms vary greatly in size, from less than one square kilometre to several hundred, and can contain up to 80 million locusts per square kilometre. Carried by the wind, swarms may travel more than 100 kilometres in a day, and each locust can consume roughly its own body weight in fresh vegetation daily. The upsurge of 2019–2021, which affected more than twenty countries across East Africa and South-West Asia, was the worst in Kenya for seventy years.",
+    "Control currently depends mainly on chemical pesticides sprayed from vehicles or aircraft. Because these chemicals can harm other wildlife and contaminate water supplies, biological alternatives have been developed, most notably a fungus that infects locusts but is harmless to other animals. The fungus acts more slowly than chemicals, typically taking a week or more to kill, which limits its usefulness once a swarm is already on the move.",
+    "Most specialists agree that the most effective strategy is prevention: detecting and treating locust populations in the early stages, before swarms form. This depends on regular monitoring in remote breeding areas, some of which are difficult to reach because of insecurity."
+  ],
+  qs: [
+    {s:"Solitary locusts actively seek out other locusts.", a:"F", p:0, kw:"solitary", ev:"avoiding one another", trap:"wordmatch", lv:1,
+     ex:"Matn: yolgʻiz chigirtkalar bir-biridan qochadi (avoiding one another). “seeking each other out” — bu gregar bosqichdagi xulq. Bayonot ikki bosqichni aralashtirgan → FALSE."},
+    {s:"A locust's behaviour changes more quickly than its physical appearance.", a:"T", p:0, kw:"few hours", ev:"within a few hours their behaviour changes, and over successive generations their colour and body shape alter as well", trap:"comparison", lv:3,
+     ex:"Xulq: bir necha soatda oʻzgaradi. Rang va tana shakli: bir necha avlod davomida. Ikkala muddat ham bitta jumlada aytilgan, ularni solishtirishning oʻzi yetarli: xulq tezroq → TRUE."},
+    {s:"The transformation into the gregarious phase is set off by repeated physical contact between locusts.", a:"T", p:0, kw:"physical contact", ev:"the frequent physical contact triggers a remarkable transformation", trap:"paraphrase", lv:1,
+     ex:"frequent = repeated; triggers = sets off → TRUE."},
+    {s:"Every locust swarm covers several hundred square kilometres.", a:"F", p:1, kw:"vary greatly", ev:"Swarms vary greatly in size, from less than one square kilometre to several hundred", trap:"generalization", lv:2,
+     ex:"Matn: galalar hajmi juda farq qiladi — bir kvadrat kilometrdan kamdan bir necha yuzgacha. “Every swarm covers several hundred” — eng katta holatni hammaga yoyish. Matndagi kichik galalar bunga zid → FALSE."},
+    {s:"Locust swarms usually travel at night.", a:"NG", p:1, kw:"100 kilometres", ev:"Carried by the wind, swarms may travel more than 100 kilometres in a day", trap:"specificity", lv:1,
+     ex:"Matn masofa va shamol haqida gapiradi, sutkaning qaysi vaqtida uchishini aytmaydi. Diqqat: “in a day” = bir sutkada, kunduzi degani emas → NOT GIVEN."},
+    {s:"The 2019–2021 upsurge was the most severe ever recorded in East Africa.", a:"NG", p:1, kw:"2019–2021", ev:"was the worst in Kenya for seventy years", trap:"superlative", lv:3,
+     ex:"Matn: Keniyada 70 yil ichidagi eng yomoni. Bayonot: butun Sharqiy Afrikada, tarixdagi eng yomoni. Ikki chegara kengaytirilgan (Keniya → Sharqiy Afrika, 70 yil → ever). Lekin matn bunga zid gap ham aytmaydi → NOT GIVEN."},
+    {s:"The fungus used against locusts poses no danger to other animals.", a:"T", p:2, kw:"fungus", ev:"a fungus that infects locusts but is harmless to other animals", trap:"paraphrase", lv:1,
+     ex:"harmless to other animals = poses no danger to other animals → TRUE."},
+    {s:"The biological method is more expensive than chemical spraying.", a:"NG", p:2, kw:"biological alternatives", ev:"The fungus acts more slowly than chemicals, typically taking a week or more to kill", trap:"specificity", lv:2,
+     ex:"Biologik usulning kamchiligi sifatida faqat SEKINLIGI aytilgan. Narx haqida hech narsa yoʻq. Bayonot yangi detal (narx) qoʻshgan → NOT GIVEN."},
+    {s:"The fungus is particularly useful against swarms that are already migrating.", a:"F", p:2, kw:"on the move", ev:"which limits its usefulness once a swarm is already on the move", trap:"wordmatch", lv:2,
+     ex:"“usefulness” soʻzi ikkalasida ham bor, lekin matnda “limits its usefulness” — foydasini cheklaydi. Soʻz bir xil, maʼno teskari → FALSE."},
+    {s:"All specialists believe prevention is the best approach to locust control.", a:"F", p:3, kw:"specialists", ev:"Most specialists agree that the most effective strategy is prevention", trap:"quantifier", lv:2,
+     ex:"Most ≠ All. Matn koʻpchilik deydi, demak baʼzi mutaxassislar boshqacha oʻylaydi → FALSE."}
+  ]
+},
+{
+  id: "p5", exam: "IELTS", level: 3, title: "The Origins of Writing", topic: "Tarix",
+  paras: [
+    "For much of the twentieth century, scholars assumed that writing had been invented only once, in Mesopotamia, and had spread from there to other parts of the world. Most now accept that it emerged independently in at least three, and probably four, places: Mesopotamia, Egypt, China and Mesoamerica.",
+    "The earliest Mesopotamian writing, dating from around 3300 BCE, was not used to record speech, literature or history. Clay tablets from the city of Uruk list quantities of grain, livestock and labour, suggesting that writing developed from accounting practices in increasingly complex urban economies. Indeed, some archaeologists trace its roots to small clay tokens, used for thousands of years earlier to represent goods, although this theory is not universally accepted.",
+    "Egyptian hieroglyphs appear only slightly later than the first Mesopotamian signs, and the closeness in dates once led researchers to assume that the idea of writing had passed from one region to the other. The discovery in the 1980s of inscribed labels at Abydos, dated to about 3250 BCE, weakened this view, since the Egyptian system differs from the Mesopotamian one in both its signs and its structure.",
+    "Chinese writing is first attested in inscriptions on bones and turtle shells from around 1200 BCE, used for divination at the court of the Shang kings. The script is already so developed at this stage that many specialists believe earlier forms must have existed, written perhaps on bamboo or other perishable materials that have not survived."
+  ],
+  qs: [
+    {s:"Scholars today generally agree that writing was invented in more than one place.", a:"T", p:0, kw:"Most now accept", ev:"Most now accept that it emerged independently in at least three, and probably four, places", trap:"paraphrase", lv:1,
+     ex:"Most now accept = bugun koʻpchilik qabul qiladi = generally agree. at least three = birdan ortiq joy → TRUE."},
+    {s:"It is known for certain that writing arose independently in exactly four regions.", a:"F", p:0, kw:"probably four", ev:"at least three, and probably four", trap:"hedging", lv:3,
+     ex:"Matn: kamida uchta, EHTIMOL toʻrtta. “probably” — aniq emas. Matnning oʻzi bu raqam taxminiy ekanini aytgan, shuning uchun “known for certain ... exactly four” daʼvosi unga zid → FALSE."},
+    {s:"The earliest Mesopotamian texts were mainly concerned with economic matters.", a:"T", p:1, kw:"Uruk", ev:"Clay tablets from the city of Uruk list quantities of grain, livestock and labour, suggesting that writing developed from accounting practices", trap:"paraphrase", lv:2,
+     ex:"Don, chorva va ishchi kuchi miqdori roʻyxati — xoʻjalik hisobi (accounting). Bayonot buni umumiy soʻz bilan “economic matters” deb atagan. Bundan tashqari, matn adabiyot va tarix yozilmaganini ham aytadi → TRUE."},
+    {s:"All archaeologists believe that writing grew out of the use of clay tokens.", a:"F", p:1, kw:"tokens", ev:"although this theory is not universally accepted", trap:"quantifier", lv:1,
+     ex:"“some archaeologists” va “not universally accepted” — hamma emas. “All” → FALSE."},
+    {s:"The clay tokens were made by the same people who later built Uruk.", a:"NG", p:1, kw:"tokens", ev:"some archaeologists trace its roots to small clay tokens, used for thousands of years earlier to represent goods", trap:"specificity", lv:2,
+     ex:"Matn tokenlar nima uchun ishlatilganini aytadi, kim yasaganini emas. Bayonot yangi detal qoʻshgan → NOT GIVEN."},
+    {s:"Egyptian hieroglyphs appeared considerably earlier than Mesopotamian writing.", a:"F", p:2, kw:"slightly later", ev:"Egyptian hieroglyphs appear only slightly later than the first Mesopotamian signs", trap:"sequence", lv:2,
+     ex:"Matn: biroz KEYIN (slightly later). Bayonot: ancha OLDIN. Ham tartib, ham farq miqdori zid → FALSE."},
+    {s:"The Abydos labels were discovered by a British expedition.", a:"NG", p:2, kw:"Abydos", ev:"The discovery in the 1980s of inscribed labels at Abydos, dated to about 3250 BCE, weakened this view", trap:"specificity", lv:1,
+     ex:"Matn topilma vaqti (1980-yillar) va yoshini aytadi; kim topgani aytilmagan → NOT GIVEN."},
+    {s:"The Shang inscriptions are the oldest known examples of Chinese writing.", a:"T", p:3, kw:"first attested", ev:"Chinese writing is first attested in inscriptions on bones and turtle shells from around 1200 BCE", trap:"paraphrase", lv:3,
+     ex:"“first attested” — ilk bor qayd etilgan, yaʼni bizgacha yetib kelgan eng qadimgi namunalar = “oldest known”. “known” soʻzi muhim: mutaxassislar bundan oldin ham yozuv boʻlgan deb hisoblaydi, lekin u saqlanmagan. Shuning uchun “oldest EVER” emas, “oldest KNOWN” → TRUE."},
+    {s:"Examples of pre-Shang Chinese writing on bamboo have been found.", a:"F", p:3, kw:"bamboo", ev:"written perhaps on bamboo or other perishable materials that have not survived", trap:"wordmatch", lv:2,
+     ex:"“bamboo” soʻzi matnda bor, lekin u yerda bunday materiallar SAQLANMAGANI (have not survived) aytilgan. Topilgan boʻlishi mumkin emas → FALSE."},
+    {s:"Divination was the most important activity at the Shang court.", a:"NG", p:3, kw:"divination", ev:"used for divination at the court of the Shang kings", trap:"superlative", lv:2,
+     ex:"Matn yozuv fol ochish uchun ishlatilganini aytadi. Bu saroydagi eng muhim faoliyatmi — baho yoʻq → NOT GIVEN."}
+  ]
+},
+{
+  id: "p6", exam: "TOEFL", level: 2, title: "Coral Bleaching", topic: "Ekologiya",
+  paras: [
+    "Reef-building corals depend on a partnership with microscopic algae called zooxanthellae, which live inside the coral's tissues. Through photosynthesis, the algae supply the coral with as much as 90 percent of its energy, and in return they receive shelter and nutrients. The algae are also responsible for much of the coral's color.",
+    "When water temperatures rise even 1°C above the usual summer maximum for several weeks, this partnership can break down. The stressed algae begin producing harmful chemicals, and the coral expels them, leaving its tissue transparent so that the white limestone skeleton shows through — a process known as bleaching. A bleached coral is not dead. If temperatures return to normal fairly quickly, it may regain algae and recover; if the stress continues, it is likely to starve.",
+    "Mass bleaching events were virtually unknown before the 1980s. Since then they have become more frequent, and the intervals between them have shortened, leaving reefs less time to recover. The Great Barrier Reef experienced severe bleaching in 2016 and 2017, the first time it had been affected in consecutive years.",
+    "Not all corals are equally vulnerable. Some species, and some populations within a species, tolerate heat better, possibly because they host more heat-resistant types of algae. Researchers are investigating whether such corals could be bred and transplanted to restore damaged reefs, although critics warn that this approach cannot keep pace with the scale of warming."
+  ],
+  qs: [
+    {s:"Corals obtain all of their energy from the algae living in their tissues.", a:"F", p:0, kw:"90 percent", ev:"the algae supply the coral with as much as 90 percent of its energy", trap:"quantifier", lv:1,
+     ex:"“as much as 90 percent” — 90 foizgacha. “all” — 100 %. Demak, kamida 10 % energiya boshqa manbadan keladi → FALSE."},
+    {s:"The relationship between corals and algae benefits both partners.", a:"T", p:0, kw:"in return", ev:"and in return they receive shelter and nutrients", trap:"paraphrase", lv:1,
+     ex:"Korall energiya oladi, suvoʻtlar esa evaziga (in return) boshpana va ozuqa oladi. Ikkala tomon foyda koʻrmoqda → TRUE."},
+    {s:"Bleached corals turn white because their skeletons change color.", a:"F", p:1, kw:"skeleton", ev:"leaving its tissue transparent so that the white limestone skeleton shows through", trap:"causal", lv:3,
+     ex:"Matn sababni aniq aytadi: toʻqima tiniq boʻlib qoladi va oq skelet koʻrinib qoladi. Skelet rangini oʻzgartirmaydi — u avvaldan oq. Matn boshqa sababni koʻrsatgan, bayonotdagi sabab unga zid → FALSE."},
+    {s:"Bleached corals always die within a few weeks.", a:"F", p:1, kw:"not dead", ev:"A bleached coral is not dead.", trap:"absolute", lv:1,
+     ex:"Matn: oqargan korall oʻlik emas, harorat tez normallashsa tiklanishi mumkin. “always die” — istisnosiz oʻlim — zid → FALSE."},
+    {s:"Mass bleaching events have become more common since the 1980s.", a:"T", p:2, kw:"1980s", ev:"Since then they have become more frequent", trap:"paraphrase", lv:1,
+     ex:"more frequent = more common; Since then = 1980-yillardan beri → TRUE."},
+    {s:"The bleaching of 2017 was the most severe in the history of the Great Barrier Reef.", a:"NG", p:2, kw:"consecutive", ev:"The Great Barrier Reef experienced severe bleaching in 2016 and 2017, the first time it had been affected in consecutive years.", trap:"superlative", lv:3,
+     ex:"Matnda “first time” bor, lekin u faqat KETMA-KET ikki yilga tegishli. 2016 va 2017-yilgi oqarish ikkalasi ham “severe” deb atalgan, bir-biri bilan ham, oʻtmish bilan ham solishtirilmagan. “eng kuchli” degan baho yoʻq → NOT GIVEN."},
+    {s:"Heat-tolerant corals contain a larger number of algae than other corals.", a:"NG", p:3, kw:"heat-resistant", ev:"possibly because they host more heat-resistant types of algae", trap:"wordmatch", lv:3,
+     ex:"Matnda “more” soʻzi bor, lekin u suvoʻtlarning TURLARIGA (types) tegishli: issiqqa chidamliroq turlar. Suvoʻtlar SONI haqida hech narsa yoʻq. Ustiga matn “possibly” deb ehtiyotkor gapiradi → NOT GIVEN."},
+    {s:"Breeding heat-tolerant corals is already being used to restore reefs on a large scale.", a:"F", p:3, kw:"investigating", ev:"Researchers are investigating whether such corals could be bred and transplanted to restore damaged reefs", trap:"time", lv:2,
+     ex:"“are investigating whether ... could” — hozircha faqat oʻrganilmoqda, qoʻllanilmayapti. “already being used ... on a large scale” — zid → FALSE."},
+    {s:"Critics doubt that coral breeding can work quickly enough to match the rate of warming.", a:"T", p:3, kw:"critics", ev:"critics warn that this approach cannot keep pace with the scale of warming", trap:"attribution", lv:2,
+     ex:"Fikr egasi toʻgʻri (critics). cannot keep pace with = isishga yetishib ola olmaydi = cannot work quickly enough to match → TRUE."},
+    {s:"Zooxanthellae are found only in reef-building corals.", a:"NG", p:0, kw:"zooxanthellae", ev:"Reef-building corals depend on a partnership with microscopic algae called zooxanthellae, which live inside the coral's tissues.", trap:"absolute", lv:2,
+     ex:"Matn bu suvoʻtlar rif quruvchi korallarda yashashini aytadi, lekin FAQAT ular ichidami — aytilmagan. “only” soʻzini matndan topa olmaysiz, zid maʼlumot ham yoʻq → NOT GIVEN."}
+  ]
+},
+{
+  id: "p7", exam: "TOEFL", level: 3, title: "The Hudson River School", topic: "Sanʼat tarixi",
+  paras: [
+    "The Hudson River School was a loosely connected group of American landscape painters active from about 1825 to 1875. Although the name refers to the valley north of New York City where its earliest members worked, later artists associated with the movement painted scenes as far away as the Rocky Mountains, the Arctic and South America. The term itself was originally used by a critic in the 1870s, by which time the style had begun to seem old-fashioned.",
+    "Thomas Cole, usually regarded as the group's founder, emigrated from England as a young man. His paintings combined carefully observed natural detail with dramatic lighting and, frequently, moral or religious themes. Cole was deeply concerned about the spread of railways and logging into the wilderness, and several of his works contrast untouched landscapes with signs of human intrusion.",
+    "The second generation, including Frederic Church and Albert Bierstadt, produced enormous canvases that were exhibited individually, often in darkened rooms with dramatic lighting, to paying audiences. Church's Heart of the Andes, shown in New York in 1859, attracted thousands of visitors. Some historians argue that these paintings helped persuade the public and politicians to protect wild areas, contributing to the creation of the first national parks; others regard this link as speculative.",
+    "By the 1880s, critics and collectors increasingly favored the looser brushwork of French-influenced painters, and Hudson River School works fell out of fashion. Interest revived only in the mid-twentieth century, and today their paintings are among the most sought-after American works of the nineteenth century."
+  ],
+  qs: [
+    {s:"Hudson River School painters depicted only landscapes of the Hudson Valley.", a:"F", p:0, kw:"as far away as", ev:"later artists associated with the movement painted scenes as far away as the Rocky Mountains, the Arctic and South America", trap:"absolute", lv:1,
+     ex:"Nom vodiydan olingan, lekin keyingi rassomlar Qoyali togʻlar, Arktika va Janubiy Amerikani ham chizgan. “only” istisnoni yoʻqqa chiqaradi → FALSE."},
+    {s:"The name of the movement came into use after the style had passed the height of its popularity.", a:"T", p:0, kw:"1870s", ev:"The term itself was originally used by a critic in the 1870s, by which time the style had begun to seem old-fashioned.", trap:"sequence", lv:3,
+     ex:"Nom 1870-yillarda paydo boʻlgan; bu paytda uslub “eskirgandek” koʻrina boshlagan. Demak, nom uslub shuhrati choʻqqisidan KEYIN paydo boʻlgan. Tartib matnda aniq → TRUE."},
+    {s:"Thomas Cole was the most talented member of the Hudson River School.", a:"NG", p:1, kw:"founder", ev:"Thomas Cole, usually regarded as the group's founder, emigrated from England as a young man.", trap:"superlative", lv:1,
+     ex:"Matn Coleni asoschi (founder) deydi. Asoschi ≠ eng iqtidorli. Bunday baho matnda yoʻq → NOT GIVEN."},
+    {s:"Cole was worried about the impact of railways and logging on the wilderness.", a:"T", p:1, kw:"railways", ev:"Cole was deeply concerned about the spread of railways and logging into the wilderness", trap:"paraphrase", lv:1,
+     ex:"deeply concerned = worried → TRUE."},
+    {s:"All of Cole's paintings contained religious themes.", a:"F", p:1, kw:"frequently", ev:"frequently, moral or religious themes", trap:"quantifier", lv:2,
+     ex:"frequently = koʻpincha (hammasi emas). Ustiga matn “moral OR religious” deydi — baʼzilarida diniy emas, axloqiy mavzu boʻlgan. All → FALSE."},
+    {s:"Heart of the Andes was the most visited painting exhibited in New York in 1859.", a:"NG", p:2, kw:"Heart of the Andes", ev:"Church's Heart of the Andes, shown in New York in 1859, attracted thousands of visitors.", trap:"superlative", lv:2,
+     ex:"“thousands of visitors” — minglab tomoshabin. Boshqa asarlar bilan solishtirish yoʻq → NOT GIVEN."},
+    {s:"The paintings of Church and Bierstadt led directly to the creation of the first national parks.", a:"NG", p:2, kw:"national parks", ev:"Some historians argue that these paintings helped persuade the public and politicians to protect wild areas, contributing to the creation of the first national parks; others regard this link as speculative.", trap:"opinion", lv:3,
+     ex:"Ikki qaramaqarshi fikr bor, matnning oʻzi hukm chiqarmaydi. Ustiga birinchi guruh ham “led directly” emas, “contributing” (hissa qoʻshgan) deydi. Fikr fakt sifatida va kuchaytirib berilgan → NOT GIVEN."},
+    {s:"Historians disagree about whether the paintings influenced the protection of wild areas.", a:"T", p:2, kw:"speculative", ev:"others regard this link as speculative", trap:"opinion", lv:2,
+     ex:"Baʼzilar taʼsir boʻlgan deydi, boshqalar bu bogʻliqlikni taxmin deb hisoblaydi. Fikrlar farq qilishi matnda aniq → TRUE. (“Opinions differ” turidagi bayonot.)"},
+    {s:"Hudson River School paintings have remained consistently popular since the nineteenth century.", a:"F", p:3, kw:"fell out of fashion", ev:"Hudson River School works fell out of fashion. Interest revived only in the mid-twentieth century", trap:"time", lv:1,
+     ex:"1880-yillardan modadan chiqqan, qiziqish faqat XX asr oʻrtalarida qaytgan. “consistently popular” — uzluksiz mashhur — zid → FALSE."},
+    {s:"Hudson River School paintings are now the most valuable American artworks of any period.", a:"NG", p:3, kw:"sought-after", ev:"today their paintings are among the most sought-after American works of the nineteenth century", trap:"superlative", lv:3,
+     ex:"Matn: XIX asr Amerika asarlari ORASIDA eng talabgir asarlardan BIRI. Bayonot: barcha davrlardagi eng QIMMAT. Uch oʻzgarish: among the most → the most, nineteenth century → any period, sought-after → valuable. Zid maʼlumot ham yoʻq → NOT GIVEN."}
+  ]
+},
+{
+  id: "p8", exam: "TOEFL", level: 2, title: "Sleep in Migrating Birds", topic: "Biologiya",
+  paras: [
+    "Many songbirds migrate thousands of kilometers twice a year, often flying at night and feeding during the day. This schedule leaves little opportunity for sleep, yet birds in migration show few of the signs of sleep deprivation that would be expected in mammals. How they cope has long puzzled biologists.",
+    "Laboratory studies of Swainson's thrushes, a North American species, offered one answer. During the migratory season, captive thrushes reduced their total sleep by roughly two-thirds, and they increasingly relied on very brief naps, some lasting only a few seconds, taken with one or both eyes closed. Their performance on learning tasks remained almost unchanged, whereas thrushes deprived of the same amount of sleep outside the migratory season performed considerably worse.",
+    "Some birds may also sleep while flying. Recordings of brain activity in frigatebirds, large seabirds that can stay aloft for weeks, showed that they sometimes sleep with one half of the brain at a time, keeping one eye open in the direction of travel. However, they slept on average for less than 45 minutes a day in flight, compared with over 12 hours on land.",
+    "These findings suggest that migratory birds possess a seasonal ability to resist the effects of sleep loss. Whether the same mechanism operates in all migratory species is not yet known, and the frigatebird data come from a species that, unlike most songbirds, glides for long periods rather than flapping continuously."
+  ],
+  qs: [
+    {s:"Songbirds lose weight during migration because they get so little sleep.", a:"NG", p:0, kw:"sleep deprivation", ev:"This schedule leaves little opportunity for sleep", trap:"causal", lv:2,
+     ex:"Matnda vazn haqida hech narsa yoʻq; uyqu yetishmovchiligi bilan bogʻliq sabab–oqibat ham aytilmagan → NOT GIVEN."},
+    {s:"Biologists have been trying for a long time to understand how migrating birds manage on little sleep.", a:"T", p:0, kw:"puzzled", ev:"How they cope has long puzzled biologists.", trap:"paraphrase", lv:1,
+     ex:"has long puzzled = uzoq vaqtdan beri boshqotirma boʻlib kelgan = trying for a long time to understand; cope = manage → TRUE."},
+    {s:"Captive thrushes slept less during the migratory season than wild thrushes did.", a:"NG", p:1, kw:"captive", ev:"During the migratory season, captive thrushes reduced their total sleep by roughly two-thirds", trap:"comparison", lv:2,
+     ex:"Matn asirdagi (captive) qushlarni faqat OʻZLARINING boshqa paytdagi holati bilan solishtiradi. Yovvoyi qushlar haqida maʼlumot yoʻq — qiyoslashning ikkinchi tomoni yoʻq → NOT GIVEN."},
+    {s:"The thrushes always closed both eyes when they took short naps.", a:"F", p:1, kw:"eyes closed", ev:"taken with one or both eyes closed", trap:"absolute", lv:2,
+     ex:"“one or both eyes” — baʼzan bitta, baʼzan ikkala koʻz. “always ... both” — zid → FALSE."},
+    {s:"Losing sleep affected the thrushes' learning more outside the migratory season.", a:"T", p:1, kw:"outside the migratory season", ev:"whereas thrushes deprived of the same amount of sleep outside the migratory season performed considerably worse", trap:"comparison", lv:3,
+     ex:"Migratsiya mavsumida natija deyarli oʻzgarmagan; mavsumdan tashqari xuddi shuncha uyqu yoʻqotilganda ancha yomonlashgan. Ikkala tomon ham matnda bor, solishtirish: mavsumdan tashqari taʼsir kuchliroq → TRUE."},
+    {s:"Frigatebirds always sleep with only half of their brain while flying.", a:"F", p:2, kw:"one half of the brain", ev:"they sometimes sleep with one half of the brain at a time", trap:"absolute", lv:2,
+     ex:"sometimes = baʼzan. always = doimo. Matn ham mavjud istisnoni bildiradi → FALSE."},
+    {s:"Frigatebirds sleep for far longer on land than when flying.", a:"T", p:2, kw:"45 minutes", ev:"they slept on average for less than 45 minutes a day in flight, compared with over 12 hours on land", trap:"comparison", lv:1,
+     ex:"Uchganda 45 daqiqadan kam, quruqlikda 12 soatdan koʻp — farq juda katta (far longer) → TRUE."},
+    {s:"It has been shown that all migratory species share the thrushes' resistance to sleep loss.", a:"F", p:3, kw:"not yet known", ev:"Whether the same mechanism operates in all migratory species is not yet known", trap:"hedging", lv:2,
+     ex:"“not yet known” — hali nomaʼlum. Matnning oʻzi hukm chiqargan: aniqlanmagan. “has been shown” daʼvosi zid → FALSE."},
+    {s:"Frigatebirds can fly without stopping for longer than any songbird.", a:"NG", p:3, kw:"unlike most songbirds", ev:"the frigatebird data come from a species that, unlike most songbirds, glides for long periods rather than flapping continuously", trap:"comparison", lv:3,
+     ex:"Matn frigat qushi haftalab havoda qola olishini aytadi, lekin sayroqi qushlar qancha uzoq uchishi aytilmagan. Matndagi farq uchish USULI haqida (sirpanish / qanot qoqish), davomiyligi haqida emas → NOT GIVEN."},
+    {s:"Most songbirds glide for long periods during migration.", a:"F", p:3, kw:"unlike most songbirds", ev:"unlike most songbirds, glides for long periods rather than flapping continuously", trap:"negation", lv:3,
+     ex:"“unlike most songbirds” — koʻpchilik sayroqi qushlardan FARQLI oʻlaroq. Demak, sayroqi qushlar uzoq sirpanmaydi, uzluksiz qanot qoqadi. “unlike” inkorini oʻzgartirib oʻqish — klassik tuzoq → FALSE."}
+  ]
+},
+{
+  id: "p9", exam: "TOEFL", level: 3, title: "The Formation of the Moon", topic: "Astronomiya",
+  paras: [
+    "The most widely accepted explanation for the Moon's origin is the giant-impact hypothesis. According to this model, roughly 4.5 billion years ago, shortly after the Earth formed, a body about the size of Mars — sometimes called Theia — struck the young planet at an angle. Debris from both bodies was thrown into orbit around the Earth and gradually gathered to form the Moon.",
+    "The hypothesis accounts for several features that earlier theories could not. The Moon has a relatively small iron core, consistent with its formation mainly from the outer, rocky layers of the two colliding bodies. It also explains why the Earth–Moon system has an unusually large amount of rotational energy.",
+    "One observation, however, has proved difficult to reconcile with the standard model. Simulations predict that most of the Moon's material should have come from Theia, yet rock samples returned by the Apollo missions show that the chemical composition of lunar rocks is almost identical to that of the Earth's mantle. Since bodies that formed in different parts of the solar system typically differ in composition, this similarity is surprising.",
+    "Several modified versions of the hypothesis have been proposed to resolve the problem. One suggests that the impact was so energetic that the two bodies were almost completely vaporized and mixed together before the Moon condensed. Another proposes that Theia formed close to the Earth and therefore had a similar composition from the start. Neither has yet been confirmed, and some researchers have revived the idea that the Moon formed from a series of smaller impacts rather than a single giant one."
+  ],
+  qs: [
+    {s:"The giant-impact hypothesis is supported by more scientists than any other theory of the Moon's origin.", a:"T", p:0, kw:"most widely accepted", ev:"The most widely accepted explanation for the Moon's origin is the giant-impact hypothesis.", trap:"superlative", lv:2,
+     ex:"most widely accepted = eng keng qabul qilingan = boshqa nazariyalardan koʻp olim qoʻllaydi. Bu safar “eng ...” matnning OʻZIDA bor, shuning uchun TRUE. Superlative har doim NOT GIVEN emas — matnda boʻlsa, TRUE."},
+    {s:"Theia struck the Earth head-on.", a:"F", p:0, kw:"at an angle", ev:"struck the young planet at an angle", trap:"direct", lv:1,
+     ex:"head-on = toʻppa-toʻgʻri, peshonama-peshona; at an angle = burchak ostida. Antonim orqali berilgan zidlik → FALSE."},
+    {s:"The Moon was formed from material that came from both the Earth and Theia.", a:"T", p:0, kw:"both bodies", ev:"Debris from both bodies was thrown into orbit around the Earth", trap:"paraphrase", lv:1,
+     ex:"Debris from both bodies = ikkala jismdan chiqqan parchalar = material from both → TRUE."},
+    {s:"The Moon took only a few years to form after the collision.", a:"NG", p:0, kw:"gradually", ev:"gradually gathered to form the Moon", trap:"time", lv:2,
+     ex:"gradually = asta-sekin; aniq muddat aytilmagan. “only a few years” — matnda yoʻq. “Asta-sekin” astronomik oʻlchovda necha yil ekanini bilmaymiz, demak zid ham emas → NOT GIVEN."},
+    {s:"The giant-impact hypothesis can explain every known feature of the Earth–Moon system.", a:"F", p:2, kw:"difficult to reconcile", ev:"One observation, however, has proved difficult to reconcile with the standard model.", trap:"generalization", lv:2,
+     ex:"Matn: bitta kuzatuvni standart model bilan muvofiqlashtirish qiyin boʻlgan. Demak, “every feature” ni tushuntira olmaydi → FALSE."},
+    {s:"Computer simulations suggest that Theia supplied most of the Moon's material.", a:"T", p:2, kw:"Simulations", ev:"Simulations predict that most of the Moon's material should have come from Theia", trap:"paraphrase", lv:2,
+     ex:"predict = suggest; should have come from Theia = Theia supplied. Diqqat: bu simulyatsiya NATIJASI, fakt emas — bayonot ham “simulations suggest” deydi, fikr egasi toʻgʻri → TRUE."},
+    {s:"Theia formed in a part of the solar system far from the Earth.", a:"NG", p:3, kw:"close to the Earth", ev:"Another proposes that Theia formed close to the Earth and therefore had a similar composition from the start.", trap:"opinion", lv:3,
+     ex:"Matnda bitta faraz bor: Theia Yerga YAQIN paydo boʻlgan. Lekin bu faraz tasdiqlanmagan (Neither has yet been confirmed). Faraz fakt emas, demak unga qarshi bayonot ham FALSE boʻlmaydi. Theia aslida qayerda paydo boʻlgani — nomaʼlum → NOT GIVEN."},
+    {s:"The Apollo missions were planned mainly to test the giant-impact hypothesis.", a:"NG", p:2, kw:"Apollo", ev:"rock samples returned by the Apollo missions show", trap:"specificity", lv:2,
+     ex:"Matn Apollo olib kelgan namunalar natijasini aytadi, missiyalarning maqsadini emas → NOT GIVEN."},
+    {s:"It has now been established that the Earth and Theia were vaporized and mixed during the impact.", a:"F", p:3, kw:"Neither has yet been confirmed", ev:"Neither has yet been confirmed", trap:"hedging", lv:2,
+     ex:"Bu ikki farazdan biri, va matn ochiq aytadi: hech biri hali tasdiqlanmagan. “has been established” — zid → FALSE."},
+    {s:"The idea that the Moon formed from several smaller impacts has only recently been proposed for the first time.", a:"F", p:3, kw:"revived", ev:"some researchers have revived the idea that the Moon formed from a series of smaller impacts", trap:"wordmatch", lv:3,
+     ex:"revive = qayta jonlantirmoq. Demak, bu gʻoya avval ham boʻlgan, hozir qaytadan koʻrib chiqilmoqda. “for the first time” — zid → FALSE. Bitta feʼl butun javobni hal qiladi."}
+  ]
+},
+{
+  id: "p10", exam: "SAT", level: 3, title: "The Letter (prose fiction)", topic: "Badiiy matn",
+  paras: [
+    "The letter arrived on a Tuesday, which Margaret would later think was fitting, since nothing of consequence had ever happened to her on a Tuesday. She recognized her brother's handwriting at once — the cramped, leftward-leaning letters he had refused to correct despite years of reprimands from their schoolmaster — and for a long moment she simply held the envelope, turning it over as if its weight might tell her something its contents could not.",
+    "They had not spoken in eleven years. The quarrel that divided them had begun over the sale of their father's farm, though Margaret suspected, in her more honest moments, that the farm had merely given shape to a resentment both of them had carried since childhood. Thomas had wanted to keep the land; she had insisted on selling it, and she had prevailed. He left for the city a month later without saying goodbye.",
+    "She opened the envelope with a kitchen knife, carefully, as though she might later need to return it unopened. Inside was a single sheet. Thomas wrote that he was well, that he had married, and that he and his wife were expecting a child in the spring. He did not mention the farm. He did not apologize, and he did not ask her to. At the bottom, beneath his signature, he had added a line in smaller writing: “I would like the child to know its aunt.”",
+    "Margaret read the letter three times. Then she placed it on the mantelpiece, propped against the clock, where she would see it each morning, and went out to feed the hens."
+  ],
+  qs: [
+    {s:"Margaret had noticed that important things often happened to her on Tuesdays.", a:"F", p:0, kw:"Tuesday", ev:"since nothing of consequence had ever happened to her on a Tuesday", trap:"wordmatch", lv:2,
+     ex:"“Tuesday” va “happened” soʻzlari ikkalasida ham bor, lekin matn: seshanba kuni hech qachon muhim narsa boʻlmagan (nothing of consequence ... ever). Maʼno teskari → FALSE."},
+    {s:"Thomas's handwriting had not changed despite criticism from his teacher.", a:"T", p:0, kw:"schoolmaster", ev:"he had refused to correct despite years of reprimands from their schoolmaster", trap:"paraphrase", lv:2,
+     ex:"refused to correct = tuzatmagan, oʻzgartirmagan; reprimands = tanbeh, tanqid; schoolmaster = teacher → TRUE."},
+    {s:"Margaret and Thomas had not spoken to each other for more than ten years.", a:"T", p:1, kw:"eleven years", ev:"They had not spoken in eleven years.", trap:"paraphrase", lv:1,
+     ex:"eleven years = oʻn yildan ortiq → TRUE. Raqamli paraphrase, lekin mavzu aynan bir xil (gaplashmaganlik muddati)."},
+    {s:"Margaret believes the sale of the farm was the only cause of their quarrel.", a:"F", p:1, kw:"merely", ev:"the farm had merely given shape to a resentment both of them had carried since childhood", trap:"absolute", lv:3,
+     ex:"Margaret “eng halol” paytlarida ferma faqat janjalga ShAKL bergan, asl norozilik esa bolalikdan kelgan deb oʻylaydi. Demak, u fermani yagona sabab deb hisoblamaydi → FALSE. Diqqat: bu Margaretning fikri, bayonot ham uning fikri haqida (believes) — fikr egasi bir xil, shuning uchun javob shu fikrga qarab beriladi."},
+    {s:"Thomas moved to the city because he could not find work in the countryside.", a:"NG", p:1, kw:"left for the city", ev:"He left for the city a month later without saying goodbye.", trap:"causal", lv:2,
+     ex:"Matn faqat qachon ketganini va xayrlashmaganini aytadi. Ketish sababi — janjalmi, ishmi — matnda yoʻq. Taxminni javobga aylantirmang → NOT GIVEN."},
+    {s:"In his letter, Thomas apologized for the quarrel.", a:"F", p:2, kw:"apologize", ev:"He did not apologize, and he did not ask her to.", trap:"direct", lv:1,
+     ex:"Matnda ochiq yozilgan: kechirim soʻramagan → FALSE."},
+    {s:"Thomas's wife persuaded him to write to his sister.", a:"NG", p:2, kw:"his wife", ev:"Thomas wrote that he was well, that he had married, and that he and his wife were expecting a child in the spring.", trap:"assumption", lv:2,
+     ex:"Xotin faqat xatda tilga olingan. Xatni yozish gʻoyasi kimdan chiqqani aytilmagan → NOT GIVEN."},
+    {s:"Margaret decided to visit her brother after reading the letter.", a:"NG", p:3, kw:"three times", ev:"Margaret read the letter three times.", trap:"assumption", lv:3,
+     ex:"Badiiy matnda oʻquvchi voqeani davom ettirgisi keladi: xatni koʻrinadigan joyga qoʻyishi yarashuvga ishoradek. Lekin matn uning qarorini aytmaydi; u faqat tovuqlarni boqqani chiqqan. SAT va IELTS badiiy matnlarida eng koʻp uchraydigan tuzoq — taxminni fakt deb oʻqish → NOT GIVEN."},
+    {s:"Margaret put the letter in a place where she would notice it every day.", a:"T", p:3, kw:"mantelpiece", ev:"where she would see it each morning", trap:"paraphrase", lv:1,
+     ex:"see it each morning = har kuni koʻrib turadi = notice it every day → TRUE."}
+  ]
+},
+{
+  id: "p11", exam: "SAT", level: 2, title: "An Address on Education (19th-century style)", topic: "Tarixiy nutq",
+  paras: [
+    "It is often said that the education of the working man is a luxury which the nation cannot afford. I would answer that it is a necessity which the nation cannot afford to neglect. The machines that now fill our factories were not invented by idle gentlemen; a great many of them were devised by men who began life at the bench, and who learned their science, such as it was, by candlelight after a day's labour.",
+    "I do not pretend that every apprentice who attends our evening classes will become an inventor. Most will not. But the man who understands the principles of the engine he tends is less likely to injure himself or to damage it, and more likely to notice when it may be improved. His employer gains by his knowledge, whether or not he acknowledges the debt.",
+    "There are those who fear that education will make the labouring classes discontented with their station. I confess I cannot share this fear. A man who knows his own worth may indeed ask for better wages, but he is also more likely to seek them by honest means. Ignorance, not knowledge, is the soil in which disorder grows.",
+    "I ask, therefore, not for charity but for investment. Let the manufacturers of this town contribute to our library and our lecture hall as they would to any enterprise from which they expect a return. The return may be slow, but it will be certain."
+  ],
+  qs: [
+    {s:"The speaker himself worked in a factory as a young man.", a:"NG", p:0, kw:"began life at the bench", ev:"a great many of them were devised by men who began life at the bench", trap:"assumption", lv:2,
+     ex:"Nutqchi boshqalar haqida gapiradi (men who began life at the bench). Oʻzining hayoti haqida maʼlumot yoʻq. Nutqchi ishchilarni himoya qilgani uchun oʻzi ham ishchi boʻlgan degan xulosa — taxmin → NOT GIVEN."},
+    {s:"According to the speaker, many machines were invented by people who started as manual workers.", a:"T", p:0, kw:"devised", ev:"a great many of them were devised by men who began life at the bench", trap:"paraphrase", lv:1,
+     ex:"a great many = many; devised = invented; began life at the bench = hayotni dastgoh yonida, qoʻl mehnati bilan boshlagan → TRUE."},
+    {s:"The speaker expects most students at the evening classes to become inventors.", a:"F", p:1, kw:"Most will not", ev:"Most will not.", trap:"direct", lv:1,
+     ex:"Nutqchi ochiq aytadi: koʻpchiligi ixtirochi boʻlmaydi → FALSE."},
+    {s:"The speaker claims that workers who understand their machines are less likely to have accidents.", a:"T", p:1, kw:"injure himself", ev:"is less likely to injure himself or to damage it", trap:"attribution", lv:2,
+     ex:"Bayonot “the speaker claims” deb boshlanadi — fikr egasi toʻgʻri. Mazmun ham mos: less likely to injure himself = baxtsiz hodisaga uchrash ehtimoli kam → TRUE."},
+    {s:"According to the speaker, employers always recognize the benefit they gain from educated workers.", a:"F", p:1, kw:"acknowledges the debt", ev:"whether or not he acknowledges the debt", trap:"absolute", lv:3,
+     ex:"“whether or not he acknowledges” — tan olsa ham, olmasa ham. Bu ibora baʼzi ish beruvchilar foydani tan OLMASLIGINI nazarda tutadi. “always recognize” — zid → FALSE."},
+    {s:"The speaker thinks educated workers will never ask for higher wages.", a:"F", p:2, kw:"better wages", ev:"A man who knows his own worth may indeed ask for better wages", trap:"absolute", lv:2,
+     ex:"Nutqchi tan oladi: bilimli ishchi yuqoriroq maosh soʻrashi mumkin (may indeed). “never” — zid → FALSE."},
+    {s:"The evening classes had already produced several successful inventors.", a:"NG", p:1, kw:"evening classes", ev:"I do not pretend that every apprentice who attends our evening classes will become an inventor.", trap:"specificity", lv:2,
+     ex:"Nutqchi kelajak haqida gapiradi (will become). Hozirgacha kurs bitiruvchilari orasida ixtirochi boʻlganmi — aytilmagan → NOT GIVEN."},
+    {s:"Local manufacturers had previously refused to support the library.", a:"NG", p:3, kw:"manufacturers", ev:"Let the manufacturers of this town contribute to our library and our lecture hall", trap:"assumption", lv:2,
+     ex:"Nutqchi ish beruvchilarni hissa qoʻshishga chaqiradi. Ular avval rad etganmi — aytilmagan. Chaqiriq ≠ oldingi rad → NOT GIVEN."},
+    {s:"The speaker believes the benefits of education will take time to appear.", a:"T", p:3, kw:"slow", ev:"The return may be slow, but it will be certain.", trap:"paraphrase", lv:2,
+     ex:"The return may be slow = foyda sekin keladi = will take time to appear. Fikr egasi — nutqchining oʻzi → TRUE."}
+  ]
+},
+{
+  id: "p12", exam: "SAT", level: 3, title: "Language and Color Perception", topic: "Tilshunoslik",
+  paras: [
+    "Does the language a person speaks influence how they perceive the world? The idea, associated with the linguists Edward Sapir and Benjamin Lee Whorf, fell out of favor in the 1960s and 1970s, partly because of studies on color. Researchers found that speakers of languages with very few basic color terms could nonetheless distinguish and remember colors much as English speakers did, suggesting that perception was largely universal.",
+    "Interest revived in the 2000s. Russian, unlike English, has two basic terms for blue: goluboy for lighter shades and siniy for darker ones. In one experiment, Russian speakers were faster at telling two blues apart when the shades fell on opposite sides of this linguistic boundary than when they belonged to the same category; English speakers showed no such difference.",
+    "Crucially, the Russian speakers' advantage disappeared when they were asked to perform a verbal task, such as silently rehearsing a string of numbers, at the same time. This suggests that language influences perception in real time, by providing labels that the mind draws on during the task, rather than permanently reshaping how colors are seen.",
+    "The effect is modest — a difference of a fraction of a second — and its practical significance is debated. Nonetheless, it has encouraged researchers to look for similar effects in other domains, such as how speakers of different languages describe and remember spatial relations or the passage of time."
+  ],
+  qs: [
+    {s:"The Sapir–Whorf idea lost popularity partly because of research into color.", a:"T", p:0, kw:"fell out of favor", ev:"fell out of favor in the 1960s and 1970s, partly because of studies on color", trap:"paraphrase", lv:1,
+     ex:"fell out of favor = lost popularity; studies on color = research into color. “partly” ikkalasida ham bor → TRUE."},
+    {s:"Early studies found that people whose languages had few color words could not tell many colors apart.", a:"F", p:0, kw:"nonetheless", ev:"could nonetheless distinguish and remember colors much as English speakers did", trap:"direct", lv:1,
+     ex:"Matn: baribir (nonetheless) ingliz tilida soʻzlovchilar kabi ranglarni ajrata olgan. “could not tell apart” — zid → FALSE."},
+    {s:"Russian has more basic color terms than any other language.", a:"NG", p:1, kw:"two basic terms", ev:"Russian, unlike English, has two basic terms for blue", trap:"superlative", lv:1,
+     ex:"Matn rus tilini faqat ingliz tili bilan va faqat koʻk rang uchun solishtiradi. “any other language” — matnda yoʻq → NOT GIVEN."},
+    {s:"Russian uses separate basic words for lighter and darker shades of blue.", a:"T", p:1, kw:"goluboy", ev:"goluboy for lighter shades and siniy for darker ones", trap:"paraphrase", lv:1,
+     ex:"goluboy — ochiq tuslar, siniy — toʻq tuslar uchun alohida soʻzlar → TRUE."},
+    {s:"English speakers were generally faster than Russian speakers at telling blues apart.", a:"NG", p:1, kw:"no such difference", ev:"English speakers showed no such difference", trap:"comparison", lv:3,
+     ex:"Matn ingliz tilida soʻzlovchilar IKKI HOLAT orasida farq koʻrsatmaganini aytadi (no such difference). Bu ikki guruhning umumiy tezligini solishtirish emas. Kim tezroq — nomaʼlum → NOT GIVEN."},
+    {s:"A simultaneous verbal task removed the Russian speakers' advantage.", a:"T", p:2, kw:"verbal task", ev:"the Russian speakers' advantage disappeared when they were asked to perform a verbal task", trap:"paraphrase", lv:2,
+     ex:"disappeared = removed; at the same time = simultaneous → TRUE."},
+    {s:"The experiment showed that speaking Russian permanently changes the way colors are seen.", a:"F", p:2, kw:"permanently", ev:"rather than permanently reshaping how colors are seen", trap:"negation", lv:2,
+     ex:"“rather than permanently reshaping” — doimiy oʻzgartirish EMAS, vazifa paytidagi taʼsir. Bayonot matn rad etgan variantni tanlagan → FALSE."},
+    {s:"Researchers agree that the effect has significant practical consequences.", a:"F", p:3, kw:"debated", ev:"its practical significance is debated", trap:"opinion", lv:2,
+     ex:"debated — munozarali. Kelishuv yoʻq, demak “agree” daʼvosi zid → FALSE (“Everyone agrees” turi)."},
+    {s:"Similar effects have been found in how people remember time.", a:"NG", p:3, kw:"look for", ev:"it has encouraged researchers to look for similar effects in other domains", trap:"hedging", lv:3,
+     ex:"look for = izlamoq. Topilganmi — aytilmagan. Qidiruv ≠ natija. Matn topilmagan ham demaydi, shuning uchun FALSE emas → NOT GIVEN."}
+  ]
+},
+{
+  id: "p13", exam: "SAT", level: 2, title: "How Monarch Butterflies Navigate", topic: "Tabiiy fanlar",
+  paras: [
+    "Each autumn, monarch butterflies from eastern North America fly up to several thousand kilometres to a small number of forested mountain sites in central Mexico, where they spend the winter in dense clusters. None of the butterflies that make this journey has done it before: the generation that migrates south lives for several months, whereas the summer generations that precede it survive only a few weeks.",
+    "How monarchs find their way without experience has been studied for decades. Experiments in flight simulators have shown that they use the position of the sun, correcting for its movement across the sky with an internal clock. Surprisingly, an important part of this clock is located not in the brain but in the antennae: butterflies whose antennae had been painted to block light lost the ability to keep a consistent southward heading.",
+    "The sun compass cannot work on overcast days, and researchers have found evidence that monarchs also possess a magnetic sense that may serve as a backup. This sense appears to depend on ultraviolet light, which can penetrate cloud cover.",
+    "The eastern monarch population has declined substantially since the 1990s. Loss of milkweed — the only plant on which monarch caterpillars feed — is widely cited as a major cause, although the relative importance of other factors, such as habitat loss in Mexico and extreme weather, continues to be debated."
+  ],
+  qs: [
+    {s:"Monarchs flying south can draw on experience from earlier migrations.", a:"F", p:0, kw:"done it before", ev:"None of the butterflies that make this journey has done it before", trap:"direct", lv:1,
+     ex:"Matn: bu safarni qiladigan kapalaklarning hech biri buni avval qilmagan. Tajriba boʻlishi mumkin emas → FALSE."},
+    {s:"The generation that migrates south lives longer than the summer generations.", a:"T", p:0, kw:"several months", ev:"the generation that migrates south lives for several months, whereas the summer generations that precede it survive only a few weeks", trap:"comparison", lv:1,
+     ex:"Bir necha oy > bir necha hafta. Ikkala tomon ham matnda → TRUE."},
+    {s:"The monarch's internal clock is located entirely in its antennae.", a:"F", p:1, kw:"antennae", ev:"an important part of this clock is located not in the brain but in the antennae", trap:"absolute", lv:2,
+     ex:"“an important part” — muhim QISMI. “entirely” — butunlay. Qisman ≠ butunlay → FALSE."},
+    {s:"Painting the antennae interfered with the butterflies' sense of direction.", a:"T", p:1, kw:"painted", ev:"butterflies whose antennae had been painted to block light lost the ability to keep a consistent southward heading", trap:"paraphrase", lv:2,
+     ex:"lost the ability to keep a consistent southward heading = janub yoʻnalishini saqlay olmay qolgan = sense of direction buzilgan (interfered) → TRUE."},
+    {s:"Ultraviolet light is able to pass through clouds.", a:"T", p:2, kw:"ultraviolet", ev:"ultraviolet light, which can penetrate cloud cover", trap:"paraphrase", lv:1,
+     ex:"penetrate cloud cover = bulutlardan oʻta oladi = pass through clouds → TRUE."},
+    {s:"Monarchs rely on their magnetic sense mainly at night.", a:"NG", p:2, kw:"magnetic sense", ev:"researchers have found evidence that monarchs also possess a magnetic sense that may serve as a backup", trap:"specificity", lv:2,
+     ex:"Matn magnit sezgini bulutli kunlarda zaxira boʻlishi mumkinligini aytadi. Tunda ishlatilishi haqida hech narsa yoʻq → NOT GIVEN."},
+    {s:"Experts agree that milkweed loss is the main reason for the decline in monarch numbers.", a:"F", p:3, kw:"debated", ev:"the relative importance of other factors, such as habitat loss in Mexico and extreme weather, continues to be debated", trap:"opinion", lv:3,
+     ex:"“widely cited as A major cause” — muhim sabablardan BIRI, yagona asosiy sabab emas. Boshqa omillarning nisbiy ahamiyati esa munozarali. Demak, “mutaxassislar kelishgan” degan daʼvo zid → FALSE."},
+    {s:"The western monarch population has also declined since the 1990s.", a:"NG", p:3, kw:"eastern", ev:"The eastern monarch population has declined substantially since the 1990s.", trap:"specificity", lv:2,
+     ex:"Matn faqat ShARQIY populyatsiya haqida gapiradi. Gʻarbiy populyatsiya tilga olinmagan → NOT GIVEN."},
+    {s:"Monarchs return to the exact trees used by the previous migrating generation.", a:"NG", p:0, kw:"dense clusters", ev:"to a small number of forested mountain sites in central Mexico, where they spend the winter in dense clusters", trap:"specificity", lv:2,
+     ex:"Matn kapalaklar oz sonli togʻ oʻrmonlariga borishini aytadi. Aynan avvalgi avlod tanlagan daraxtlarga qaytishi haqida hech narsa yoʻq → NOT GIVEN."}
+  ]
+}
+];
+
+</script>
+<script>
+/* ---------- Tuzoqlar kutubxonasi ---------- */
+const TRAPS = {
+  paraphrase: { name:"Paraphrase", uz:"Qayta ifodalash", short:"Maʼno va mavzu bir xil, soʻzlar boshqa — javob TRUE.",
+    body:["TRUE javoblar deyarli hech qachon matndagi soʻzlar bilan berilmaydi. Savol tuzuvchi sinonim, soʻz turkumini almashtirish (decide → decision), faol va majhul nisbat, inkor orqali ifoda (not uncommon) yoki umumiy soʻz (grain, livestock → economic matters) ishlatadi.",
+          "Eng koʻp xato — ortiqcha ehtiyotkorlik: soʻzlar mos kelmagani uchun NOT GIVEN tanlash. Maʼlumot matnda bor boʻlsa-yu, faqat boshqa soʻzlar bilan aytilgan boʻlsa, javob TRUE.",
+          "Chegara: paraphrase mavzuni oʻzgartirmaydi. Bayonotni tasdiqlash uchun hisob-kitob yoki taxmin kerak boʻlsa, bu endi paraphrase emas — NOT GIVEN tomonga qarang."],
+    signals:"sinonimlar, soʻz turkumi almashuvi, faol ↔ majhul nisbat, not un-…, umumlashtiruvchi otlar",
+    ex:{t:"Several of the largest firms have closed since 2022.", s:"Some of the biggest companies have stopped operating in recent years.", a:"T", w:"largest → biggest, closed → stopped operating, since 2022 → in recent years. Uch almashuv, maʼno bir xil."},
+    check:"Bayonotni soʻzma-soʻz emas, maʼno bilan matnga qoʻyib koʻring: mavzu ham, kuch ham bir xilmi?" },
+  direct: { name:"Direct contradiction", uz:"Toʻgʻridan-toʻgʻri zidlik", short:"Matnda bayonotning teskarisi ochiq yozilgan — FALSE.",
+    body:["Eng oson holat, lekin koʻpincha antonim orqali yashiriladi: head-on ↔ at an angle, avoid ↔ seek out, apologized ↔ did not apologize.",
+          "Barmoq testi: matndan bitta jumlani koʻrsatib, “mana, buning teskarisi yozilgan” deya olasizmi? Ha boʻlsa — FALSE. Yoʻq boʻlsa — FALSE emas."],
+    signals:"antonimlar, not, no, never, none",
+    ex:{t:"None of the butterflies that make this journey has done it before.", s:"Monarchs flying south can draw on experience from earlier migrations.", a:"F", w:"Hech biri avval uchmagan — tajriba boʻlishi mumkin emas."},
+    check:"Ziddiyatni koʻrsatadigan aniq jumlani barmoq bilan koʻrsata olamanmi?" },
+  quantifier: { name:"Quantifiers", uz:"Miqdor soʻzlari", short:"all / most / some / nearly half — bayonotdagi miqdor matndagidan boshqa pogʻonada boʻlsa, FALSE.",
+    body:["Miqdor zinapoyasi: none < a few < some < many < most < almost all < all. Matn bir pogʻonada, bayonot boshqasida boʻlsa — zidlik. Matn “most” desa-yu, bayonot “all” desa, demak, hammasi emas → FALSE.",
+          "Raqamlarda ham shunday: “almost threefold” (uch barobardan kam) ↔ “more than tripled” (uch barobardan koʻp); “as much as 90 %” ↔ “all”; “nearly half” ↔ “the majority”.",
+          "Matn miqdor haqida umuman gapirmasa, miqdorli bayonot NOT GIVEN boʻladi."],
+    signals:"all, every, most, the majority, many, some, a few, few, nearly, almost, as much as, up to, at least",
+    ex:{t:"Most specialists agree that the most effective strategy is prevention.", s:"All specialists believe prevention is the best approach.", a:"F", w:"Most ≠ All."},
+    check:"Bayonotdagi miqdor matndagi bilan bir pogʻonadami?" },
+  absolute: { name:"Absolute words", uz:"Kuchaytiruvchi soʻzlar", short:"only / always / never / entirely — istisno yozilgan boʻlsa FALSE, istisno haqida indamasa NOT GIVEN.",
+    body:["Bu soʻzlar “istisno yoʻq!” deb qatʼiy daʼvo qiladi. Shuning uchun bitta istisno topilsa, bayonot darhol yiqiladi.",
+          "Uch natija: matnda istisno aniq yozilgan (sometimes, partly, largely, one or both, an important part) → FALSE; istisno haqida hech narsa yoʻq → NOT GIVEN; matnda ham xuddi shunday qatʼiy soʻz bor (only, every, without exception) → TRUE.",
+          "Tez uchraydigan juftliklar: some → all, often → always, rarely → never, partly → entirely, largely → completely, one of the reasons → the only reason."],
+    signals:"only, always, never, entirely, completely, every, all, solely, exclusively",
+    ex:{t:"Dating these sections therefore relies partly on computer models.", s:"The age of the deepest ice is determined entirely by computer models.", a:"F", w:"partly = qisman, entirely = butunlay."},
+    check:"Matnda bu qatʼiy daʼvoni buzadigan istisno bormi?" },
+  generalization: { name:"Generalization", uz:"Umumlashtirish", short:"Matn natijani chegaralaydi, bayonot uni hammaga yoyadi.",
+    body:["Matn natijani bir guruh, joy, vaqt yoki shart bilan chegaralaydi (in the deepest sections, in Kenya, in some studies). Bayonot shu chegarani olib tashlab, natijani hammaga yoyadi.",
+          "Matn chegaradan tashqarida boshqacha natija bergan boʻlsa → FALSE. Chegaradan tashqari haqida indamasa → NOT GIVEN.",
+          "Yangi detal qoʻshish (specificity) bilan adashtirmang: u yerda bayonot matnda umuman yoʻq maʼlumot qoʻshadi."],
+    signals:"throughout, everywhere, every, all, consistently; matnda: some, in certain, under…, for…",
+    ex:{t:"Swarms vary greatly in size, from less than one square kilometre to several hundred.", s:"Every locust swarm covers several hundred square kilometres.", a:"F", w:"Eng katta holat hammaga yoyilgan; matndagi kichik galalar bunga zid."},
+    check:"Matn natijani kimga yoki qayerga chegaralagan, bayonot bu chegarani saqlaganmi?" },
+  specificity: { name:"Added detail", uz:"Yangi detal qoʻshish", short:"a matnda bor, x yoʻq: a + x → NOT GIVEN (agar x ga zid gap ham boʻlmasa).",
+    body:["Bayonot matndagi toʻgʻri maʼlumotga (a) yangi detal (x) qoʻshadi: sabab, maqsad, narx, kim, qachon, qayerda. x matnning hech bir joyida na tasdiqlansa, na inkor qilinsa → NOT GIVEN.",
+          "Ikki tekshirish: x butun matnda yoʻqmi (faqat shu jumlada emas)? x boshqa soʻzlar bilan yashirinmaganmi? x ning teskarisi boshqa xatboshida boʻlsa — FALSE; x sinonim bilan bor boʻlsa — TRUE.",
+          "NOT GIVEN javoblarning eng koʻpi aynan shu tuzoqdan chiqadi."],
+    signals:"because, in order to, by, cheaper, at night, British, the same people…",
+    ex:{t:"The discovery in the 1980s of inscribed labels at Abydos weakened this view.", s:"The Abydos labels were discovered by a British expedition.", a:"NG", w:"Qachon topilgani bor, kim topgani yoʻq."},
+    check:"Bayonotdagi har bir detalni matndan topa olamanmi?" },
+  superlative: { name:"Superlatives", uz:"“Eng …” va “birinchi”", short:"one of the X → the X: odatda NOT GIVEN.",
+    body:["the highest = 1-oʻrin, bitta. one of the highest = yuqori oʻrinlardagi guruhdan biri — 1-, 2- yoki 5-oʻrin boʻlishi mumkin.",
+          "Matn “one of the …” desa, bayonot “the …” desa → NOT GIVEN: 1-oʻrinmi, yoʻqmi — matn aytmaydi. Matn boshqasi birinchi ekanini aytsa → FALSE.",
+          "Agar “eng …” matnning oʻzida boʻlsa (the most widely accepted) va bayonot uni paraphrase qilsa → TRUE. Superlative har doim NOT GIVEN emas."],
+    signals:"the most, the best, the largest, the first, the oldest, one of the, among the",
+    ex:{t:"It is one of the largest reserves in Asia.", s:"It is the largest reserve in Asia.", a:"NG", w:"Guruhda ekani aytilgan, 1-oʻrinda ekani aytilmagan."},
+    check:"Matn 1-oʻrinni aniq aytyaptimi yoki faqat yuqori guruhni?" },
+  comparison: { name:"Comparisons", uz:"Qiyoslash", short:"Ikkala tomon ham matnda boʻlsa — solishtiring; bittasi yoʻq boʻlsa — NOT GIVEN.",
+    body:["Bayonot ikki narsani solishtiradi (more than, less, faster, as … as). Avval tekshiring: matnda ikkala tomon haqida ham maʼlumot bormi?",
+          "Ikkalasi bor boʻlsa — oʻzingiz solishtiring: mos → TRUE, teskari → FALSE (comparable ↔ considerably less).",
+          "Matn A ni faqat B bilan solishtirsa, bayonot esa A ni C bilan solishtirsa → NOT GIVEN (einkorn faqat zamonaviy bugʻdoy bilan solishtirilgan, boshqa qadimiy donlar bilan emas)."],
+    signals:"more, less, -er, than, as … as, comparable, similar, unlike, whereas",
+    ex:{t:"English speakers showed no such difference.", s:"English speakers were generally faster than Russian speakers.", a:"NG", w:"Matn guruh ichidagi farqni aytadi, guruhlar orasidagi tezlikni emas."},
+    check:"Qiyoslashning ikkala tomoni ham matndami?" },
+  hedging: { name:"Hedging vs proof", uz:"Ehtiyotkor ifoda va isbot", short:"Matn “isbotlanmagan” desa — FALSE; isbot haqida indamasa — NOT GIVEN.",
+    body:["Ilmiy matnlar ehtiyotkor gapiradi: may, might, possibly, suggest, appear, probably. Bayonot esa koʻpincha qatʼiy: proved, confirmed, established, known for certain.",
+          "Matnning oʻzi hukm chiqargan boʻlsa (not yet confirmed, not established, remains unsupported, inconsistent results, not yet known) → “proved” degan bayonot FALSE.",
+          "Matn isbot haqida umuman gapirmasa → NOT GIVEN. Yana bir nozik joy: “izlanmoqda” (look for, searching for, investigating) ≠ “topildi”. Natija haqidagi bayonot odatda NOT GIVEN; “already” esa “not yet” ga zid boʻlsa — FALSE."],
+    signals:"may, might, possibly, suggest, appear, probably, not yet, has yet to, established, proved, confirmed",
+    ex:{t:"Sleep may improve memory, although this link has yet to be confirmed.", s:"Scientists have proven that sleep improves memory.", a:"F", w:"Matn ochiq aytadi: hali tasdiqlanmagan."},
+    check:"Matnning oʻzi isbot holati haqida hukm chiqarganmi?" },
+  opinion: { name:"Opinion vs fact", uz:"Fikr va fakt", short:"Kimningdir fikri fakt sifatida berilsa — odatda NOT GIVEN.",
+    body:["Matnda faqat fikr(lar) bor va matn hukm chiqarmaydi: fikrni fakt sifatida aytgan bayonot → NOT GIVEN; “fikrlar farq qiladi” → TRUE; “hamma kelishgan” → FALSE; fikrga yangi detal qoʻshilgan → NOT GIVEN.",
+          "Matnning oʻzi hukm chiqargan (neither claim has been supported): “isbotlangan” degan bayonot → FALSE; fikrning oʻzi fakt sifatida → NOT GIVEN qoladi, chunki “isbot yoʻq” ≠ “yolgʻon”.",
+          "Jumlani oxirigacha oʻqing: hal qiluvchi soʻz koʻpincha however, but, although dan keyin turadi (a claim that remains scientifically unsupported)."],
+    signals:"claim, argue, believe, maintain, critics, supporters, some say, is debated",
+    ex:{t:"Some critics claim the policy has failed.", s:"The policy has failed.", a:"NG", w:"Tanqidchilar fikri fakt emas."},
+    check:"Bu kimning gapi va matnning oʻzi unga baho berganmi?" },
+  attribution: { name:"Attribution", uz:"Fikr egasi", short:"Fikr egasi toʻgʻri va mazmun mos → TRUE; egasi almashgan → FALSE.",
+    body:["Bayonotda believe, claim, say, think boʻlsa, ikki narsani tekshiring: kim aytgan (critics, supporters, the speaker, some historians) va nima degan.",
+          "Egasi ham, mazmuni ham mos → TRUE (Critics warn that… = Critics doubt that…). Mazmun toʻgʻri, lekin egasi almashgan (supporters ↔ critics) → FALSE.",
+          "Bunday bayonot fikrni fakt sifatida bermaydi, shuning uchun TRUE boʻlishi mumkin."],
+    signals:"according to, X believes / claims / argues, in the view of",
+    ex:{t:"Others maintain that the phenomenon is real but too context-dependent to offer reliable guidance to retailers.", s:"Some psychologists believe the effect exists but is of limited practical use to shops.", a:"T", w:"Egasi (others = some psychologists) ham, mazmun ham mos."},
+    check:"Bayonotdagi fikr egasi matndagi bilan bir xilmi?" },
+  causal: { name:"Cause and correlation", uz:"Sabab va bogʻliqlik", short:"Birga sodir boʻlish ≠ sabab. Sabab aytilmagan boʻlsa — NOT GIVEN.",
+    body:["Matn koʻpincha faqat bogʻliqlikni aytadi: in step with, tend to, associated with, also report. Bayonot uni sababga aylantiradi: caused, led to, because, increases.",
+          "Matnda sabab aytilmagan boʻlsa → NOT GIVEN. Matn boshqa sababni ochiq koʻrsatgan boʻlsa → FALSE (korallar skelet rangi oʻzgargani uchun emas, toʻqima tiniq boʻlgani uchun oqaradi).",
+          "Matn yana bir omilni tilga olsa (but these cities also have stricter regulations), bu sabab hali aniqlanmaganiga ishora."],
+    signals:"because, cause, lead to, result in, due to; matnda: in step, tend to, associated, linked",
+    ex:{t:"Countries with higher coffee consumption also report longer life expectancy.", s:"Drinking coffee increases life expectancy.", a:"NG", w:"Bogʻliqlik bor, sabab aytilmagan."},
+    check:"Matn sababni aytyaptimi yoki faqat birga sodir boʻlishni?" },
+  assumption: { name:"Assumption", uz:"Taxmin va fon bilim", short:"Mantiqiy koʻrinsa ham, matnda yoʻq boʻlsa — NOT GIVEN.",
+    body:["Bayonot hayotiy tajriba, umumiy bilim yoki voqeani davom ettirishga tayanadi. U ehtimolga yaqin boʻlishi mumkin, lekin javob faqat matnga tayanadi.",
+          "Badiiy matnlarda eng koʻp uchraydi: qahramon xatni koʻrinadigan joyga qoʻydi — demak, akasinikiga borish qaroriga keldimi? Matn buni aytmaydi.",
+          "Asosiy test: “Matn toʻgʻri boʻlib, bayonot notoʻgʻri boʻlishi mumkinmi?” Mumkin boʻlsa — NOT GIVEN (matnga zid boʻlsa — FALSE). Hisob-kitob bilan topiladigan, lekin mavzusi matnda tilga olinmagan xulosa ham shu guruhga kiradi."],
+    signals:"decided, persuaded, overall, in total, previously refused…",
+    ex:{t:"The company moved its headquarters to Berlin.", s:"The company moved to reduce costs.", a:"NG", w:"Maqsad aytilmagan."},
+    check:"Matn toʻgʻri boʻlib, bayonot notoʻgʻri boʻlishi mumkinmi?" },
+  time: { name:"Time and tense", uz:"Zamon", short:"Oʻtmish, hozir va kelajak almashsa diqqat: “not yet” ↔ “already” = FALSE.",
+    body:["Matn oʻtmish haqida gapirsa (was widely used in the 19th century), hozirgi holat haqidagi bayonot (is still used) → NOT GIVEN.",
+          "Matn “hali emas” desa (are investigating whether, will soon be able, not yet), “allaqachon” degan bayonot → FALSE.",
+          "Kelajak haqidagi bayonot (is expected to, within the next decade) matnda muddat boʻlmasa → NOT GIVEN. Uzluksizlik (consistently, have remained) matndagi uzilishga (fell out of fashion … revived) zid boʻlsa → FALSE."],
+    signals:"still, no longer, already, yet, soon, now, once, consistently, since",
+    ex:{t:"Researchers are investigating whether such corals could be bred and transplanted.", s:"Breeding corals is already being used on a large scale.", a:"F", w:"Hozircha faqat oʻrganilmoqda."},
+    check:"Bayonot va matn bir xil vaqt haqida gapiryaptimi?" },
+  sequence: { name:"Sequence", uz:"Ketma-ketlik va tartib", short:"first / before / after / oldest — tartib aniq aytilmagan boʻlsa NOT GIVEN.",
+    body:["“Eng qadimgi” ≠ “birinchi burgʻulangan”; “mashhur” ≠ “birinchi”. Matndagi soʻz boshqa tartib haqida boʻlishi mumkin.",
+          "Matnda ikkala voqea va ularning tartibi bor boʻlsa — solishtiring (slightly later ↔ considerably earlier → FALSE).",
+          "by which time, prior to, not until, subsequently kabi bogʻlovchilar tartibni yashirin beradi."],
+    signals:"first, earlier, later, before, after, prior to, by which time, not until, subsequently",
+    ex:{t:"Egyptian hieroglyphs appear only slightly later than the first Mesopotamian signs.", s:"Egyptian hieroglyphs appeared considerably earlier than Mesopotamian writing.", a:"F", w:"Tartib ham, farq ham zid."},
+    check:"Matn aynan shu tartibni aytyaptimi?" },
+  negation: { name:"Negation", uz:"Inkor va ikki inkor", short:"not, no, at no point, unlike, rather than — inkorni oʻqib chiqmang.",
+    body:["Inkor kichik koʻrinadi, lekin butun maʼnoni teskari qiladi: “unlike most songbirds” — sayroqi qushlar bunday emas; “rather than permanently reshaping” — doimiy oʻzgarish emas.",
+          "Ikki inkor tasdiqqa teng: not uncommon = fairly common; “no clear preference → more likely” degani “clear preference → less likely” degani.",
+          "“at no point … did they approach” — hech qachon hatto yaqinlashmagan: undan oshishi ham mumkin emas."],
+    signals:"not, no, never, none, at no point, unlike, rather than, without, un-, in-, -less",
+    ex:{t:"Unlike earlier models, the new engine does not rely on fossil fuels.", s:"Earlier engine models did not rely on fossil fuels.", a:"F", w:"Soʻzlar bir xil, “unlike” maʼnoni teskari qiladi."},
+    check:"Matndagi har bir inkor nimaga tegishli?" },
+  wordmatch: { name:"Word matching", uz:"Soʻz mosligi tuzogʻi", short:"Bir xil soʻz ≠ bir xil maʼno. Soʻz nimaga tegishli ekanini tekshiring.",
+    body:["Savol tuzuvchi ataylab matndagi soʻzni bayonotga qoʻyadi. Siz uni koʻrib TRUE deysiz — lekin soʻz boshqa narsaga tegishli yoki maʼno teskari boʻlib chiqadi.",
+          "Misollar: “more heat-resistant TYPES” ↔ “a larger NUMBER of algae”; “first time … in consecutive years” ↔ “never before”; “revived the idea” ↔ “for the first time”; “limits its usefulness” ↔ “particularly useful”.",
+          "TRUE yozishdan oldin oʻzingizdan soʻring: matn buni xuddi shu kuch bilan va xuddi shu narsa haqida aytyaptimi?"],
+    signals:"bayonotdagi soʻz matnda aynan bir xil turgan boʻlsa — ehtiyot boʻling",
+    ex:{t:"The fungus acts slowly, which limits its usefulness once a swarm is already on the move.", s:"The fungus is particularly useful against migrating swarms.", a:"F", w:"“usefulness” soʻzi bor, lekin u cheklanishi haqida."},
+    check:"Bu soʻz matnda aynan nimaga tegishli?" }
+};
+const TRAP_ORDER = ["paraphrase","direct","quantifier","absolute","generalization","specificity","superlative","comparison","hedging","opinion","attribution","causal","assumption","time","sequence","negation","wordmatch"];
+
+const MISS = {
+  "T>F":"Siz FALSE dedingiz, lekin matn buni tasdiqlaydi. Koʻpincha paraphrase ni zidlik deb oʻqish yoki bitta soʻzni notoʻgʻri tushunish sababli boʻladi. Isbot jumlasini bayonot bilan soʻzma-soʻz emas, maʼno bilan solishtiring.",
+  "T>NG":"Ortiqcha ehtiyotkorlik: maʼlumot matnda bor edi, faqat boshqa soʻzlar bilan aytilgan. Soʻzlar mos kelmasa ham, maʼno va mavzu mos boʻlsa — TRUE.",
+  "F>T":"Matndagi oʻxshash soʻzlar aldadi: bitta soʻz (miqdor, inkor, kuchaytiruvchi soʻz yoki isbot darajasi) maʼnoni oʻzgartirgan. Jumlani oxirigacha, ayniqsa however, but, only dan keyingi qismini oʻqing.",
+  "F>NG":"Zidlikni koʻrmay qoldingiz: matnda bayonotni inkor qiladigan jumla bor. Barmoq testi: isbot jumlasini koʻrsatib, “bu teskarisini aytyapti” deya olasizmi?",
+  "NG>T":"Matnda yoʻq maʼlumotni bor deb oldingiz. Bayonotdagi qaysi qism (detal, sabab, “eng …”, miqdor) isbotsiz qolganini toping — aynan shu qism javobni NOT GIVEN qiladi.",
+  "NG>F":"Barmoq testi oʻtmaydi: matnda bayonotga zid jumla yoʻq — faqat bu haqda maʼlumot yoʻq. FALSE uchun matn teskarisini aytishi shart; indamasa — NOT GIVEN."
+};
+
+const LBL = {T:"TRUE", F:"FALSE", NG:"NOT GIVEN"};
+const EXAM = {IELTS:"IELTS Academic uslubi", TOEFL:"TOEFL uslubi", SAT:"SAT uslubi"};
+const LETTERS = "ABCDEFGH";
+
+/* ---------- Maʼlumotlarni tayyorlash ---------- */
+const Q = {}, ALL = [], PBY = {};
+PASSAGES.forEach(p => {
+  PBY[p.id] = p;
+  p.words = p.paras.join(" ").split(/\s+/).length;
+  p.qs.forEach((q, i) => { q.id = p.id + "-" + (i+1); q.n = i+1; q.P = p; Q[q.id] = q; ALL.push(q); });
+});
+
+let store = { ans:{} };
+try { const raw = localStorage.getItem("tfng-trenajor-v1"); if (raw) { const s = JSON.parse(raw); if (s && s.ans) store = s; } } catch(e) {}
+function save(){ try { localStorage.setItem("tfng-trenajor-v1", JSON.stringify(store)); } catch(e) {} }
+function record(q, v){
+  const r = store.ans[q.id] || { n:0, wrong:0, hist:[] };
+  r.n++; r.last = v; r.ok = (v === q.a); if (!r.ok) r.wrong++;
+  r.hist = (r.hist || []).concat(v).slice(-10);
+  store.ans[q.id] = r; save();
+}
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const fmt = s => { s = Math.max(0, Math.round(s)); return String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0"); };
+const dots = lv => "●".repeat(lv) + "○".repeat(3-lv);
+const pct = (a,b) => b ? Math.round(a*100/b) : 0;
+
+/* ---------- Holat ---------- */
+const S = { view:"lib", exam:"ALL", level:0, sess:null, timer:null };
+const view = document.getElementById("view");
+
+/* ---------- Umumiy bloklar ---------- */
+function passageHTML(p, opt){
+  opt = opt || {};
+  const body = p.paras.map((t, i) => {
+    let html = esc(t);
+    if (opt.ev && opt.evPara === i) {
+      const k = t.indexOf(opt.ev);
+      if (k >= 0) html = esc(t.slice(0,k)) + '<mark class="ev' + (opt.ng ? " ng" : "") + '" id="evmark">' + esc(opt.ev) + "</mark>" + esc(t.slice(k + opt.ev.length));
+    }
+    const focus = (opt.focus === i) ? " focus" : "";
+    return '<p class="para' + focus + '"><span class="pl" aria-hidden="true">' + LETTERS[i] + "</span>" + html + "</p>";
+  }).join("");
+  return '<div class="ph"><span class="tag t-' + p.exam + '">' + EXAM[p.exam] + '</span><h2 class="ptitle">' + esc(p.title) + '</h2><div class="pmeta">' + esc(p.topic) + " · " + p.words + " soʻz · daraja " + dots(p.level) + "</div></div>" + body;
+}
+
+function treeHTML(a){
+  const s1 = a === "F" ? "yes" : "no";
+  const s2 = a === "F" ? "skip" : (a === "T" ? "yes" : "no");
+  return '<ol class="tree">' +
+    '<li class="st ' + s1 + '"><span class="q">Matnda bayonotga zid jumla bormi?</span><span class="r">' + (a==="F" ? "Ha → <b>FALSE</b>" : "Yoʻq → keyingi savol") + "</span></li>" +
+    '<li class="st ' + s2 + '"><span class="q">Bayonotning barcha qismlari matnda isbotlanganmi?</span><span class="r">' + (a==="F" ? "—" : a==="T" ? "Ha → <b>TRUE</b>" : "Yoʻq → <b>NOT GIVEN</b>") + "</span></li></ol>";
+}
+
+function ruleHTML(k){
+  const t = TRAPS[k];
+  return t.body.map(b => "<p>" + esc(b) + "</p>").join("") +
+    '<div class="sig"><span class="lab">Signal soʻzlar</span> ' + esc(t.signals) + "</div>" +
+    '<div class="exbox"><div><span class="lab">Matn</span><span class="en">' + esc(t.ex.t) + '</span></div><div><span class="lab">Bayonot</span><span class="en">' + esc(t.ex.s) + '</span></div><div><span class="lab">Javob</span><b>' + LBL[t.ex.a] + "</b> — " + esc(t.ex.w) + "</div></div>" +
+    '<p class="chk"><span class="lab">Tekshirish savoli</span> ' + esc(t.check) + "</p>";
+}
+
+function trapCount(k){ return ALL.filter(q => q.trap === k).length; }
+
+function fbHTML(q, v, uid){
+  const ok = v === q.a, t = TRAPS[q.trap];
+  let h = '<div class="fb">';
+  h += '<div class="verdict ' + (ok ? "ok" : "bad") + '">' + (ok ? "✓ Toʻgʻri — " + LBL[q.a] : "✗ Xato. Siz: " + LBL[v] + " · Toʻgʻri javob: <b>" + LBL[q.a] + "</b>") + "</div>";
+  h += '<div class="fsec"><h4>' + (q.a === "NG" ? "Eng yaqin joy" : "Isbot") + " · " + LETTERS[q.p] + ' xatboshi</h4><blockquote class="' + (q.a === "NG" ? "ng" : "") + '">“' + esc(q.ev) + "”</blockquote>" +
+       (q.a === "NG" ? '<p class="note">Matn shu mavzuga eng yaqin joyda ham bayonotni na tasdiqlaydi, na inkor qiladi.</p>' : "") + "</div>";
+  h += '<div class="fsec"><h4>Tahlil</h4><p>' + esc(q.ex) + "</p></div>";
+  if (!ok) h += '<div class="fsec miss"><h4>Qayerda adashdingiz</h4><p>' + esc(MISS[q.a + ">" + v]) + "</p></div>";
+  h += '<div class="fsec"><h4>Qaror yoʻli</h4>' + treeHTML(q.a) + "</div>";
+  h += '<div class="trapcard"><div class="th"><span class="eyebrow">Tuzoq</span><b>' + esc(t.uz) + '</b><span class="mono">' + esc(t.name) + "</span></div><p>" + esc(t.short) + "</p>" +
+       '<div class="btns"><button class="btn ghost" data-act="rule" data-uid="' + uid + '">Qoidani batafsil oʻqish</button><button class="btn ghost" data-act="trapdrill" data-t="' + q.trap + '">Shu tuzoq boʻyicha mashq (' + trapCount(q.trap) + ")</button></div>" +
+       '<div class="rulefull" id="rf-' + uid + '" hidden>' + ruleHTML(q.trap) + "</div></div>";
+  return h + "</div>";
+}
+
+function bubbles(sel, done, correct, act, extra){
+  return ["T","F","NG"].map((v, i) => {
+    let c = "bub";
+    if (sel === v) c += " sel";
+    if (done && v === correct) c += " right";
+    if (done && sel === v && v !== correct) c += " wrong";
+    return '<button class="' + c + '" data-act="' + act + '" data-v="' + v + '"' + (extra || "") + (done ? " disabled" : "") + ' aria-pressed="' + (sel === v) + '"><span class="o">' + (v === "NG" ? "NG" : v) + '</span><span class="w">' + LBL[v] + '</span><kbd>' + (i+1) + "</kbd></button>";
+  }).join("");
+}
+
+/* ---------- Kutubxona ---------- */
+function libHTML(){
+  const answered = Object.keys(store.ans).filter(k => Q[k]).length;
+  const wrongIds = Object.keys(store.ans).filter(k => Q[k] && !store.ans[k].ok);
+  const list = PASSAGES.filter(p => (S.exam === "ALL" || p.exam === S.exam) && (!S.level || p.level === S.level));
+  let h = '<section class="intro"><h1>True / False / Not Given</h1><p class="lede">IELTS, TOEFL va SAT uslubidagi ' + PASSAGES.length + " ta matn, " + ALL.length + " ta savol va " + TRAP_ORDER.length + " ta tuzoq qoidasi. Har javobdan keyin matndagi isbot belgilanadi va tuzoq qoidasi batafsil tushuntiriladi.</p>" +
+    '<div class="progress-line"><span>Yechilgan: <b class="num">' + answered + " / " + ALL.length + "</b></span><span>Toʻgʻri: <b class=\"num\">" + pct(answered - wrongIds.length, answered) + "%</b></span></div></section>";
+  h += '<section class="quick">' +
+    qcard("mix", "Aralash 20 savol", "Barcha matnlardan tasodifiy, har savol oʻz matni bilan") +
+    qcard("hard", "Eng qiyin savollar", ALL.filter(q => q.lv === 3).length + " ta 3-darajali savol") +
+    qcard("mist", "Xatolarim ustida", wrongIds.length ? wrongIds.length + " ta savol qayta yechiladi" : "Hozircha xato yoʻq", !wrongIds.length) +
+    qcard("ng", "Faqat FALSE va NOT GIVEN", "Eng koʻp adashiladigan juftlik — 30 savol") + "</section>";
+  h += '<section class="filters" aria-label="Filtr"><div class="seg" role="group">' +
+    ["ALL","IELTS","TOEFL","SAT"].map(e => '<button data-act="fexam" data-v="' + e + '" aria-pressed="' + (S.exam === e) + '">' + (e === "ALL" ? "Hammasi" : e) + "</button>").join("") +
+    '</div><div class="seg" role="group">' + [0,1,2,3].map(l => '<button data-act="flevel" data-v="' + l + '" aria-pressed="' + (S.level === l) + '">' + (l ? "Daraja " + l : "Har qanday daraja") + "</button>").join("") + "</div></section>";
+  h += '<section class="plist">' + list.map(p => {
+    const done = p.qs.filter(q => store.ans[q.id]).length, ok = p.qs.filter(q => store.ans[q.id] && store.ans[q.id].ok).length;
+    return '<article class="prow"><div class="pinfo"><span class="tag t-' + p.exam + '">' + p.exam + '</span><h3>' + esc(p.title) + '</h3><div class="pmeta">' + esc(p.topic) + " · " + p.qs.length + " savol · " + p.words + " soʻz · daraja " + dots(p.level) + "</div>" +
+      '<div class="bar" aria-label="Natija"><i style="width:' + pct(done, p.qs.length) + '%"></i></div><div class="pmeta num">' + (done ? done + " / " + p.qs.length + " yechilgan, " + ok + " toʻgʻri" : "Hali boshlanmagan") + "</div></div>" +
+      '<div class="pact"><button class="btn primary" data-act="start" data-p="' + p.id + '" data-m="practice">Mashq</button><button class="btn" data-act="start" data-p="' + p.id + '" data-m="exam">Imtihon · ' + fmt(p.qs.length * 90) + "</button></div></article>";
+  }).join("") + (list.length ? "" : '<p class="empty">Bu filtr boʻyicha matn yoʻq.</p>') + "</section>";
+  h += '<p class="foot">Matnlar shu trenajor uchun IELTS, TOEFL va SAT Reading uslubida yozilgan original mashq matnlari; rasmiy imtihon materiallari emas. True / False / Not Given formati IELTS Readingga xos — TOEFL va SAT uslubidagi matnlar akademik va badiiy matnni oʻqish uchun qoʻshilgan.</p>';
+  return h;
+}
+function qcard(k, t, d, dis){ return '<button class="qc" data-act="quick" data-k="' + k + '"' + (dis ? " disabled" : "") + '><b>' + t + "</b><span>" + d + "</span></button>"; }
+
+/* ---------- Seans ---------- */
+function startSession(ids, title, mode, pid){
+  stopTimer();
+  S.sess = { ids, title, mode, pid, idx:0, ans:{}, hint:{}, open:{}, submitted:false, left: ids.length * 90 };
+  S.view = "sess"; render(); window.scrollTo(0,0);
+  if (mode === "exam") startTimer();
+}
+function startTimer(){
+  S.timer = setInterval(() => {
+    const s = S.sess; if (!s || s.submitted) return stopTimer();
+    s.left--; const el = document.getElementById("clock"); if (el) { el.textContent = fmt(s.left); el.classList.toggle("low", s.left <= 60); }
+    if (s.left <= 0) { submitExam(true); }
+  }, 1000);
+}
+function stopTimer(){ if (S.timer) { clearInterval(S.timer); S.timer = null; } }
+
+function sessHTML(){
+  const s = S.sess;
+  const q = Q[s.ids[s.idx]];
+  let evOpt = {};
+  if (s.mode === "practice") {
+    if (s.ans[q.id]) evOpt = { ev:q.ev, evPara:q.p, ng:q.a === "NG" };
+    else if (s.hint[q.id]) evOpt = { focus:q.p };
+  } else if (s.submitted && s.focusQ) {
+    const fq = Q[s.focusQ]; evOpt = { ev:fq.ev, evPara:fq.p, ng:fq.a === "NG" };
+  }
+  const p = s.mode === "practice" ? q.P : PBY[s.pid];
+  const correct = s.ids.filter(id => s.ans[id] === Q[id].a).length, answered = s.ids.filter(id => s.ans[id]).length;
+  let h = '<div class="sbar"><button class="btn ghost" data-act="home">← Matnlar</button><div class="stitle"><b>' + esc(s.title) + '</b><span class="mono">' + (s.mode === "exam" ? "Imtihon rejimi" : "Mashq rejimi") + "</span></div>";
+  if (s.mode === "exam") h += '<div class="clockwrap">' + (s.submitted ? '<span class="score num">' + correct + " / " + s.ids.length + "</span>" : '<span class="mono">Vaqt</span><span id="clock" class="clock num">' + fmt(s.left) + "</span>") + "</div>";
+  else h += '<div class="clockwrap"><span class="mono">Toʻgʻri</span><span class="score num">' + correct + " / " + answered + "</span></div>";
+  h += "</div>";
+  if (s.mode === "practice") h += '<div class="strip" role="group" aria-label="Savollar">' + s.ids.map((id, i) => {
+      let c = "sq"; if (s.ans[id]) c += s.ans[id] === Q[id].a ? " ok" : " bad"; if (i === s.idx) c += " cur";
+      return '<button class="' + c + '" data-act="goto" data-i="' + i + '" aria-label="Savol ' + (i+1) + '">' + (i+1) + "</button>"; }).join("") + "</div>";
+  h += '<div class="sgrid"><section class="passage" id="passage" aria-label="Matn">' + passageHTML(p, evOpt) + '</section><section class="qpane">' + (s.mode === "practice" ? practiceQ(q) : examList()) + "</section></div>";
+  return h;
+}
+
+function practiceQ(q){
+  const s = S.sess, v = s.ans[q.id], done = !!v;
+  let h = '<div class="qcard"><div class="qh"><span class="mono">Savol ' + (s.idx+1) + " / " + s.ids.length + '</span><span class="mono">' + q.P.exam + " · daraja " + dots(q.lv) + "</span></div>";
+  h += '<p class="instr">Bayonot matndagi maʼlumotga mosmi?</p><p class="stmt">' + esc(q.s) + "</p>";
+  h += '<div class="bubbles">' + bubbles(v, done, q.a, "ans") + "</div>";
+  if (!done) h += '<div class="hintrow"><button class="btn ghost" data-act="hint"' + (s.hint[q.id] ? " disabled" : "") + ">Maslahat</button>" + (s.hint[q.id] ? '<p class="hint">Kalit soʻz: <b>' + esc(q.kw) + "</b> — " + LETTERS[q.p] + " xatboshini diqqat bilan oʻqing. Jumlani oxirigacha oʻqishni unutmang.</p>" : '<span class="kbdnote">Klaviatura: 1 / 2 / 3 — javob, → — keyingi</span>') + "</div>";
+  if (done) h += fbHTML(q, v, "p" + q.id);
+  h += '<div class="nav"><button class="btn" data-act="prev"' + (s.idx === 0 ? " disabled" : "") + '>← Oldingi</button>' +
+       (s.idx < s.ids.length - 1 ? '<button class="btn primary" data-act="next">Keyingi →</button>' : '<button class="btn primary" data-act="finish">Yakunlash</button>') + "</div>";
+  return h + "</div>";
+}
+
+function examList(){
+  const s = S.sess;
+  let h = '<div class="qcard"><p class="instr">Do the following statements agree with the information given in the passage? Har savolga TRUE, FALSE yoki NOT GIVEN belgilang.</p>';
+  h += s.ids.map((id, i) => {
+    const q = Q[id], v = s.ans[id];
+    let row = '<div class="erow' + (s.submitted ? (v === q.a ? " ok" : " bad") : "") + '"><div class="eq"><span class="en num">' + (i+1) + '</span><p>' + esc(q.s) + "</p></div>";
+    row += '<div class="bubbles sm">' + bubbles(v, s.submitted, q.a, "eans", ' data-id="' + id + '"') + "</div>";
+    if (s.submitted) {
+      row += '<button class="btn ghost" data-act="eopen" data-id="' + id + '" aria-expanded="' + !!s.open[id] + '">' + (s.open[id] ? "Tahlilni yopish" : "Tahlil va isbot") + "</button>";
+      if (s.open[id]) row += fbHTML(q, v || "none", "e" + id);
+    }
+    return row + "</div>";
+  }).join("");
+  if (!s.submitted) {
+    const n = s.ids.filter(id => s.ans[id]).length;
+    h += '<div class="nav"><span class="mono">' + n + " / " + s.ids.length + ' belgilangan</span><button class="btn primary" data-act="submit">Topshirish</button></div>';
+  } else {
+    h += '<div class="nav"><button class="btn" data-act="start" data-p="' + s.pid + '" data-m="practice">Shu matnni mashq rejimida</button><button class="btn primary" data-act="home">Boshqa matn</button></div>';
+  }
+  return h + "</div>";
+}
+
+function submitExam(auto){
+  const s = S.sess; stopTimer(); s.submitted = true; s.auto = !!auto;
+  s.ids.forEach(id => { if (s.ans[id]) record(Q[id], s.ans[id]); });
+  render(); window.scrollTo(0,0);
+}
+
+function finishHTML(){
+  const s = S.sess, n = s.ids.length, ok = s.ids.filter(id => s.ans[id] === Q[id].a).length, done = s.ids.filter(id => s.ans[id]).length;
+  const bytrap = {};
+  s.ids.forEach(id => { const q = Q[id]; if (s.ans[id] && s.ans[id] !== q.a) bytrap[q.trap] = (bytrap[q.trap] || 0) + 1; });
+  const tops = Object.entries(bytrap).sort((a,b) => b[1]-a[1]).slice(0,3);
+  let h = '<section class="finish"><span class="mono">Seans yakunlandi</span><h1 class="num">' + ok + " / " + done + "</h1><p>" + esc(s.title) + " · " + n + " ta savoldan " + done + " tasi yechildi, aniqlik " + pct(ok, done) + "%.</p>";
+  if (tops.length) h += "<h3>Koʻp adashgan tuzoqlaringiz</h3><ul class='tlist'>" + tops.map(([k,c]) => "<li><b>" + esc(TRAPS[k].uz) + "</b> — " + c + " ta xato. " + esc(TRAPS[k].short) + ' <button class="link" data-act="trapdrill" data-t="' + k + '">Mashq qilish</button></li>').join("") + "</ul>";
+  else if (done) h += "<p>Bu seansda xato boʻlmadi.</p>";
+  h += '<div class="nav"><button class="btn" data-act="home">Matnlarga qaytish</button>' + (s.ids.some(id => s.ans[id] && s.ans[id] !== Q[id].a) ? '<button class="btn primary" data-act="redowrong">Xatolarni qayta yechish</button>' : "") + "</div></section>";
+  return h;
+}
+
+/* ---------- Qoidalar ---------- */
+function rulesHTML(){
+  let h = '<section class="intro"><h1>Qoidalar</h1><p class="lede">Javob faqat matnga tayanadi — umumiy bilim, hayotiy tajriba va hisob-kitobli taxmin hisobga olinmaydi.</p></section>';
+  h += '<section class="rsec"><h2>Uch javob</h2><div class="tbl"><table><thead><tr><th>Javob</th><th>Matnda nima bor</th><th>Oʻziga beriladigan savol</th></tr></thead><tbody>' +
+    "<tr><td><b>TRUE</b></td><td>Bayonotdagi barcha maʼlumot matnda bor (koʻpincha boshqa soʻzlar bilan)</td><td>Matn aynan shuni aytyaptimi?</td></tr>" +
+    "<tr><td><b>FALSE</b></td><td>Matnda bayonotga zid maʼlumot bor</td><td>Matn buning teskarisini aytyaptimi?</td></tr>" +
+    "<tr><td><b>NOT GIVEN</b></td><td>Matnda tasdiq ham, inkor ham yoʻq</td><td>Buni matn asosida isbotlab ham, rad etib ham boʻlmaydimi?</td></tr></tbody></table></div>" +
+    '<p class="small">YES / NO / NOT GIVEN — xuddi shu mantiq, lekin muallifning fikri (views, claims) haqida. Savollar matndagi maʼlumot tartibida keladi.</p></section>';
+  h += '<section class="rsec"><h2>Qaror daraxti</h2><div class="dtree"><div class="node">Bayonotni qismlarga boʻling: kim / nima + amal + miqdor, vaqt, sabab, shart</div><div class="arrow">↓</div>' +
+    '<div class="node dq">1. Matnda bayonotga zid jumla bormi?</div><div class="branch"><div class="leaf f"><span class="mono">Ha</span><b>FALSE</b><span>Barmoq bilan koʻrsata oladigan ziddiyat</span></div><div class="leaf go"><span class="mono">Yoʻq</span>↓</div></div>' +
+    '<div class="node dq">2. Bayonotning barcha qismlari matnda isbotlanganmi?</div><div class="branch"><div class="leaf t"><span class="mono">Ha</span><b>TRUE</b><span>Paraphrase bilan boʻlsa ham</span></div><div class="leaf ng"><span class="mono">Yoʻq</span><b>NOT GIVEN</b><span>Kamida bitta qism isbotsiz</span></div></div></div></section>';
+  h += '<section class="rsec"><h2>Ishlash algoritmi</h2><ol class="algo">' + [
+    "Barcha bayonotlarni oʻqing va langar soʻzlarni belgilang: ismlar, raqamlar, sanalar, atamalar.",
+    "Har bayonotdagi xavfli soʻzlarni aylana ichiga oling: all, only, always, the most, proven, caused, still.",
+    "Matndan langar soʻzni yoki uning sinonimini toping; savollar matn tartibida kelishini unutmang.",
+    "Topilgan jumlani, undan oldingi va keyingi jumlani oʻqing — chegaralovchi shart (however, only, except) koʻpincha keyingi jumlada boʻladi.",
+    "Bayonotni qismlarga boʻling va har qismni matn bilan alohida solishtiring.",
+    "Qaror qabul qiling: bitta qism zid → FALSE; zid qism yoʻq, lekin bitta qism isbotsiz → NOT GIVEN; hammasi mos → TRUE.",
+    "Bitta savolga 1,5 daqiqadan ortiq sarflamang. Topilmasa, vaqtincha NOT GIVEN deb belgilang va keyingisiga oʻting."
+  ].map(x => "<li>" + esc(x) + "</li>").join("") + "</ol></section>";
+  h += '<section class="rsec"><h2>Tuzoqlar</h2><p class="small">Har bir tuzoq qoidasi, signal soʻzlari, namunasi va tekshirish savoli. Natijalaringiz shu yerda ham koʻrinadi.</p><div class="traps">' +
+    TRAP_ORDER.map(k => {
+      const t = TRAPS[k], st = trapStat(k);
+      return '<details class="trap"><summary><span class="tn"><b>' + esc(t.uz) + '</b><span class="mono">' + esc(t.name) + '</span></span><span class="ts num">' + (st.n ? pct(st.ok, st.n) + "% · " + st.n + " urinish" : trapCount(k) + " savol") + '</span></summary><div class="tb"><p class="short">' + esc(t.short) + "</p>" + ruleHTML(k) +
+        '<button class="btn primary" data-act="trapdrill" data-t="' + k + '">Shu tuzoq boʻyicha mashq (' + trapCount(k) + " savol)</button></div></details>";
+    }).join("") + "</div></section>";
+  return h;
+}
+function trapStat(k){
+  let n = 0, ok = 0;
+  ALL.forEach(q => { if (q.trap === k && store.ans[q.id]) { n++; if (store.ans[q.id].ok) ok++; } });
+  return { n, ok };
+}
+
+/* ---------- Natijalar ---------- */
+function statsHTML(){
+  const ids = Object.keys(store.ans).filter(k => Q[k]);
+  const ok = ids.filter(k => store.ans[k].ok).length;
+  let h = '<section class="intro"><h1>Natijalar</h1><p class="lede">Har savol boʻyicha oxirgi javobingiz hisobga olinadi. Maʼlumot faqat shu brauzerda saqlanadi.</p></section>';
+  if (!ids.length) return h + '<section class="rsec"><p>Hali birorta savol yechilmagan. Matnlar boʻlimidan mashqni boshlang — natijalar shu yerda paydo boʻladi.</p><button class="btn primary" data-act="home">Matnlarga oʻtish</button></section>';
+  h += '<section class="kpis"><div><span class="mono">Yechilgan</span><b class="num">' + ids.length + " / " + ALL.length + '</b></div><div><span class="mono">Aniqlik</span><b class="num">' + pct(ok, ids.length) + '%</b></div><div><span class="mono">Hozir xato</span><b class="num">' + (ids.length - ok) + "</b></div></section>";
+  // javob turi boʻyicha
+  const conf = {};
+  ids.forEach(k => { const r = store.ans[k], a = Q[k].a; if (!r.ok) { const key = a + ">" + r.last; conf[key] = (conf[key] || 0) + 1; } });
+  h += '<section class="rsec"><h2>Javob turi boʻyicha</h2><div class="hbars">' + ["T","F","NG"].map(a => {
+    const xs = ids.filter(k => Q[k].a === a), o = xs.filter(k => store.ans[k].ok).length;
+    return '<div class="hb"><span class="hl">' + LBL[a] + ' savollar</span><span class="track"><i style="width:' + pct(o, xs.length) + '%"></i></span><span class="hv num">' + (xs.length ? pct(o, xs.length) + "% · " + o + "/" + xs.length : "—") + "</span></div>";
+  }).join("") + "</div>";
+  const top = Object.entries(conf).sort((a,b) => b[1]-a[1])[0];
+  if (top) { const [ca, ua] = top[0].split(">"); h += '<div class="insight"><span class="eyebrow">Eng koʻp takrorlanayotgan xato</span><p><b>' + LBL[ca] + " javobli savolga " + LBL[ua] + "</b> deyapsiz — " + top[1] + " marta. " + esc(MISS[top[0]]) + "</p></div>"; }
+  h += "</section>";
+  h += '<section class="rsec"><h2>Tuzoqlar boʻyicha</h2><div class="hbars">' + TRAP_ORDER.map(k => ({ k, st:trapStat(k) })).filter(x => x.st.n).sort((a,b) => pct(a.st.ok,a.st.n) - pct(b.st.ok,b.st.n)).map(x =>
+    '<div class="hb"><span class="hl">' + esc(TRAPS[x.k].uz) + '</span><span class="track' + (pct(x.st.ok,x.st.n) < 60 ? " weak" : "") + '"><i style="width:' + pct(x.st.ok, x.st.n) + '%"></i></span><span class="hv num">' + pct(x.st.ok, x.st.n) + "% · " + x.st.ok + "/" + x.st.n + '</span><button class="link" data-act="trapdrill" data-t="' + x.k + '">Mashq</button></div>').join("") + "</div></section>";
+  const wrong = ids.filter(k => !store.ans[k].ok);
+  h += '<section class="rsec"><h2>Xatolar daftari</h2>';
+  if (wrong.length) {
+    h += '<button class="btn primary" data-act="quick" data-k="mist">Hammasini qayta yechish (' + wrong.length + ")</button><ul class=\"wlist\">" + wrong.map(k => { const q = Q[k], r = store.ans[k];
+      return "<li><span class='mono'>" + q.P.exam + " · " + esc(q.P.title) + " · " + q.n + "-savol</span><p>" + esc(q.s) + "</p><span class='small'>Siz: " + LBL[r.last] + " · Toʻgʻri: <b>" + LBL[q.a] + "</b> · Tuzoq: " + esc(TRAPS[q.trap].uz) + "</span></li>"; }).join("") + "</ul>";
+  } else h += "<p>Hozir xato javob yoʻq.</p>";
+  h += "</section>";
+  h += '<section class="rsec reset">' + (S.confirmReset ? '<p>Barcha natijalar oʻchiriladi. Davom etasizmi?</p><button class="btn danger" data-act="reset2">Ha, oʻchirish</button> <button class="btn" data-act="reset0">Bekor qilish</button>' : '<button class="btn ghost" data-act="reset1">Natijalarni tozalash</button>') + "</section>";
+  return h;
+}
+
+/* ---------- Render ---------- */
+function render(){
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-current", b.dataset.v === S.view || (S.view === "sess" && b.dataset.v === "lib") || (S.view === "fin" && b.dataset.v === "lib") ? "page" : "false"));
+  document.body.classList.toggle("in-sess", S.view === "sess");
+  if (S.view === "lib") view.innerHTML = libHTML();
+  else if (S.view === "rules") view.innerHTML = rulesHTML();
+  else if (S.view === "stats") view.innerHTML = statsHTML();
+  else if (S.view === "fin") view.innerHTML = finishHTML();
+  else if (S.view === "sess") {
+    view.innerHTML = sessHTML();
+    const m = document.getElementById("evmark"), pane = document.getElementById("passage");
+    if (m && pane) { const top = m.offsetTop - pane.clientHeight / 3; pane.scrollTo({ top: Math.max(0, top), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
+    const f = document.querySelector(".para.focus"); if (f && pane) pane.scrollTo({ top: Math.max(0, f.offsetTop - 12) });
+  }
+}
+
+/* ---------- Hodisalar ---------- */
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b || b.disabled) return;
+  const a = b.dataset.act, s = S.sess;
+  switch (a) {
+    case "tab": stopTimer(); S.view = b.dataset.v; S.confirmReset = false; render(); window.scrollTo(0,0); break;
+    case "home": stopTimer(); S.view = "lib"; render(); window.scrollTo(0,0); break;
+    case "fexam": S.exam = b.dataset.v; render(); break;
+    case "flevel": S.level = +b.dataset.v; render(); break;
+    case "start": { const p = PBY[b.dataset.p]; startSession(p.qs.map(q => q.id), p.title, b.dataset.m, p.id); break; }
+    case "quick": {
+      const k = b.dataset.k;
+      if (k === "mix") startSession(shuffle(ALL).slice(0,20).map(q => q.id), "Aralash 20 savol", "practice");
+      if (k === "hard") startSession(shuffle(ALL.filter(q => q.lv === 3)).map(q => q.id), "Eng qiyin savollar", "practice");
+      if (k === "mist") { const w = Object.keys(store.ans).filter(id => Q[id] && !store.ans[id].ok); if (w.length) startSession(shuffle(w), "Xatolarim ustida", "practice"); }
+      if (k === "ng") startSession(shuffle(ALL.filter(q => q.a !== "T")).slice(0,30).map(q => q.id), "FALSE va NOT GIVEN", "practice");
+      break; }
+    case "trapdrill": { const k = b.dataset.t; startSession(shuffle(ALL.filter(q => q.trap === k)).map(q => q.id), "Tuzoq: " + TRAPS[k].uz, "practice"); break; }
+    case "ans": { const q = Q[s.ids[s.idx]]; if (s.ans[q.id]) break; s.ans[q.id] = b.dataset.v; record(q, b.dataset.v); render(); break; }
+    case "hint": s.hint[s.ids[s.idx]] = true; render(); break;
+    case "next": if (s.idx < s.ids.length - 1) { s.idx++; render(); scrollQ(); } break;
+    case "prev": if (s.idx > 0) { s.idx--; render(); scrollQ(); } break;
+    case "goto": s.idx = +b.dataset.i; render(); scrollQ(); break;
+    case "finish": S.view = "fin"; render(); window.scrollTo(0,0); break;
+    case "redowrong": { const w = s.ids.filter(id => s.ans[id] && s.ans[id] !== Q[id].a); startSession(w, "Xatolarni qayta yechish", "practice"); break; }
+    case "eans": if (!s.submitted) { s.ans[b.dataset.id] = b.dataset.v; const keep = window.scrollY; render(); window.scrollTo(0, keep); } break;
+    case "submit": submitExam(false); break;
+    case "eopen": { const id = b.dataset.id; s.open[id] = !s.open[id]; if (s.open[id]) s.focusQ = id; const keep = window.scrollY; render(); window.scrollTo(0, keep); break; }
+    case "rule": { const el = document.getElementById("rf-" + b.dataset.uid); if (el) { el.hidden = !el.hidden; b.textContent = el.hidden ? "Qoidani batafsil oʻqish" : "Qoidani yopish"; } break; }
+    case "reset1": S.confirmReset = true; render(); break;
+    case "reset0": S.confirmReset = false; render(); break;
+    case "reset2": store = { ans:{} }; save(); S.confirmReset = false; render(); break;
+  }
+});
+function scrollQ(){ const el = document.querySelector(".qpane"); if (el && window.innerWidth < 900) el.scrollIntoView({ block:"start" }); }
+
+document.addEventListener("keydown", e => {
+  if (S.view !== "sess" || !S.sess || S.sess.mode !== "practice" || e.metaKey || e.ctrlKey || e.altKey) return;
+  const s = S.sess, q = Q[s.ids[s.idx]], k = e.key.toLowerCase();
+  const map = { "1":"T", "2":"F", "3":"NG", t:"T", f:"F", n:"NG" };
+  if (map[k] && !s.ans[q.id]) { s.ans[q.id] = map[k]; record(q, map[k]); render(); }
+  else if ((k === "arrowright" || k === "enter") && s.ans[q.id] && s.idx < s.ids.length - 1) { s.idx++; render(); }
+  else if (k === "arrowleft" && s.idx > 0) { s.idx--; render(); }
+  else if (k === "h" && !s.ans[q.id]) { s.hint[q.id] = true; render(); }
+});
+
+render();
+
+</script>
+
+</body>
+</html>
