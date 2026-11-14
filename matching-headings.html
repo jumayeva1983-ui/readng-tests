@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Matching Headings Trenajori</title>
+<title>Matching Headings Tahlil Trenajori</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
 <style>
-/* Layout: imtihon kitobchasi — chapda matn varagʻi, oʻngda sarlavhalar roʻyxati va javob varagʻi; isbot gapi marker bilan belgilanadi */
+/* Layout: imtihon kitobchasi — chapda matn varagʻi, oʻngda sarlavhalar roʻyxati va javob tahlili; joriy paragraf qalam rangida, isbot gapi marker bilan belgilanadi */
 :root{
   --paper:#EEF1F5; --sheet:#FFFFFF; --ink:#151D2C; --muted:#586376; --line:#D5DBE4; --soft:#E6EAF0;
   --pencil:#2B4BD3; --pencil-ink:#FFFFFF; --pencil-soft:#E3E8FC;
@@ -224,10 +224,92 @@ pre.tpl{margin:0;white-space:pre-wrap;font:400 14px/1.7 var(--f-mono);background
 .wlist li:first-child{border-top:0}
 .empty{padding:20px 0;color:var(--muted)}
 
+/* tezkor mashqlar, paragraf tasmasi, sarlavha tanlash, javob tahlili */
+.xlink{font-size:13.5px;color:var(--pencil);text-decoration:none;font-weight:500;white-space:nowrap}
+.xlink:hover{text-decoration:underline}
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:22px}
+.qc{text-align:left;border:1px solid var(--line);background:var(--sheet);border-radius:var(--r);padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-width:0}
+.qc b{font:500 17.5px/1.25 var(--f-read)}
+.qc span{font-size:13px;color:var(--muted)}
+.qc:hover:not(:disabled){border-color:var(--pencil)}
+.qc:disabled{opacity:.5;cursor:default}
+.strip{display:flex;gap:6px;flex-wrap:wrap;padding-bottom:12px}
+.sq{min-width:34px;height:32px;padding:0 8px;border:1px solid var(--line);background:var(--sheet);border-radius:4px;font:500 13px/1 var(--f-mono);cursor:pointer;color:var(--muted)}
+.sq.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.sq.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.sq.cur{box-shadow:0 0 0 2px var(--pencil);color:var(--ink)}
+.score{font:600 22px/1 var(--f-read)}
+.para.dim{color:var(--muted)}
+.para.cur{background:var(--pencil-soft);border-radius:4px;padding:8px 10px 8px 52px;margin-inline:-8px}
+.para.cur .pl{left:8px;top:11px;background:var(--pencil);border-color:var(--pencil);color:var(--pencil-ink)}
+.para.cur .pk{left:10px;top:36px}
+.only-narrow{display:none}
+.qh{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.instr{font:500 18.5px/1.35 var(--f-read);margin:10px 0 12px}
+.instr span{display:block;font:400 13.5px/1.45 var(--f-ui);color:var(--muted);margin-top:3px}
+.hopts{display:flex;flex-direction:column;gap:6px}
+.hopt{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:8px;align-items:baseline;text-align:left;border:1px solid var(--line);background:var(--sheet);border-radius:var(--r);padding:9px 12px;cursor:pointer;font:400 16.5px/1.35 var(--f-read);color:var(--ink)}
+.hopt .rn{font:600 12.5px/1 var(--f-mono);color:var(--muted)}
+.hopt .un{font:500 10.5px/1.2 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hopt:hover:not(:disabled){border-color:var(--muted)}
+.hopt.sel{border-color:var(--pencil);background:var(--pencil-soft);box-shadow:inset 0 0 0 1px var(--pencil)}
+.hopt.sel .rn{color:var(--pencil)}
+.hopt:disabled{cursor:default}
+.hopt.used{color:var(--muted);background:transparent;border-style:dashed}
+.hopt.used .ht{text-decoration:line-through}
+.hopt.right{border-color:var(--ok);background:var(--ok-soft)}
+.hopt.right .rn,.hopt.right .un{color:var(--ok)}
+.hopt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.hopt.wrong .rn,.hopt.wrong .un{color:var(--bad)}
+.qcard .hinttxt{font-size:14px;background:var(--pencil-soft);padding:9px 12px;border-radius:4px;margin:10px 0 0}
+.fb{display:flex;flex-direction:column;gap:16px;margin-top:16px}
+.verdict{padding:10px 14px;border-radius:var(--r);font-weight:600;display:flex;flex-direction:column;gap:3px;scroll-margin-top:calc(env(safe-area-inset-top, 0px) + 76px)}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)}
+.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+.verdict .vh{font:400 16.5px/1.35 var(--f-read);color:var(--ink)}
+.fsec{display:flex;flex-direction:column;gap:7px;min-width:0}
+.fsec h4{font:500 11px/1.3 var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0}
+.fsec p{margin:0;max-width:68ch}
+.fsec.miss{background:var(--bad-soft);border-radius:var(--r);padding:12px 14px}
+.fsec.miss h4{color:var(--bad)}
+.fsec.miss .note{color:var(--ink)}
+.advice{font-size:14px;background:var(--sheet);border-radius:4px;padding:9px 12px}
+.tree{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.tree li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;padding:9px 12px;border-top:1px solid var(--line);font-size:14px;align-items:start}
+.tree li:first-child{border-top:0}
+.tree .tq b{display:block;font:500 10.5px/1.5 var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.tree .tr{display:flex;flex-direction:column;gap:3px;align-items:flex-end}
+.tree .r{font:600 12.5px/1.4 var(--f-mono);white-space:nowrap}
+.tree .r.yes{color:var(--ok)}
+.tree .r.no{color:var(--bad)}
+.tree li.fail{background:var(--bad-soft)}
+.tree .why{grid-column:1 / -1;font-size:13.5px;color:var(--bad);font-weight:500}
+.trapcard{border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--paper)}
+.trapcard .th{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.trapcard p{margin:0;max-width:68ch}
+.rulefull{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:8px;font-size:14.5px}
+.tlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.tlist li{border-top:1px solid var(--line);padding-block:9px;display:flex;flex-direction:column;gap:4px;font-size:14.5px}
+.tlist li:first-child{border-top:0;padding-top:0}
+.erow{border-top:1px solid var(--line);padding-block:12px;display:flex;flex-direction:column;gap:4px}
+.erow:first-of-type{border-top:0;padding-top:0}
+.eh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.eh .ea{font-size:14px;flex:1;min-width:0}
+.finish{max-width:780px;padding-block:32px 0;display:flex;flex-direction:column;gap:14px}
+.finish h1{font:600 clamp(44px,8vw,72px)/1 var(--f-read);margin:0}
+.finish p{margin:0;max-width:68ch}
+.finish .rsec{margin-top:0}
+.dsteps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);max-width:none}
+.dsteps li{padding:11px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
+.dsteps li:first-child{border-top:0}
+.dsteps .no{font-size:13.5px;color:var(--bad)}
+
 @media (max-width: 900px){
   .sgrid{grid-template-columns:minmax(0,1fr)}
   .passage{position:relative;top:0;max-height:none;padding:16px 18px}
   .para{font-size:16.5px}
+  .only-narrow{display:inline-flex;margin-top:8px}
+  .passage.solo .para:not(.cur){display:none}
 }
 @media (max-width: 560px){
   .kpis,.rsum{grid-template-columns:1fr}
@@ -239,6 +321,10 @@ pre.tpl{margin:0;white-space:pre-wrap;font:400 14px/1.7 var(--f-mono);background
   .sigs div{grid-template-columns:1fr;gap:2px}
   .tabs button{padding:7px 8px;font-size:14px}
   .trap .tb{padding-left:14px}
+  .hopt{grid-template-columns:30px minmax(0,1fr)}
+  .hopt .un{grid-column:2}
+  .tree li{grid-template-columns:minmax(0,1fr)}
+  .tree .tr{flex-direction:row;gap:12px;align-items:baseline}
 }
 @media (prefers-reduced-motion: reduce){ *{transition:none!important;scroll-behavior:auto!important} }
 </style>
@@ -247,11 +333,11 @@ pre.tpl{margin:0;white-space:pre-wrap;font:400 14px/1.7 var(--f-mono);background
 
 <div class="wrap">
   <header class="top">
-    <div class="brand"><span class="key" aria-hidden="true">i–x</span><b>Matching Headings</b></div>
+    <div class="brand"><span class="key" aria-hidden="true">i–x</span><b>Matching Headings</b><a class="xlink" id="xlink" href="index.html" hidden>TFNG trenajori →</a></div>
     <nav class="tabs" aria-label="Boʻlimlar">
       <button data-act="tab" data-v="lib">Testlar</button>
       <button data-act="tab" data-v="drill">Mashqlar</button>
-      <button data-act="tab" data-v="rules">Strategiya</button>
+      <button data-act="tab" data-v="rules">Qoidalar</button>
       <button data-act="tab" data-v="stats">Natijalar</button>
       <button data-act="tab" data-v="teach">Oʻqituvchiga</button>
     </nav>
@@ -596,175 +682,252 @@ const SIGNALS = ["however","yet","but","instead","rather","in fact","despite","a
 const SIG_RE = new RegExp("\\b(" + SIGNALS.map(s => s.replace(/ /g, "\\s")).join("|") + ")\\b", "gi");
 function sigHL(html){ return html.replace(SIG_RE, '<b class="sigw">$1</b>'); }
 
-function trapOf(p, q, v){
-  if (!v) return { k:"blank", note:"Bu paragrafga sarlavha tanlanmagan." };
+/* ===================== SAVOLLAR INDEKSI ===================== */
+const QID = {}, ALLQ = [];
+PASSAGES.forEach(p => p.paras.forEach(q => { q.id = p.id + "-" + q.L; q.P = p; QID[q.id] = q; ALLQ.push(q); }));
+const HARD = ["forget", "time", "placebo"];
+
+/* Notoʻgʻri tanlangan sarlavha qaysi tuzoq turiga kirishi va nega xato ekani */
+function trapOf(p, q, v, reveal){
+  if (!v) return { k:"blank", note:"" };
   if (q.tr && q.tr[v]) return { k:q.tr[v][0], note:q.tr[v][1] };
-  if (p.ans[v]) return { k:"other", note:"“" + v + "” sarlavhasi " + p.ans[v] + " paragrafning asosiy fikrini ifodalaydi. Uni oʻsha paragrafga qoʻyish kerak edi." };
-  if (p.D[v]) return { k:p.D[v][0], note:p.D[v][1] };
+  if (p.ans[v]) {
+    const o = p.pm[p.ans[v]];
+    if (reveal || store.ans[o.id]) return { k:"other", note:"“" + v + "” sarlavhasi " + o.L + " paragrafning asosiy fikrini ifodalaydi (“" + o.gist + "”). " + q.L + " paragrafning asosiy fikri esa boshqa: “" + q.gist + "”" };
+    return { k:"other", note:"Bu sarlavha matndagi boshqa paragrafning asosiy fikrini ifodalaydi. " + q.L + " paragrafning asosiy fikri esa: “" + q.gist + "”" };
+  }
+  if (p.D[v]) return { k:p.D[v][0], note:"Bu ortiqcha (chalgʻituvchi) sarlavha: u matndagi hech bir paragrafga mos kelmaydi. " + p.D[v][1] + " " + q.L + " paragrafning asosiy fikri: “" + q.gist + "”" };
   return { k:"other", note:"" };
 }
 
+/* Qaror yoʻli: har bir nomzod sarlavha toʻrt savoldan oʻtishi kerak */
+const STEPS = [
+  { t:"Dalil", q:"Sarlavhadagi fikrni paragrafdan aniq bir gap bilan koʻrsatish mumkinmi?", f:["assumption","wordmatch"] },
+  { t:"Qamrov", q:"Sarlavha paragrafdagi gaplarning koʻpchiligini qamraydimi (bitta misol, kirish yoki oʻtish gapini emas)?", f:["detail","neighbour","turn"] },
+  { t:"Fokus va daraja", q:"Sarlavhaning fokus soʻzi, yoʻnalishi va daʼvo kuchi matndagi bilan bir xilmi?", f:["focus","opposite","degree"] },
+  { t:"Aniqlik", q:"Sarlavha aynan shu paragrafga xosmi (butun matnga yoki boshqa paragrafga emas)?", f:["broad","other"] }
+];
+const STEPFAIL = {
+  assumption:"matnda bunday fikrni aytgan gap yoʻq", wordmatch:"soʻz matnda bor, lekin sarlavhadagi fikr yoʻq",
+  detail:"faqat bitta misol yoki faktga mos keladi", neighbour:"faqat oʻtish gapiga mos, asosiy qismi qoʻshni paragrafda", turn:"faqat burilishgacha boʻlgan kirish qismiga mos keladi",
+  focus:"mavzu toʻgʻri, lekin yoritilgan jihat boshqa", opposite:"yoʻnalishi matndagi fikrga teskari", degree:"matndagidan kuchliroq daʼvo qiladi",
+  broad:"boshqa paragraflarga ham bir xil mos keladi", other:"boshqa paragrafning sarlavhasi"
+};
+function trapCount(k){ return ALLQ.filter(q => q.tr && Object.keys(q.tr).some(h => q.tr[h][0] === k)).length; }
+
 /* ===================== SAQLASH ===================== */
-const KEY = "mh-trenajor-v1";
-function fresh(){ return { att:{}, log:[], dr:{ trap:[0,0], topic:[0,0] } }; }
+const KEY = "mh-trenajor-v2";
+function fresh(){ return { ans:{}, exams:{}, dr:{ trap:[0,0], topic:[0,0] } }; }
 let store = fresh();
-try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.att && s.log) store = Object.assign(fresh(), s); } } catch(e) {}
+try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.ans) store = Object.assign(fresh(), s); } } catch(e) {}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e) {} }
+function record(q, v){
+  const r = store.ans[q.id] || { n:0, wrong:0, hist:[] };
+  r.n++; r.last = v; r.ok = v === q.a; if (!r.ok) r.wrong++;
+  r.hist = (r.hist || []).concat(v).slice(-10); r.r = "";
+  store.ans[q.id] = r; save();
+}
+function answeredIds(){ return Object.keys(store.ans).filter(k => QID[k]); }
+function wrongIds(){ return answeredIds().filter(k => !store.ans[k].ok); }
 
 const S = { view:"lib", sess:null, timer:null, confirmReset:false, dr:{ kind:"trap", item:null, opts:[], pick:null, txt:"", shown:false, sig:false } };
 
-/* ===================== TEST SESSIYASI ===================== */
-function start(pid, mode){
+/* ===================== SEANS ===================== */
+function startSession(ids, title, mode, pid){
   stopTimer();
-  const p = PBY[pid];
-  S.sess = { pid, mode, sel:{}, st:{}, okr:{}, li:{}, hint:{}, round:0, first:null, t0:Date.now(), left:p.mins * 60, used:null, done:false };
-  S.view = "sess"; render(); window.scrollTo(0, 0);
-  S.timer = setInterval(tick, 1000);
+  S.sess = { ids, title, mode, pid:pid || null, idx:0, ans:{}, pick:{}, hint:{}, open:{}, ro:{}, full:false, submitted:false, auto:false, left:mode === "exam" ? PBY[pid].mins * 60 : 0, used:null };
+  S.view = "sess"; render(); window.scrollTo(0, 0); focusPara();
+  if (mode === "exam") S.timer = setInterval(tick, 1000);
 }
 function stopTimer(){ if (S.timer) { clearInterval(S.timer); S.timer = null; } }
-function elapsed(){ return Math.floor((Date.now() - S.sess.t0) / 1000); }
 function tick(){
-  const s = S.sess; if (!s) return stopTimer();
-  if (s.mode === "exam" && s.round === 0) { s.left--; if (s.left <= 0) { s.left = 0; check(true); return; } }
-  const el = document.getElementById("clock");
-  if (el) { el.textContent = clockVal(); el.classList.toggle("low", s.mode === "exam" && s.round === 0 && s.left < 120); }
+  const s = S.sess; if (!s || s.submitted || s.mode !== "exam") return stopTimer();
+  s.left--;
+  if (s.left <= 0) { s.left = 0; submitExam(true); return; }
+  const el = document.getElementById("clock"); if (el) { el.textContent = fmt(s.left); el.classList.toggle("low", s.left < 120); }
 }
-function clockVal(){ const s = S.sess; if (s.used != null) return fmt(s.used); return s.mode === "exam" && s.round === 0 ? fmt(s.left) : fmt(elapsed()); }
-
-function check(auto){
-  const s = S.sess; if (!s || s.done) return;
-  const p = PBY[s.pid];
-  s.round++;
-  p.paras.forEach(q => {
-    if (s.st[q.L]) return;
-    const v = s.sel[q.L] || "";
-    if (v === q.a) { s.st[q.L] = "ok"; s.okr[q.L] = s.round; }
-    else {
-      s.st[q.L] = "bad";
-      const t = trapOf(p, q, v);
-      store.log.push({ p:p.id, L:q.L, v, a:q.a, k:t.k, r:"", n:s.round, t:Date.now() });
-      s.li[q.L] = store.log.length - 1;
-    }
-  });
-  if (s.round === 1) {
-    s.first = p.paras.filter(q => s.st[q.L] === "ok").length;
-    s.auto = !!auto;
-    const prev = store.att[p.id] || { n:0, best:0 };
-    store.att[p.id] = { n:prev.n + 1, first:s.first, best:Math.max(prev.best || 0, s.first), total:p.paras.length, mode:s.mode, hints:Object.keys(s.hint).length, t:Date.now() };
-    if (s.mode === "exam") { s.used = p.mins * 60 - s.left; stopTimer(); }
-  }
-  finishIfDone(); save(); render();
-  const el = document.getElementById("fbtop"); if (el) el.scrollIntoView({ block:"start" });
-}
-function finishIfDone(){
-  const s = S.sess, p = PBY[s.pid];
-  if (p.paras.every(q => s.st[q.L] === "ok" || s.st[q.L] === "rev")) {
-    s.done = true;
-    if (s.used == null) s.used = elapsed();
-    stopTimer();
-    const a = store.att[p.id]; if (a) a.fin = p.paras.filter(q => s.st[q.L] === "ok").length;
-  }
-}
+function sessOpen(){ const s = S.sess; return !!s && (s.mode === "exam" ? !s.submitted : s.ids.some(id => !s.ans[id])); }
+function isOk(s, id){ return s.ans[id] === QID[id].a; }
+function curQ(){ const s = S.sess; return s && s.mode === "practice" ? QID[s.ids[s.idx]] : null; }
 
 function sessHTML(){
-  const s = S.sess, p = PBY[s.pid];
-  const clockLbl = s.used != null ? "Sarflangan vaqt" : (s.mode === "exam" && s.round === 0 ? "Qolgan vaqt" : "Vaqt");
-  let h = '<div class="sbar"><button class="btn ghost" data-act="tab" data-v="lib">← Testlar</button><div class="stitle"><span class="mono">' + p.no + "-matn · " + (s.mode === "exam" ? "Imtihon rejimi" : "Mashq rejimi") + "</span><b>" + esc(p.title) + '</b></div><div class="clockwrap"><span class="mono">' + clockLbl + '</span><span id="clock" class="clock num">' + clockVal() + "</span></div></div>";
-  h += '<div class="sgrid">' + passageHTML(p, s) + '<div class="qpane">' + sheetHTML(p, s) + fbHTML(p, s) + "</div></div>";
+  const s = S.sess, exam = s.mode === "exam";
+  const q = exam ? null : QID[s.ids[s.idx]];
+  const p = exam ? PBY[s.pid] : q.P;
+  const okN = s.ids.filter(id => isOk(s, id)).length, done = s.ids.filter(id => s.ans[id]).length;
+  let h = '<div class="sbar"><button class="btn ghost" data-act="home">← Testlar</button><div class="stitle"><span class="mono">' + (exam ? "Imtihon rejimi" : "Mashq rejimi") + (s.pid ? " · " + p.no + "-matn" : "") + "</span><b>" + esc(s.title) + '</b></div><div class="clockwrap">';
+  if (exam) h += s.submitted ? '<span class="mono">Natija</span><span class="score num">' + okN + " / " + s.ids.length + "</span>" : '<span class="mono">Qolgan vaqt</span><span id="clock" class="clock num' + (s.left < 120 ? " low" : "") + '">' + fmt(s.left) + "</span>";
+  else h += '<span class="mono">Toʻgʻri</span><span class="score num">' + okN + " / " + done + "</span>";
+  h += "</div></div>";
+  if (!exam) h += '<div class="strip" role="group" aria-label="Paragraflar">' + s.ids.map((id, i) => {
+    let c = "sq"; if (s.ans[id]) c += isOk(s, id) ? " ok" : " bad"; if (i === s.idx) c += " cur";
+    const lbl = s.pid ? QID[id].L : i + 1;
+    return '<button class="' + c + '" data-act="goto" data-i="' + i + '" aria-label="' + (s.pid ? lbl + " paragraf" : lbl + "-savol") + '"' + (i === s.idx ? ' aria-current="true"' : "") + ">" + lbl + "</button>";
+  }).join("") + "</div>";
+  h += '<div class="sgrid" id="sgrid">' + passageHTML(p, s, q) + '<div class="qpane">' + (exam ? examHTML(p, s) : practiceHTML(p, s, q)) + "</div></div>";
   return h;
 }
-function passageHTML(p, s){
-  let h = '<article class="passage" aria-label="Matn"><div class="ph"><span class="tag t-' + p.exam + '">' + EXAM[p.exam] + '</span> <span class="mono">' + p.band + '</span><h2 class="ptitle">' + esc(p.title) + '</h2><p class="small">Matnda ' + p.paras.length + " ta paragraf (A–" + p.paras[p.paras.length - 1].L + ") bor. Har bir paragrafga roʻyxatdan mos sarlavhani tanlang. Sarlavhalar paragraflardan koʻp, ortiqchalari ishlatilmaydi.</p></div>";
-  h += p.paras.map(q => {
-    const st = s.st[q.L], v = s.sel[q.L];
-    const ev = st === "ok" || st === "rev";
-    return '<p class="para" id="para-' + q.L + '"><span class="pl">' + q.L + "</span>" + (v ? '<span class="pk ' + (st === "ok" ? "ok" : st ? "bad" : "") + '">' + v + "</span>" : "") + ptext(q.t, ev) + "</p>";
+
+function passageHTML(p, s, q){
+  const exam = s.mode === "exam";
+  let h = '<article class="passage' + (!exam && !s.full ? " solo" : "") + '" id="passage" aria-label="Matn"><div class="ph"><span class="tag t-' + p.exam + '">' + EXAM[p.exam] + '</span> <span class="mono">' + p.band + '</span><h2 class="ptitle">' + esc(p.title) + '</h2><p class="small">';
+  if (exam) h += "Matnda " + p.paras.length + " ta paragraf (A–" + p.paras[p.paras.length - 1].L + ") bor. Har bir paragrafga roʻyxatdan mos sarlavhani tanlang. Sarlavhalar paragraflardan koʻp, ortiqchalari ishlatilmaydi.";
+  else h += "Hozir <b>" + q.L + " paragraf</b> yechilmoqda. Qoʻshni paragraflarni ham koʻzdan kechiring: oʻtish gapi tuzoq boʻlishi mumkin.";
+  h += "</p>";
+  if (!exam) h += '<button class="btn ghost sm only-narrow" data-act="full" aria-pressed="' + s.full + '">' + (s.full ? "Faqat " + q.L + " paragrafni koʻrsatish" : "Butun matnni koʻrsatish") + "</button>";
+  h += "</div>";
+  h += p.paras.map(x => {
+    const v = s.ans[x.id];
+    const shown = exam ? s.submitted : !!v;
+    let cls = "para"; if (!exam) cls += x.id === q.id ? " cur" : " dim";
+    let pk = "";
+    if (shown) pk = '<span class="pk ' + (v === x.a ? "ok" : "bad") + '" title="Toʻgʻri sarlavha">' + x.a + "</span>";
+    else if (exam && v) pk = '<span class="pk">' + v + "</span>";
+    return '<p class="' + cls + '" id="para-' + x.L + '"><span class="pl">' + x.L + "</span>" + pk + ptext(x.t, shown) + "</p>";
   }).join("");
   return h + "</article>";
 }
-function sheetHTML(p, s){
-  const used = new Set(Object.values(s.sel).filter(Boolean));
-  let h = '<section class="card"><h3>Sarlavhalar roʻyxati</h3><ol class="hlist">' + Object.keys(p.H).map(k => '<li class="' + (used.has(k) ? "used" : "") + '"><span class="rn">' + k + "</span><span>" + esc(p.H[k]) + "</span></li>").join("") + "</ol></section>";
-  h += '<section class="card"><h3>Javoblar varagʻi</h3>';
-  h += p.paras.map(q => {
-    const st = s.st[q.L];
-    const cls = st === "ok" ? "ok" : st ? "bad" : "";
-    const opts = '<option value="">— tanlang —</option>' + Object.keys(p.H).map(k => '<option value="' + k + '"' + (s.sel[q.L] === k ? " selected" : "") + ">" + k + " – " + esc(p.H[k]) + "</option>").join("");
-    let side = "";
-    if (st === "ok") side = '<span class="ic" aria-label="toʻgʻri">✓</span>';
-    else if (st) side = '<span class="ic" aria-label="notoʻgʻri">✗</span>';
-    else if (s.mode === "practice") side = '<button class="btn ghost sm" data-act="hint" data-l="' + q.L + '" aria-expanded="' + !!s.hint[q.L] + '">Ishora</button>';
-    return '<div class="arow ' + cls + '"><label class="al" for="sel-' + q.L + '">' + q.L + '</label><select id="sel-' + q.L + '" data-l="' + q.L + '"' + (st ? " disabled" : "") + ">" + opts + "</select>" + side + (s.hint[q.L] && !st ? '<p class="hinttxt">' + esc(q.hint) + "</p>" : "") + "</div>";
-  }).join("");
-  const open = p.paras.filter(q => !s.st[q.L]);
-  if (open.length) {
-    const blanks = open.filter(q => !s.sel[q.L]).length;
-    h += '<div class="nav"><span class="small">' + (s.round ? "Xato paragraflarni qayta yeching. " : "") + (blanks ? blanks + " ta paragraf javobsiz" : "Hamma paragraflarga javob berildi") + '</span><button class="btn primary" data-act="check">' + (s.round ? "Qayta tekshirish" : "Tekshirish") + "</button></div>";
-  }
+
+/* ---------- Mashq rejimi: paragraflar bittadan, har javobdan keyin toʻliq tahlil ---------- */
+function practiceHTML(p, s, q){
+  const v = s.ans[q.id], done = !!v, pick = s.pick[q.id] || "";
+  const usedBy = {};
+  p.paras.forEach(x => { if (x.id !== q.id && s.ans[x.id]) usedBy[x.a] = x.L; });
+  let h = '<section class="card qcard"><div class="qh"><span class="mono">' + q.L + " paragraf · " + (s.idx + 1) + " / " + s.ids.length + '</span><span class="mono">' + p.no + "-matn · " + p.band + "</span></div>";
+  h += '<p class="instr">Choose the correct heading for paragraph ' + q.L + ".<span>" + q.L + " paragrafning asosiy fikrini ifodalaydigan sarlavhani tanlang va javobni tekshiring.</span></p>";
+  h += '<div class="hopts" role="radiogroup" aria-label="Sarlavhalar roʻyxati">' + Object.keys(p.H).map(k => {
+    let c = "hopt", dis = done, note = "";
+    if (done) { if (k === q.a) { c += " right"; note = "toʻgʻri javob"; } else if (k === v) { c += " wrong"; note = "sizning javobingiz"; } }
+    else if (usedBy[k]) { c += " used"; dis = true; note = usedBy[k] + " paragraf"; }
+    else if (pick === k) c += " sel";
+    return '<button class="' + c + '" role="radio" aria-checked="' + (done ? k === v : pick === k) + '" data-act="pick" data-k="' + k + '"' + (dis ? " disabled" : "") + '><span class="rn">' + k + '</span><span class="ht">' + esc(p.H[k]) + "</span>" + (note ? '<span class="un">' + note + "</span>" : "") + "</button>";
+  }).join("") + "</div>";
+  if (!done) {
+    h += '<div class="nav"><button class="btn ghost" data-act="hint" aria-expanded="' + !!s.hint[q.id] + '">' + (s.hint[q.id] ? "Ishorani yopish" : "Ishora") + '</button><button class="btn primary" data-act="check"' + (pick ? "" : " disabled") + ">Javobni tekshirish</button></div>";
+    if (s.hint[q.id]) h += '<p class="hinttxt">' + esc(q.hint) + "</p>";
+    if (Object.keys(usedBy).length) h += '<p class="small" style="margin:10px 0 0">Chizilgan sarlavhalar oldingi paragraflarda ishlatilgan: har bir sarlavha faqat bir marta qoʻllanadi.</p>';
+  } else h += fbHTML(p, q, v, "p" + q.id, false);
+  h += '<div class="nav"><button class="btn" data-act="prev"' + (s.idx === 0 ? " disabled" : "") + ">← Oldingi</button>" +
+    (s.idx < s.ids.length - 1 ? '<button class="btn' + (done ? " primary" : "") + '" data-act="next">Keyingi →</button>' : '<button class="btn' + (done ? " primary" : "") + '" data-act="finish">Yakunlash</button>') + "</div>";
   return h + "</section>";
 }
-function fbHTML(p, s){
-  if (!s.round) return "";
-  const total = p.paras.length;
-  const okN = p.paras.filter(q => s.st[q.L] === "ok").length;
-  const badN = p.paras.filter(q => s.st[q.L] === "bad").length;
-  let h = '<section class="card" id="fbtop"><h3>Natija va tahlil</h3><div class="rsum"><div><span class="mono">Birinchi urinish</span><b class="num">' + s.first + " / " + total + '</b></div><div><span class="mono">Hozirgi holat</span><b class="num">' + okN + " / " + total + '</b></div><div><span class="mono">Vaqt</span><b class="num">' + (s.used != null ? fmt(s.used) : fmt(elapsed())) + "</b></div></div>";
-  if (s.auto) h += '<p class="small">Vaqt tugadi, javoblar avtomatik tekshirildi.</p>';
-  if (badN) h += '<p class="small" style="margin-top:12px">Xato paragraflar uchun avval tuzoq izohini oʻqing va xato sababini belgilang. Keyin “Xatolarni qayta ishlash” tugmasi bilan shu paragraflarni yana yeching yoki toʻgʻri javobni oching.</p>';
-  h += "</section>";
-  h += '<section class="card"><h3>Har bir javobning izohi</h3>' + p.paras.map(q => cardHTML(p, s, q)).join("") + "</section>";
-  if (badN) h += '<div class="btns"><button class="btn primary" data-act="retry">Xatolarni qayta ishlash (' + badN + ')</button><button class="btn" data-act="revealall">Hamma javoblarni koʻrsatish</button></div>';
-  if (s.done) {
-    h += '<section class="card"><h3>Ortiqcha sarlavhalar nega ortiqcha</h3><ul class="dlist">' + Object.keys(p.D).map(k => "<li>" + hd(p, k) + '<span class="ttag">' + TRAPS[p.D[k][0]].n + "</span><p>" + esc(p.D[k][1]) + "</p></li>").join("") + "</ul></section>";
-    h += '<div class="btns"><button class="btn primary" data-act="tab" data-v="lib">Testlar roʻyxati</button><button class="btn" data-act="start" data-p="' + p.id + '" data-m="' + s.mode + '">Shu testni qaytadan</button><button class="btn" data-act="tab" data-v="stats">Natijalar va xatolar daftari</button></div>';
-  }
-  return h;
+
+/* ---------- Javob tahlili: hukm, isbot, tahlil, xato sababi, qaror yoʻli, tuzoq qoidasi ---------- */
+function ruleHTML(k){
+  const t = TRAPS[k];
+  return "<p>" + esc(t.l) + '</p><p><span class="lab">Qanday qochish</span>' + esc(t.avoid) + "</p>" + trapExample(k);
 }
-function cardHTML(p, s, q){
-  const st = s.st[q.L];
-  if (!st) return '<div class="fcard"><div class="fh"><span class="fl">' + q.L + '</span><span class="pill bad">Qayta yechilmoqda</span></div></div>';
-  const v = s.sel[q.L] || "";
-  let h = '<div class="fcard"><div class="fh"><span class="fl">' + q.L + "</span>";
-  if (st === "ok") h += '<span class="pill ok">Toʻgʻri' + (s.okr[q.L] > 1 ? " · " + s.okr[q.L] + "-urinishda" : "") + "</span>";
-  else if (st === "bad") h += '<span class="pill bad">Notoʻgʻri</span>';
-  else h += '<span class="pill bad">Notoʻgʻri · javob ochildi</span>';
-  h += "</div>";
-  if (st !== "ok") {
-    const ent = store.log[s.li[q.L]];
-    const t = trapOf(p, q, ent ? ent.v : v);
-    h += '<p><span class="lab">Siz tanladingiz</span>' + (ent && ent.v ? hd(p, ent.v) : "javob berilmagan") + "</p>";
-    if (t.k !== "blank") h += '<div class="trapbox"><div><span class="eyebrow">Tuzoq</span><span class="tn">' + TRAPS[t.k].n + "</span></div>" + (t.note ? "<p>" + esc(t.note) + "</p>" : "") + '<p class="note"><span class="lab">Qoida</span>' + esc(TRAPS[t.k].avoid) + "</p></div>";
-    if (st === "bad") {
-      h += '<div><span class="lab">Nega xato qildingiz?</span><div class="chips" style="margin-top:6px">' + Object.keys(REASONS).map(r => '<button class="chip" data-act="reason" data-l="' + q.L + '" data-r="' + r + '" aria-pressed="' + !!(ent && ent.r === r) + '">' + REASONS[r].t + "</button>").join("") + "</div></div>";
-      h += '<p class="note"><span class="lab">Ishora</span>' + esc(q.hint) + "</p>";
-      h += '<div class="btns"><button class="btn sm" data-act="reveal" data-l="' + q.L + '">Toʻgʻri javobni koʻrsatish</button></div>';
+function pathHTML(q, v, t){
+  const ok = v === q.a;
+  return '<ol class="tree">' + STEPS.map((st, i) => {
+    const fail = !ok && t && st.f.indexOf(t.k) > -1;
+    return '<li class="' + (fail ? "fail" : "") + '"><span class="tq"><b>' + (i + 1) + ". " + st.t + "</b>" + st.q + '</span><span class="tr"><span class="r yes">' + q.a + " ✓</span>" + (fail ? '<span class="r no">' + v + " ✗</span>" : "") + "</span>" +
+      (fail ? '<span class="why">Siz tanlagan sarlavha shu savoldan oʻtmaydi: ' + STEPFAIL[t.k] + ".</span>" : "") + "</li>";
+  }).join("") + "</ol>";
+}
+function fbHTML(p, q, v, uid, reveal){
+  const s = S.sess, ok = v === q.a, blank = !v;
+  const t = ok || blank ? null : trapOf(p, q, v, reveal);
+  let h = '<div class="fb">';
+  h += '<div class="verdict ' + (ok ? "ok" : "bad") + '"><span>' + (ok ? "✓ Toʻgʻri — " + q.a : blank ? "✗ Javob berilmagan · Toʻgʻri javob: " + q.a : "✗ Xato. Siz: " + v + " · Toʻgʻri javob: " + q.a) + '</span><span class="vh">' + esc(p.H[q.a]) + "</span></div>";
+  h += '<div class="fsec"><h4>Isbot · ' + q.L + " paragraf</h4><blockquote>“" + esc(evSentence(q.t)) + '”</blockquote><p class="note"><span class="lab">Paragrafning qisqa mazmuni</span><span class="hd">' + esc(q.gist) + "</span></p></div>";
+  h += '<div class="fsec"><h4>Tahlil: nega aynan ' + q.a + "</h4><p>" + esc(q.why) + "</p></div>";
+  if (t) {
+    const rec = store.ans[q.id];
+    h += '<div class="fsec miss"><h4>Qayerda adashdingiz</h4><p><span class="lab">Siz tanladingiz</span>' + hd(p, v) + "</p>" + (t.note ? "<p>" + esc(t.note) + "</p>" : "") +
+      '<p><span class="ttag">' + TRAPS[t.k].n + "</span></p><p>" + esc(TRAPS[t.k].s) + '</p><p class="note"><span class="lab">Qoida</span>' + esc(TRAPS[t.k].avoid) + "</p>";
+    if (rec && !rec.ok && rec.last === v) {
+      h += '<div><span class="lab">Nega shunday tanladingiz? (ixtiyoriy)</span><div class="chips" style="margin-top:6px">' + Object.keys(REASONS).map(r => '<button class="chip" data-act="reason" data-id="' + q.id + '" data-r="' + r + '" aria-pressed="' + (rec.r === r) + '">' + REASONS[r].t + "</button>").join("") + "</div></div>";
+      if (rec.r) h += '<p class="advice"><span class="lab">Tavsiya</span>' + esc(REASONS[rec.r].a) + "</p>";
     }
+    h += "</div>";
   }
-  if (st === "ok" || st === "rev") {
-    h += '<p><span class="lab">Toʻgʻri javob</span>' + hd(p, q.a) + "</p><p>" + esc(q.why) + "</p><blockquote>" + esc(evSentence(q.t)) + "</blockquote>";
-    if (q.tr) {
-      const ks = Object.keys(q.tr).filter(k => k !== (store.log[s.li[q.L]] || {}).v);
-      if (ks.length) h += '<details class="more"><summary>Bu paragrafdagi boshqa tuzoqlar (' + ks.length + ")</summary><ul>" + ks.map(k => "<li><b>" + k + "</b> " + esc(p.H[k]) + " – <i>" + TRAPS[q.tr[k][0]].n + "</i>. " + esc(q.tr[k][1]) + "</li>").join("") + "</ul></details>";
-    }
+  h += '<div class="fsec"><h4>Qaror yoʻli</h4>' + pathHTML(q, v, t) + "</div>";
+  if (t) {
+    const n = trapCount(t.k), open = s && s.ro[uid];
+    h += '<div class="trapcard"><div class="th"><span class="eyebrow">Tuzoq</span><b>' + TRAPS[t.k].n + '</b><span class="mono">' + TRAPS[t.k].en + '</span></div><div class="btns"><button class="btn ghost sm" data-act="rule" data-uid="' + uid + '" aria-expanded="' + !!open + '">' + (open ? "Qoidani yopish" : "Qoidani batafsil oʻqish") + "</button>" +
+      (n ? '<button class="btn ghost sm" data-act="trapdrill" data-t="' + t.k + '">Shu tuzoq boʻyicha mashq (' + n + ")</button>" : "") + "</div>" + (open ? '<div class="rulefull">' + ruleHTML(t.k) + "</div>" : "") + "</div>";
   }
+  const ks = Object.keys(q.tr || {}).filter(k => k !== v && (reveal || !p.ans[k] || store.ans[p.pm[p.ans[k]].id]));
+  if (ks.length) h += '<div class="fsec"><h4>Shu paragrafdagi ' + (t ? "boshqa " : "") + 'tuzoq sarlavhalar</h4><ul class="tlist">' + ks.map(k => "<li>" + hd(p, k) + '<span class="ttag">' + TRAPS[q.tr[k][0]].n + "</span><span>" + esc(q.tr[k][1]) + "</span></li>").join("") + "</ul></div>";
   return h + "</div>";
 }
 
+/* ---------- Imtihon rejimi: hamma paragraf birga, taymer bilan ---------- */
+function examHTML(p, s){
+  const used = new Set(s.ids.map(id => s.ans[id]).filter(Boolean));
+  let h = "";
+  if (s.submitted) {
+    const okN = s.ids.filter(id => isOk(s, id)).length;
+    h += '<section class="card" id="fbtop"><h3>Natija</h3><div class="rsum"><div><span class="mono">Toʻgʻri javoblar</span><b class="num">' + okN + " / " + s.ids.length + '</b></div><div><span class="mono">Aniqlik</span><b class="num">' + pct(okN, s.ids.length) + '%</b></div><div><span class="mono">Sarflangan vaqt</span><b class="num">' + fmt(s.used) + "</b></div></div>" +
+      (s.auto ? '<p class="small" style="margin:10px 0 0">Vaqt tugadi, javoblar avtomatik topshirildi.</p>' : "") +
+      '<p class="small" style="margin:10px 0 0">Matnda har bir paragrafning dalil gapi belgilandi, paragraf yonida toʻgʻri sarlavha raqami koʻrsatildi. Quyida har bir paragrafning toʻliq tahlili bor; xato javoblarning tahlili ochiq turibdi.</p></section>';
+    h += '<section class="card"><h3>Paragraflar boʻyicha tahlil</h3>' + s.ids.map(id => {
+      const q = QID[id], v = s.ans[id] || "", ok = v === q.a;
+      return '<div class="erow"><div class="eh"><span class="fl">' + q.L + '</span><span class="pill ' + (ok ? "ok" : "bad") + '">' + (ok ? "Toʻgʻri" : v ? "Notoʻgʻri" : "Javobsiz") + '</span><span class="ea num">' + (ok ? q.a : (v ? "Siz: " + v + " · " : "") + "Toʻgʻri: <b>" + q.a + "</b>") + '</span><button class="btn ghost sm" data-act="eopen" data-id="' + id + '" aria-expanded="' + !!s.open[id] + '">' + (s.open[id] ? "Tahlilni yopish" : "Tahlil va isbot") + "</button></div>" +
+        (s.open[id] ? fbHTML(p, q, v, "e" + id, true) : "") + "</div>";
+    }).join("") + "</section>";
+    h += distractHTML(p);
+    h += '<div class="btns">' + (s.ids.some(id => !isOk(s, id)) ? '<button class="btn primary" data-act="redowrong">Xatolarni mashq rejimida qayta yechish</button>' : "") + '<button class="btn" data-act="start" data-p="' + p.id + '" data-m="practice">Shu matnni mashq rejimida</button><button class="btn" data-act="home">Boshqa matn</button></div>';
+    return h;
+  }
+  h += '<section class="card"><h3>Sarlavhalar roʻyxati</h3><ol class="hlist">' + Object.keys(p.H).map(k => '<li class="' + (used.has(k) ? "used" : "") + '"><span class="rn">' + k + "</span><span>" + esc(p.H[k]) + "</span></li>").join("") + "</ol></section>";
+  h += '<section class="card"><h3>Javoblar varagʻi</h3>' + s.ids.map(id => {
+    const q = QID[id];
+    const opts = '<option value="">— tanlang —</option>' + Object.keys(p.H).map(k => '<option value="' + k + '"' + (s.ans[id] === k ? " selected" : "") + ">" + k + " – " + esc(p.H[k]) + "</option>").join("");
+    return '<div class="arow"><label class="al" for="sel-' + q.L + '">' + q.L + '</label><select id="sel-' + q.L + '" data-id="' + id + '">' + opts + "</select></div>";
+  }).join("");
+  const blanks = s.ids.filter(id => !s.ans[id]).length;
+  h += '<div class="nav"><span class="small">' + (blanks ? blanks + " ta paragraf javobsiz" : "Hamma paragraflarga javob berildi") + '</span><button class="btn primary" data-act="submit">Topshirish</button></div></section>';
+  return h;
+}
+function distractHTML(p){
+  return '<section class="card"><h3>Ortiqcha sarlavhalar nega ortiqcha</h3><ul class="dlist">' + Object.keys(p.D).map(k => "<li>" + hd(p, k) + '<span class="ttag">' + TRAPS[p.D[k][0]].n + "</span><p>" + esc(p.D[k][1]) + "</p></li>").join("") + "</ul></section>";
+}
+function submitExam(auto){
+  const s = S.sess; if (!s || s.submitted) return;
+  const p = PBY[s.pid];
+  stopTimer(); s.submitted = true; s.auto = !!auto; s.used = p.mins * 60 - s.left;
+  s.ids.forEach(id => { if (s.ans[id]) record(QID[id], s.ans[id]); if (!isOk(s, id)) s.open[id] = true; });
+  const okN = s.ids.filter(id => isOk(s, id)).length, prev = store.exams[p.id] || { n:0, best:0 };
+  store.exams[p.id] = { n:prev.n + 1, best:Math.max(prev.best || 0, okN), last:okN, total:s.ids.length, used:s.used, t:Date.now() };
+  save(); S.view = "sess"; render(); window.scrollTo(0, 0);
+}
+
+/* ---------- Mashq seansi yakuni ---------- */
+function finishHTML(){
+  const s = S.sess, n = s.ids.length, done = s.ids.filter(id => s.ans[id]).length, ok = s.ids.filter(id => isOk(s, id)).length;
+  const bytrap = {};
+  s.ids.forEach(id => { const q = QID[id]; if (s.ans[id] && !isOk(s, id)) { const k = trapOf(q.P, q, s.ans[id], true).k; bytrap[k] = (bytrap[k] || 0) + 1; } });
+  const tops = Object.keys(bytrap).sort((a, b) => bytrap[b] - bytrap[a]).slice(0, 3);
+  let h = '<section class="finish"><span class="mono">Seans yakunlandi</span><h1 class="num">' + ok + " / " + done + "</h1><p>" + esc(s.title) + ": " + n + " ta paragrafdan " + done + " tasi yechildi, aniqlik " + pct(ok, done) + "%.</p>";
+  if (tops.length) h += '<div class="rsec"><h2>Koʻp tushgan tuzoqlaringiz</h2><ul class="tlist">' + tops.map(k => "<li><span><b>" + TRAPS[k].n + "</b> · " + bytrap[k] + " ta xato</span><span>" + esc(TRAPS[k].s) + '</span><span class="note"><span class="lab">Qoida</span>' + esc(TRAPS[k].avoid) + "</span>" + (trapCount(k) ? '<span><button class="btn sm" data-act="trapdrill" data-t="' + k + '">Shu tuzoq boʻyicha mashq (' + trapCount(k) + ")</button></span>" : "") + "</li>").join("") + "</ul></div>";
+  else if (done) h += "<p>Bu seansda xato boʻlmadi.</p>";
+  if (s.pid && done === n) h += distractHTML(PBY[s.pid]);
+  h += '<div class="btns">' + (s.ids.some(id => s.ans[id] && !isOk(s, id)) ? '<button class="btn primary" data-act="redowrong">Xatolarni qayta yechish</button>' : "") + (s.pid ? '<button class="btn" data-act="start" data-p="' + s.pid + '" data-m="exam">Shu matn imtihon rejimida</button>' : "") + '<button class="btn" data-act="home">Testlarga qaytish</button><button class="btn" data-act="tab" data-v="stats">Natijalar</button></div></section>';
+  return h;
+}
+
 /* ===================== TESTLAR ROʻYXATI ===================== */
+function qcard(k, t, d, dis){ return '<button class="qc" data-act="quick" data-k="' + k + '"' + (dis ? " disabled" : "") + "><b>" + t + "</b><span>" + d + "</span></button>"; }
 function libHTML(){
-  const ids = Object.keys(store.att).filter(id => PBY[id]);
-  const tot = ids.reduce((a, id) => a + store.att[id].total, 0), ok = ids.reduce((a, id) => a + store.att[id].first, 0);
-  let h = '<section class="intro"><h1>Matching Headings</h1><p class="lede">IELTS Reading formatidagi ' + PASSAGES.length + " ta matn va " + TOTALQ + " ta savol: oddiy darajadan Band 8–9 gacha. Har bir javob dalil gap bilan tushuntiriladi, notoʻgʻri tanlangan sarlavhaning tuzoq turi koʻrsatiladi, xatolar esa daftarga yoziladi va qayta ishlanadi.</p>";
-  h += '<div class="progress-line"><span>Yechilgan testlar: <b class="num">' + ids.length + " / " + PASSAGES.length + "</b></span><span>Birinchi urinishdagi aniqlik: <b class=\"num\">" + pct(ok, tot) + "%</b></span><span>Xatolar daftarida: <b class=\"num\">" + store.log.filter(e => e.k !== "blank").length + "</b></span></div>";
-  if (S.sess && !S.sess.done) h += '<div class="resume"><span>Tugallanmagan test: <b>' + esc(PBY[S.sess.pid].title) + '</b></span><button class="btn primary" data-act="resume">Davom ettirish</button></div>';
+  const ids = answeredIds(), wrong = wrongIds(), fresh0 = ALLQ.filter(q => !store.ans[q.id]).length;
+  let h = '<section class="intro"><h1>Matching Headings</h1><p class="lede">IELTS Reading formatidagi ' + PASSAGES.length + " ta matn va " + TOTALQ + " ta paragraf: Band 5.5 darajasidan Band 8–9 gacha. Har bir javobdan keyin toʻgʻri sarlavha, matndagi dalil gap, tahlil, siz tanlagan sarlavhaning tuzoq turi va shu tuzoq qoidasi koʻrsatiladi.</p>";
+  h += '<div class="progress-line"><span>Yechilgan paragraflar: <b class="num">' + ids.length + " / " + TOTALQ + '</b></span><span>Toʻgʻri: <b class="num">' + pct(ids.length - wrong.length, ids.length) + '%</b></span><span>Xatolar daftarida: <b class="num">' + wrong.length + "</b></span></div>";
+  if (sessOpen()) h += '<div class="resume"><span>Tugallanmagan seans: <b>' + esc(S.sess.title) + '</b></span><button class="btn primary" data-act="resume">Davom ettirish</button></div>';
   h += "</section>";
+  h += '<section class="quick" aria-label="Tezkor mashqlar">' +
+    qcard("mix", "Aralash 10 paragraf", "Barcha matnlardan tasodifiy, har paragraf oʻz matni bilan") +
+    qcard("hard", "Eng qiyin paragraflar", ALLQ.filter(q => HARD.indexOf(q.P.id) > -1).length + " ta paragraf: Band 7–9 va C1 matnlar") +
+    qcard("mist", "Xatolarim ustida", wrong.length ? wrong.length + " ta paragraf qayta yechiladi" : "Hozircha xato yoʻq", !wrong.length) +
+    qcard("new", "Hali yechilmaganlar", fresh0 ? fresh0 + " ta yangi paragraf" : "Hamma paragraf yechilgan", !fresh0) + "</section>";
   h += '<section class="plist">' + PASSAGES.map(p => {
-    const a = store.att[p.id];
+    const done = p.paras.filter(q => store.ans[q.id]).length, ok = p.paras.filter(q => store.ans[q.id] && store.ans[q.id].ok).length, ex = store.exams[p.id];
     return '<article class="prow"><div class="pinfo"><span class="tag t-' + p.exam + '">' + EXAM[p.exam] + '</span> <span class="mono">' + p.band + "</span><h3>" + p.no + ". " + esc(p.title) + '</h3><div class="pmeta">' + p.paras.length + " paragraf · " + Object.keys(p.H).length + " sarlavha · " + p.mins + " daqiqa</div>" +
-      '<div class="bar"><i style="width:' + (a ? pct(a.best, a.total) : 0) + '%"></i></div><div class="pmeta num">' + (a ? "Eng yaxshi birinchi urinish: " + a.best + " / " + a.total + " · urinishlar: " + a.n : "Hali yechilmagan") + "</div></div>" +
+      '<div class="bar"><i style="width:' + pct(done, p.paras.length) + '%"></i></div><div class="pmeta num">' + (done ? done + " / " + p.paras.length + " yechilgan, " + ok + " toʻgʻri" : "Hali boshlanmagan") + (ex ? " · imtihonda eng yaxshi natija: " + ex.best + " / " + ex.total : "") + "</div></div>" +
       '<div class="pact"><button class="btn primary" data-act="start" data-p="' + p.id + '" data-m="practice">Mashq</button><button class="btn" data-act="start" data-p="' + p.id + '" data-m="exam">Imtihon · ' + p.mins + " daq</button></div></article>";
   }).join("") + "</section>";
-  h += '<p class="foot"><b>Mashq rejimi:</b> vaqt cheklanmaydi, har paragrafga ishora bor. <b>Imtihon rejimi:</b> taymer bilan, ishorasiz; vaqt tugasa javoblar avtomatik tekshiriladi. Ikkala rejimda ham tekshiruvdan keyin xatolar ustida ishlash ochiladi.</p>';
+  h += '<p class="foot"><b>Mashq rejimi:</b> paragraflar bittadan yechiladi; har javobdan keyin darhol toʻgʻri sarlavha, isbot, tahlil va tuzoq qoidasi chiqadi. Ishora bor, vaqt cheklanmaydi. <b>Imtihon rejimi:</b> hamma paragraf birga, taymer bilan, ishorasiz; javoblar topshirilgach, har bir paragrafning toʻgʻri javobi va toʻliq tahlili ochiladi.</p>';
   h += '<p class="foot">Barcha matnlar shu trenajor uchun yozilgan original mashq matnlari, rasmiy imtihon materiallari emas. Band va CEFR darajalari taxminiy. Matching headings topshiriq turi IELTS Readingga xos: TOEFL va SAT belgili matnlar oʻsha imtihonlarga xos mavzu va lugʻat darajasida yozilgan, topshiriq shakli esa IELTSniki (batafsil: “Oʻqituvchiga” boʻlimi). Natijalar faqat shu brauzerda saqlanadi.</p>';
   return h;
 }
@@ -824,7 +987,14 @@ function trapExample(k){
   return "";
 }
 function rulesHTML(){
-  return `<section class="doc"><h1>Strategiya</h1><p class="lede">Matching headings topshirigʻini yechish algoritmi, sarlavhaning fokus soʻzlari, signal soʻzlar va eng koʻp uchraydigan tuzoqlar.</p>
+  return `<section class="doc"><h1>Qoidalar</h1><p class="lede">Toʻgʻri sarlavha paragrafning asosiy fikrini ifodalaydi: bitta detalni ham, butun matn mavzusini ham emas. Javob faqat matnga tayanadi; umumiy bilim va taxmin hisobga olinmaydi.</p>
+<div class="rsec"><h2>Uch asosiy qoida</h2><div class="tbl"><table><thead><tr><th>Qoida</th><th>Mazmuni</th><th>Oʻziga beriladigan savol</th></tr></thead><tbody>
+<tr><td><b>Asosiy fikr, detal emas</b></td><td>Sarlavha paragrafdagi gaplarning koʻpchiligini qamraydi. Misol, raqam yoki nom faqat dalil vazifasini bajaradi.</td><td>Muallif shu paragrafda nima qilyapti: sabab koʻrsatyaptimi, muammo qoʻyyaptimi, yechim beryaptimi?</td></tr>
+<tr><td><b>Fikr mosligi, soʻz mosligi emas</b></td><td>Toʻgʻri sarlavha odatda parafraz qilinadi. Matndagi soʻzni aynan takrorlagan sarlavha koʻpincha tuzoq boʻladi.</td><td>Sarlavhadagi har bir soʻzning matndagi ekvivalenti qaysi?</td></tr>
+<tr><td><b>Har bir sarlavha bir marta</b></td><td>Sarlavhalar paragraflardan koʻp. Ishlatilgan sarlavha roʻyxatdan oʻchiriladi, ortiqchalari hech qayerga mos kelmaydi.</td><td>Bu sarlavha boshqa paragrafga yaxshiroq mos kelmaydimi?</td></tr></tbody></table></div></div>
+<div class="rsec"><h2>Qaror yoʻli: toʻrt savol</h2><p>Har bir nomzod sarlavha toʻrtta savolning hammasidan oʻtishi kerak. Bitta savoldan oʻtmasa, u tuzoq. Trenajorda har javobdan keyin shu yoʻl koʻrsatiladi va notoʻgʻri sarlavha qaysi savolda toʻxtagani belgilanadi.</p><ol class="dsteps">` +
+  STEPS.map((st, i) => "<li><b>" + (i + 1) + ". " + st.t + "</b><span>" + st.q + '</span><span class="no">Yoʻq boʻlsa: ' + st.f.map(k => TRAPS[k].n.toLowerCase()).join(", ") + ".</span></li>").join("") +
+  `</ol></div>
 <div class="rsec"><h2>Topshiriq qanday tuzilgan</h2>
 <p>Matn paragraflarga (A, B, C…) boʻlingan, alohida roʻyxatda rim raqamlari bilan belgilangan sarlavhalar (i, ii, iii…) beriladi. Har bir paragrafga uning asosiy fikrini ifodalaydigan bitta sarlavha tanlanadi. Sarlavhalar paragraflardan koʻp boʻladi, ortiqchalari esa ataylab chalgʻitish uchun qoʻshiladi. IELTSda odatda har bir sarlavha bir marta ishlatiladi, baʼzan bitta paragraf namuna sifatida yechib beriladi: bunday sarlavhani darhol roʻyxatdan oʻchiring.</p>
 <p>Topshiriq detalni emas, paragrafning vazifasini tekshiradi: muallif shu paragrafda nima qilyapti? Sabab koʻrsatyaptimi, muammo qoʻyyaptimi, yechim taklif qilyaptimi yoki eski qarashni rad etyaptimi?</p></div>
@@ -834,7 +1004,7 @@ function rulesHTML(){
 <li><b>Paragrafning birinchi va ikkinchi gapini, keyin oxirgi gapini oʻqing.</b> Burilish soʻzlariga (however, yet, but, in fact) alohida eʼtibor bering.</li>
 <li><b>Asosiy fikrni oʻz soʻzlaringiz bilan</b> 4–7 soʻzda ayting. Oʻzbekcha boʻlsa ham boʻladi.</li>
 <li><b>Shu qisqa xulosani sarlavhalar bilan solishtiring</b> va 1–2 nomzod tanlang.</li>
-<li><b>Har bir nomzodni uch savol bilan tekshiring:</b> butun paragrafni qamraydimi? Fokus soʻzi mosmi? Matnda dalil gapi bormi?</li>
+<li><b>Har bir nomzodni toʻrt savol bilan tekshiring</b> (“Qaror yoʻli”): matnda dalil gap bormi? Butun paragrafni qamraydimi? Fokus soʻzi va daʼvo kuchi mosmi? Aynan shu paragrafga xosmi?</li>
 <li><b>Ishonchingiz komil boʻlsa</b>, javobni yozing va sarlavhani roʻyxatdan oʻchiring. Ikkilansangiz, ikkala nomzodni yozib qoʻyib, keyingi paragrafga oʻting.</li>
 <li><b>Oxirida qolgan paragraflarga qayting:</b> endi roʻyxatda nomzodlar kamaygan boʻladi.</li></ol></div>
 <div class="rsec"><h2>Asosiy fikr qayerda boʻladi</h2><div class="pos">
@@ -860,7 +1030,7 @@ function rulesHTML(){
 <div><b>Natija va xulosa</b><span>Umumlashtirish: <span class="w">as a result, therefore, in other words, on this view, in a sense</span></span></div>
 <div><b>Ehtiyotkorlik</b><span>Daraja tuzogʻini tekshiring: <span class="w">may, some, in some cases, few, rarely, suggests</span></span></div></div></div>
 <div class="rsec"><h2>Tuzoqlar</h2><p>Har bir tuzoq turi uchun taʼrif, nega ishlashi, undan qanday qochish va trenajordagi misol. Testda notoʻgʻri javob tanlansa, aynan shu turlardan biri koʻrsatiladi.</p><div class="traps">` +
-  TRAP_ORDER.map(k => '<details class="trap"><summary><span class="tn">' + TRAPS[k].n + ' <span class="mono">' + TRAPS[k].en + '</span></span><span class="ts">' + TRAPS[k].s + '</span></summary><div class="tb"><p>' + TRAPS[k].l + '</p><p><span class="lab">Qanday qochish</span>' + TRAPS[k].avoid + "</p>" + trapExample(k) + "</div></details>").join("") +
+  TRAP_ORDER.map(k => '<details class="trap"><summary><span class="tn">' + TRAPS[k].n + ' <span class="mono">' + TRAPS[k].en + '</span></span><span class="ts">' + TRAPS[k].s + '</span></summary><div class="tb"><p>' + TRAPS[k].l + '</p><p><span class="lab">Qanday qochish</span>' + TRAPS[k].avoid + "</p>" + trapExample(k) + (trapCount(k) ? '<div class="btns" style="margin-top:10px"><button class="btn primary sm" data-act="trapdrill" data-t="' + k + '">Shu tuzoq boʻyicha mashq (' + trapCount(k) + " paragraf)</button></div>" : "") + "</div></details>").join("") +
   `</div></div>
 <div class="rsec"><h2>Vaqt</h2><ul>
 <li>IELTS Readingda 3 ta matn va 40 ta savolga 60 daqiqa beriladi; javoblarni koʻchirish uchun alohida vaqt berilmaydi.</li>
@@ -907,7 +1077,7 @@ Toʻgʻri sarlavha: ______, dalil gap: “______”
 Tuzoq turi: ______
 Keyingi safar nima qilaman: ______</pre></div>
 <div class="rsec"><h2>Trenajordan foydalanish rejasi</h2><ol>
-<li><b>1-dars.</b> “Strategiya” boʻlimi; 1-matn mashq rejimida; xatolar tahlili.</li>
+<li><b>1-dars.</b> “Qoidalar” boʻlimi; 1-matn mashq rejimida; har javobdan keyingi tahlilni birga oʻqish.</li>
 <li><b>2-dars.</b> “Mavzu gapini top” mashqi (15–20 paragraf); 2-matn mashq rejimida.</li>
 <li><b>3-dars.</b> Tuzoqlar boʻlimi; “Tuzoqni aniqla” mashqi; 3- va 4-matn.</li>
 <li><b>4-dars.</b> 5- va 6-matn imtihon rejimida; “Natijalar” boʻlimidagi tuzoqlar statistikasi asosida har bir talabaga shaxsiy reja.</li></ol></div>
@@ -922,47 +1092,93 @@ function bars(rows, cls){
   return '<div class="hbars">' + rows.map(r => '<div class="hb"><span>' + r[0] + '</span><div class="track ' + cls + '"><i style="width:' + pct(r[1], max) + '%"></i></div><span class="hv num">' + r[1] + " marta</span></div>").join("") + "</div>";
 }
 function statsHTML(){
-  const ids = Object.keys(store.att).filter(id => PBY[id]);
-  const log = store.log.filter(e => PBY[e.p] && e.k !== "blank");
-  let h = '<section class="doc" style="max-width:1000px"><h1>Natijalar</h1><p class="lede">Birinchi urinishlar, tuzoqlar statistikasi va xatolar daftari. Maʼlumotlar faqat shu brauzerda saqlanadi.</p>';
-  if (!ids.length && !log.length && !store.dr.trap[1] && !store.dr.topic[1]) return h + '<div class="rsec"><p class="empty">Hali natija yoʻq. Birinchi testni yeching: tekshiruvdan keyin bu yerda tuzoqlar statistikasi va xatolar daftari paydo boʻladi.</p><button class="btn primary" data-act="start" data-p="rooftop" data-m="practice">1-matnni boshlash</button></div></section>';
-  const tot = ids.reduce((a, id) => a + store.att[id].total, 0), ok = ids.reduce((a, id) => a + store.att[id].first, 0);
-  h += '<div class="kpis"><div><span class="mono">Birinchi urinishdagi aniqlik</span><b class="num">' + pct(ok, tot) + '%</b><span class="small">' + ok + " / " + tot + ' paragraf</span></div><div><span class="mono">Yechilgan testlar</span><b class="num">' + ids.length + " / " + PASSAGES.length + '</b></div><div><span class="mono">Tuzoqqa tushishlar</span><b class="num">' + log.length + '</b><span class="small">qayta urinishlar bilan birga</span></div></div>';
-  if (ids.length) h += '<div class="rsec"><h2>Testlar boʻyicha</h2><div class="tbl"><table><thead><tr><th>Matn</th><th>Oxirgi birinchi urinish</th><th>Eng yaxshi</th><th>Xatolar tahlilidan keyin</th><th>Urinishlar</th></tr></thead><tbody>' + ids.map(id => { const a = store.att[id], p = PBY[id]; return "<tr><td>" + p.no + ". " + esc(p.title) + '</td><td class="num">' + a.first + " / " + a.total + '</td><td class="num">' + a.best + " / " + a.total + '</td><td class="num">' + (a.fin != null ? a.fin + " / " + a.total : "—") + '</td><td class="num">' + a.n + "</td></tr>"; }).join("") + "</tbody></table></div></div>";
-  if (log.length) {
-    const tc = TRAP_ORDER.map(k => [TRAPS[k].n, log.filter(e => e.k === k).length, k]).filter(r => r[1]).sort((a, b) => b[1] - a[1]);
+  const ids = answeredIds(), wrong = wrongIds(), ok = ids.length - wrong.length;
+  let h = '<section class="doc" style="max-width:1000px"><h1>Natijalar</h1><p class="lede">Har bir paragraf boʻyicha oxirgi javob hisobga olinadi. Maʼlumotlar faqat shu brauzerda saqlanadi.</p>';
+  if (!ids.length && !store.dr.trap[1] && !store.dr.topic[1]) return h + '<div class="rsec"><p class="empty">Hali natija yoʻq. Birinchi matnni yeching: shundan keyin bu yerda tuzoqlar statistikasi va xatolar daftari paydo boʻladi.</p><button class="btn primary" data-act="start" data-p="rooftop" data-m="practice">1-matnni boshlash</button></div></section>';
+  h += '<div class="kpis"><div><span class="mono">Yechilgan paragraflar</span><b class="num">' + ids.length + " / " + TOTALQ + '</b></div><div><span class="mono">Aniqlik</span><b class="num">' + pct(ok, ids.length) + '%</b><span class="small">' + ok + " / " + ids.length + ' paragraf</span></div><div><span class="mono">Hozir xato</span><b class="num">' + wrong.length + "</b></div></div>";
+  if (ids.length) h += '<div class="rsec"><h2>Matnlar boʻyicha</h2><div class="tbl"><table><thead><tr><th>Matn</th><th>Yechilgan</th><th>Toʻgʻri</th><th>Imtihon: oxirgi</th><th>Imtihon: eng yaxshi</th></tr></thead><tbody>' + PASSAGES.map(p => {
+    const d = p.paras.filter(q => store.ans[q.id]).length, o = p.paras.filter(q => store.ans[q.id] && store.ans[q.id].ok).length, ex = store.exams[p.id];
+    return "<tr><td>" + p.no + ". " + esc(p.title) + '</td><td class="num">' + d + " / " + p.paras.length + '</td><td class="num">' + (d ? o + " / " + d : "—") + '</td><td class="num">' + (ex ? ex.last + " / " + ex.total : "—") + '</td><td class="num">' + (ex ? ex.best + " / " + ex.total : "—") + "</td></tr>";
+  }).join("") + "</tbody></table></div></div>";
+  const tally = {};
+  ids.forEach(id => { const q = QID[id]; (store.ans[id].hist || []).forEach(v => { if (v !== q.a) { const k = trapOf(q.P, q, v, true).k; tally[k] = (tally[k] || 0) + 1; } }); });
+  const tc = TRAP_ORDER.map(k => [TRAPS[k].n, tally[k] || 0, k]).filter(r => r[1]).sort((a, b) => b[1] - a[1]);
+  if (tc.length) {
     const top = tc[0];
-    h += '<div class="rsec"><h2>Qaysi tuzoqlarga tushyapsiz</h2>' + bars(tc, "") + '<div class="insight"><b>Asosiy zaif nuqta: ' + top[0] + "</b><p>" + TRAPS[top[2]].avoid + "</p><p class=\"note\">Mashq: “Mashqlar” → “Tuzoqni aniqla”, keyin “Strategiya” boʻlimidagi shu tuzoq taʼrifini qayta oʻqing.</p></div></div>";
-    const rc = Object.keys(REASONS).map(r => [REASONS[r].t, log.filter(e => e.r === r).length, r]).filter(r => r[1]).sort((a, b) => b[1] - a[1]);
-    h += '<div class="rsec"><h2>Xato sabablari (oʻzingiz belgilagan)</h2>' + (rc.length ? bars(rc, "r") + '<div class="insight"><b>Tavsiya: ' + rc[0][0].toLowerCase() + "</b><p>" + REASONS[rc[0][2]].a + "</p></div>" : '<p class="empty">Test tahlilida “Nega xato qildingiz?” savoliga javob bersangiz, bu yerda shaxsiy tavsiya paydo boʻladi.</p>') + "</div>";
+    h += '<div class="rsec"><h2>Qaysi tuzoqlarga tushyapsiz</h2><p class="small">Barcha urinishlardagi xato javoblar hisobga olingan.</p>' + bars(tc, "") + '<div class="insight"><b>Asosiy zaif nuqta: ' + top[0] + "</b><p>" + esc(TRAPS[top[2]].avoid) + "</p>" + (trapCount(top[2]) ? '<div class="btns"><button class="btn sm" data-act="trapdrill" data-t="' + top[2] + '">Shu tuzoq boʻyicha mashq (' + trapCount(top[2]) + ")</button></div>" : "") + "</div></div>";
+    const rc = Object.keys(REASONS).map(r => [REASONS[r].t, ids.filter(id => store.ans[id].r === r).length, r]).filter(r => r[1]).sort((a, b) => b[1] - a[1]);
+    h += '<div class="rsec"><h2>Xato sabablari (oʻzingiz belgilagan)</h2>' + (rc.length ? bars(rc, "r") + '<div class="insight"><b>Tavsiya: ' + rc[0][0].toLowerCase() + "</b><p>" + esc(REASONS[rc[0][2]].a) + "</p></div>" : '<p class="empty">Xato javob tahlilidagi “Nega shunday tanladingiz?” savoliga javob bersangiz, bu yerda shaxsiy tavsiya paydo boʻladi.</p>') + "</div>";
   }
-  h += '<div class="rsec"><h2>Mashqlar</h2><p>Tuzoqni aniqla: <b class="num">' + store.dr.trap[0] + " / " + store.dr.trap[1] + "</b> · Mavzu gapini top: <b class=\"num\">" + store.dr.topic[0] + " / " + store.dr.topic[1] + "</b></p></div>";
-  if (log.length) h += '<div class="rsec"><h2>Xatolar daftari</h2><p class="small">Oxirgi 30 ta xato. Toʻgʻri javob yopiq: avval oʻzingiz eslab koʻring.</p><ul class="wlist">' + log.slice(-30).reverse().map(e => { const p = PBY[e.p]; return '<li><span class="mono">' + p.no + "-matn · " + esc(p.title) + " · " + e.L + " paragraf" + (e.n > 1 ? " · " + e.n + "-urinish" : "") + '</span><p><span class="lab">Tanlangan</span>' + hd(p, e.v) + '</p><p><span class="ttag">' + TRAPS[e.k].n + "</span>" + (e.r ? ' <span class="small">· ' + REASONS[e.r].t + "</span>" : "") + '</p><details class="more"><summary>Toʻgʻri javob</summary><p style="margin-top:6px">' + hd(p, e.a) + '</p></details><div class="btns"><button class="btn sm" data-act="start" data-p="' + p.id + '" data-m="practice">Testni qayta yechish</button></div></li>'; }).join("") + "</ul></div>";
+  h += '<div class="rsec"><h2>Mashqlar</h2><p>Tuzoqni aniqla: <b class="num">' + store.dr.trap[0] + " / " + store.dr.trap[1] + '</b> · Mavzu gapini top: <b class="num">' + store.dr.topic[0] + " / " + store.dr.topic[1] + "</b></p></div>";
+  h += '<div class="rsec"><h2>Xatolar daftari</h2>';
+  if (wrong.length) h += '<p class="small">Oxirgi javobi xato boʻlgan paragraflar. Paragraf qayta toʻgʻri yechilsa, daftardan chiqadi.</p><div class="btns" style="margin-bottom:6px"><button class="btn primary" data-act="quick" data-k="mist">Hammasini qayta yechish (' + wrong.length + ')</button></div><ul class="wlist">' + wrong.map(id => {
+    const q = QID[id], p = q.P, r = store.ans[id], t = trapOf(p, q, r.last, true);
+    return '<li><span class="mono">' + p.no + "-matn · " + esc(p.title) + " · " + q.L + " paragraf" + (r.wrong > 1 ? " · " + r.wrong + " marta xato" : "") + '</span><p><span class="lab">Siz</span>' + hd(p, r.last) + '</p><p><span class="lab">Toʻgʻri</span>' + hd(p, q.a) + '</p><p><span class="ttag">' + TRAPS[t.k].n + "</span>" + (r.r ? ' <span class="small">· ' + REASONS[r.r].t + "</span>" : "") + "</p>" + (t.note ? '<p class="small">' + esc(t.note) + "</p>" : "") +
+      '<details class="more"><summary>Isbot va tahlil</summary><blockquote style="margin-top:8px">“' + esc(evSentence(q.t)) + '”</blockquote><p style="margin-top:8px">' + esc(q.why) + "</p></details></li>";
+  }).join("") + "</ul>";
+  else h += "<p>Hozir xato javob yoʻq.</p>";
+  h += "</div>";
   h += '<div class="rsec plain"><h2>Natijalarni tozalash</h2>' + (S.confirmReset ? '<p>Barcha natijalar va xatolar daftari oʻchiriladi. Davom etasizmi?</p><div class="btns"><button class="btn danger" data-act="reset2">Ha, oʻchirish</button><button class="btn" data-act="reset0">Bekor qilish</button></div>' : '<button class="btn" data-act="reset1">Hamma natijalarni oʻchirish</button>') + "</div></section>";
   return h;
 }
 
 /* ===================== RENDER VA HODISALAR ===================== */
 function render(){
-  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-current", (b.dataset.v === S.view || (S.view === "sess" && b.dataset.v === "lib")) ? "page" : "false"));
   const v = S.view;
-  document.getElementById("app").innerHTML = v === "sess" ? sessHTML() : v === "drill" ? drillHTML() : v === "rules" ? rulesHTML() : v === "stats" ? statsHTML() : v === "teach" ? teachHTML() : libHTML();
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-current", (b.dataset.v === v || ((v === "sess" || v === "fin") && b.dataset.v === "lib")) ? "page" : "false"));
+  document.getElementById("app").innerHTML = v === "sess" ? sessHTML() : v === "fin" ? finishHTML() : v === "drill" ? drillHTML() : v === "rules" ? rulesHTML() : v === "stats" ? statsHTML() : v === "teach" ? teachHTML() : libHTML();
 }
-function keep(fn){ const y = window.scrollY; fn(); render(); window.scrollTo(0, y); }
+function paneTop(){ const el = document.getElementById("passage"); return el ? el.scrollTop : 0; }
+function keep(fn){ const y = window.scrollY, py = paneTop(); fn(); render(); const el = document.getElementById("passage"); if (el) el.scrollTop = py; window.scrollTo(0, y); }
+function scrollable(el){ return el && el.scrollHeight > el.clientHeight + 4; }
+/* Joriy paragrafni matn oynasida koʻrinadigan qilish */
+function focusPara(){
+  const pane = document.getElementById("passage"), cur = pane && pane.querySelector(".para.cur");
+  if (cur && scrollable(pane)) pane.scrollTop = Math.max(0, cur.offsetTop - 14);
+}
+function focusEvidence(){
+  const pane = document.getElementById("passage"), cur = pane && pane.querySelector(".para.cur"), m = cur && cur.querySelector("mark.ev");
+  if (m && scrollable(pane)) pane.scrollTop = Math.max(0, cur.offsetTop + m.offsetTop - pane.clientHeight / 3);
+}
+function narrow(){ return window.innerWidth <= 900; }
+function goPara(){
+  render();
+  if (narrow()) { const g = document.getElementById("sgrid"); if (g) g.scrollIntoView({ block:"start" }); }
+  else { window.scrollTo(0, 0); focusPara(); }
+}
 
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-act]"); if (!b || b.disabled) return;
-  const d = b.dataset, s = S.sess;
+  const d = b.dataset, s = S.sess, q = S.view === "sess" ? curQ() : null;
   switch (d.act) {
     case "tab": S.view = d.v; S.confirmReset = false; render(); window.scrollTo(0, 0); break;
-    case "start": start(d.p, d.m); break;
-    case "resume": S.view = "sess"; render(); break;
-    case "check": check(false); break;
-    case "hint": keep(() => { s.hint[d.l] = !s.hint[d.l]; }); break;
-    case "reason": keep(() => { const ent = store.log[s.li[d.l]]; if (ent) { ent.r = ent.r === d.r ? "" : d.r; save(); } }); break;
-    case "reveal": keep(() => { s.st[d.l] = "rev"; finishIfDone(); save(); }); break;
-    case "revealall": keep(() => { PBY[s.pid].paras.forEach(q => { if (s.st[q.L] === "bad" || !s.st[q.L]) { s.st[q.L] = "rev"; } }); finishIfDone(); save(); }); break;
-    case "retry": { PBY[s.pid].paras.forEach(q => { if (s.st[q.L] === "bad") { delete s.st[q.L]; s.sel[q.L] = ""; } }); render(); const f = document.querySelector("select:not([disabled])"); if (f) { f.scrollIntoView({ block:"center" }); f.focus(); } break; }
+    case "home": S.view = "lib"; render(); window.scrollTo(0, 0); break;
+    case "start": { const p = PBY[d.p]; startSession(p.paras.map(x => x.id), p.title, d.m, p.id); break; }
+    case "resume": S.view = "sess"; render(); window.scrollTo(0, 0); focusPara(); break;
+    case "quick": {
+      if (d.k === "mix") startSession(shuffle(ALLQ).slice(0, 10).map(x => x.id), "Aralash 10 paragraf", "practice");
+      if (d.k === "hard") startSession(shuffle(ALLQ.filter(x => HARD.indexOf(x.P.id) > -1)).map(x => x.id), "Eng qiyin paragraflar", "practice");
+      if (d.k === "mist") { const w = wrongIds(); if (w.length) startSession(shuffle(w), "Xatolarim ustida", "practice"); }
+      if (d.k === "new") { const n = ALLQ.filter(x => !store.ans[x.id]).map(x => x.id); if (n.length) startSession(n.slice(0, 10), "Hali yechilmagan paragraflar", "practice"); }
+      break; }
+    case "trapdrill": { const ids = shuffle(ALLQ.filter(x => x.tr && Object.keys(x.tr).some(h => x.tr[h][0] === d.t))).map(x => x.id); if (ids.length) startSession(ids, "Tuzoq: " + TRAPS[d.t].n, "practice"); break; }
+    case "pick": if (q && !s.ans[q.id]) { keep(() => { s.pick[q.id] = d.k; }); const f = document.querySelector('.hopt[data-k="' + d.k + '"]'); if (f) f.focus({ preventScroll:true }); } break;
+    case "check": if (q && s.pick[q.id] && !s.ans[q.id]) {
+      keep(() => { s.ans[q.id] = s.pick[q.id]; record(q, s.pick[q.id]); });
+      focusEvidence();
+      if (narrow()) { const vd = document.querySelector(".verdict"); if (vd) vd.scrollIntoView({ block:"start" }); }
+      break; }
+    case "hint": if (q) keep(() => { s.hint[q.id] = !s.hint[q.id]; }); break;
+    case "full": keep(() => { s.full = !s.full; }); break;
+    case "next": if (s.idx < s.ids.length - 1) { s.idx++; goPara(); } break;
+    case "prev": if (s.idx > 0) { s.idx--; goPara(); } break;
+    case "goto": s.idx = +d.i; goPara(); break;
+    case "finish": S.view = "fin"; render(); window.scrollTo(0, 0); break;
+    case "redowrong": { const w = s.ids.filter(id => !isOk(s, id) && (s.mode === "exam" || s.ans[id])); if (w.length) startSession(w, "Xatolarni qayta yechish", "practice"); break; }
+    case "submit": submitExam(false); break;
+    case "eopen": keep(() => { s.open[d.id] = !s.open[d.id]; }); break;
+    case "rule": keep(() => { s.ro[d.uid] = !s.ro[d.uid]; }); break;
+    case "reason": keep(() => { const r = store.ans[d.id]; if (r) { r.r = r.r === d.r ? "" : d.r; save(); } }); break;
     case "dkind": S.dr.kind = d.k; S.dr.item = null; render(); break;
     case "dnext": nextDrill(); render(); break;
     case "dtrap": keep(() => { const [pid, L, h] = TPOOL[S.dr.item]; S.dr.pick = d.k; store.dr.trap[1]++; if (d.k === PBY[pid].pm[L].tr[h][0]) store.dr.trap[0]++; save(); }); break;
@@ -971,18 +1187,26 @@ document.addEventListener("click", e => {
     case "dshow": keep(() => { const t = document.getElementById("own-heading"); S.dr.txt = t ? t.value : ""; S.dr.shown = true; }); break;
     case "reset1": keep(() => { S.confirmReset = true; }); break;
     case "reset0": keep(() => { S.confirmReset = false; }); break;
-    case "reset2": store = fresh(); save(); S.confirmReset = false; render(); break;
+    case "reset2": stopTimer(); store = fresh(); save(); S.sess = null; S.confirmReset = false; render(); break;
   }
 });
 document.addEventListener("keydown", e => {
   const t = e.target;
-  if ((e.key === "Enter" || e.key === " ") && t.matches && t.matches('[role="button"][data-act]')) { e.preventDefault(); t.click(); }
+  if ((e.key === "Enter" || e.key === " ") && t.matches && t.matches('[role="button"][data-act]')) { e.preventDefault(); t.click(); return; }
+  if (S.view !== "sess" || !S.sess || S.sess.mode !== "practice" || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (t.matches && t.matches("select, textarea, input")) return;
+  const s = S.sess, q = curQ();
+  if (e.key === "ArrowRight" && s.ans[q.id] && s.idx < s.ids.length - 1) { s.idx++; goPara(); }
+  else if (e.key === "ArrowLeft" && s.idx > 0) { s.idx--; goPara(); }
 });
 document.addEventListener("change", e => {
   const t = e.target;
-  if (t.matches("select[data-l]") && S.sess) { const L = t.dataset.l; keep(() => { S.sess.sel[L] = t.value; }); const f = document.getElementById("sel-" + L); if (f) f.focus({ preventScroll:true }); }
+  if (t.matches("select[data-id]") && S.sess && S.sess.mode === "exam" && !S.sess.submitted) { const id = t.dataset.id, sid = t.id; keep(() => { S.sess.ans[id] = t.value; }); const f = document.getElementById(sid); if (f) f.focus({ preventScroll:true }); }
 });
 document.addEventListener("input", e => { if (e.target.id === "own-heading") S.dr.txt = e.target.value; });
+
+/* Qoʻshni trenajorga havola faqat fayllar yonma-yon turgan joyda (sayt yoki lokal papka) koʻrsatiladi */
+(function(){ const x = document.getElementById("xlink"); if (x && (/\.github\.io$/.test(location.hostname) || location.protocol === "file:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) x.hidden = false; })();
 
 render();
 </script>

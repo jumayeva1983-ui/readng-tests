@@ -47,6 +47,8 @@ button{font:inherit;color:inherit}
 .brand{display:flex;align-items:baseline;gap:10px}
 .brand b{font:600 19px/1 var(--f-read);letter-spacing:-.01em}
 .brand .key{display:inline-flex;gap:3px}
+.xlink{font-size:13.5px;color:var(--pencil);text-decoration:none;font-weight:500;white-space:nowrap}
+.xlink:hover{text-decoration:underline}
 .brand .key i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--ink);display:inline-block}
 .brand .key i:nth-child(2){background:var(--ink)}
 .tabs{display:flex;gap:4px}
@@ -252,7 +254,7 @@ th{font:500 11px/1.2 var(--f-mono);letter-spacing:.06em;text-transform:uppercase
 
 <div class="wrap">
   <header class="top">
-    <div class="brand"><span class="key" aria-hidden="true"><i></i><i></i><i></i></span><b>TFNG Trenajori</b></div>
+    <div class="brand"><span class="key" aria-hidden="true"><i></i><i></i><i></i></span><b>TFNG Trenajori</b><a class="xlink" id="xlink" href="matching-headings.html" hidden>Matching Headings trenajori →</a></div>
     <nav class="tabs" aria-label="Boʻlimlar">
       <button data-act="tab" data-v="lib">Matnlar</button>
       <button data-act="tab" data-v="rules">Qoidalar</button>
@@ -1123,6 +1125,9 @@ document.addEventListener("keydown", e => {
   else if (k === "arrowleft" && s.idx > 0) { s.idx--; render(); }
   else if (k === "h" && !s.ans[q.id]) { s.hint[q.id] = true; render(); }
 });
+
+/* Qoʻshni trenajorga havola faqat fayllar yonma-yon turgan joyda (sayt yoki lokal papka) koʻrsatiladi */
+(function(){ const x = document.getElementById("xlink"); if (x && (/\.github\.io$/.test(location.hostname) || location.protocol === "file:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) x.hidden = false; })();
 
 render();
 
