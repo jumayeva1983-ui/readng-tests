@@ -327,7 +327,7 @@ details.more summary{cursor:pointer;font-size:13.5px;color:var(--brand);font-wei
 <body>
 
 <header class="top"><div class="wrap topin">
-  <div class="brand"><span class="mk" aria-hidden="true">iv</span><b>Matching Headings <i>Pro</i></b><a class="xlink" id="xlink1" href="matching-headings.html" hidden>Oʻzbekcha trenajor →</a><a class="xlink" id="xlink2" href="index.html" hidden>TFNG →</a></div>
+  <div class="brand"><span class="mk" aria-hidden="true">iv</span><b>Matching Headings <i>Pro</i></b><a class="xlink" id="xlink1" href="matching-headings.html" hidden>Oʻzbekcha trenajor →</a><a class="xlink" id="xlink2" href="index.html" hidden>TFNG →</a><a class="xlink" id="xlink3" href="sat-writing.html" hidden>SAT Writing →</a></div>
   <nav class="tabs" aria-label="Sections">
     <button data-act="tab" data-v="lib">Tests</button>
     <button data-act="tab" data-v="rules">Rules</button>
@@ -1042,7 +1042,7 @@ document.addEventListener("change", e => {
 });
 
 /* Links to the sibling trainers show only where the files sit side by side (a site or a local folder) */
-(function(){ if (/\.github\.io$/.test(location.hostname) || location.protocol === "file:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) ["xlink1", "xlink2"].forEach(id => { const x = document.getElementById(id); if (x) x.hidden = false; }); })();
+(function(){ if (/\.github\.io$/.test(location.hostname) || location.protocol === "file:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) ["xlink1", "xlink2", "xlink3"].forEach(id => { const x = document.getElementById(id); if (x) x.hidden = false; }); })();
 
 render();
 </script>
