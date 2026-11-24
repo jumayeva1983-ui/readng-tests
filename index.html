@@ -254,7 +254,7 @@ th{font:500 11px/1.2 var(--f-mono);letter-spacing:.06em;text-transform:uppercase
 
 <div class="wrap">
   <header class="top">
-    <div class="brand"><span class="key" aria-hidden="true"><i></i><i></i><i></i></span><b>TFNG Trenajori</b><a class="xlink" id="xlink" href="matching-headings.html" hidden>Matching Headings trenajori →</a></div>
+    <div class="brand"><span class="key" aria-hidden="true"><i></i><i></i><i></i></span><b>TFNG Trenajori</b><a class="xlink" id="xlink" href="matching-headings.html" hidden>Matching Headings trenajori →</a><a class="xlink" id="xlink2" href="ielts-reading-test-1.html" hidden>IELTS Reading Test 1 →</a></div>
     <nav class="tabs" aria-label="Boʻlimlar">
       <button data-act="tab" data-v="lib">Matnlar</button>
       <button data-act="tab" data-v="rules">Qoidalar</button>
@@ -1127,7 +1127,7 @@ document.addEventListener("keydown", e => {
 });
 
 /* Qoʻshni trenajorga havola faqat fayllar yonma-yon turgan joyda (sayt yoki lokal papka) koʻrsatiladi */
-(function(){ const x = document.getElementById("xlink"); if (x && (/\.github\.io$/.test(location.hostname) || location.protocol === "file:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) x.hidden = false; })();
+(function(){ if (/\.github\.io$/.test(location.hostname) || location.protocol === "file:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) ["xlink", "xlink2"].forEach(id => { const x = document.getElementById(id); if (x) x.hidden = false; }); })();
 
 render();
 
