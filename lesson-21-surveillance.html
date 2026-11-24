@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>The Camera at the Gate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;600&display=swap">
+<style>
+/* Layout: a CCTV-feed masthead, then one reading column beside a sticky word bank that lights up as students use the lesson's vocabulary. */
+:root{
+  --bg:#EDF0F3; --surface:#FFFFFF; --sunk:#F5F7F9; --ink:#17202A; --muted:#566271; --line:#D3DAE1;
+  --accent:#C93B2B; --ok:#1C7F61; --okbg:#DCF0E8; --warnbg:#FBEBDD; --mark:#FFEDB5; --markline:#E0B53A;
+  --phil:#5245B8; --philbg:#ECEAFB; --life:#2E7A3A; --lifebg:#E3F2E5; --logic:#A55F00; --logicbg:#FBEEDB;
+  --feed:#121922; --feedink:#D9E2EA; --feedmuted:#7F8E9C;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-read:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1318; --surface:#161D25; --sunk:#121820; --ink:#E5EAEF; --muted:#9AA6B3; --line:#2A3440;
+  --accent:#FF6E5C; --ok:#4CC59C; --okbg:#12322A; --warnbg:#3A2716; --mark:#3E3415; --markline:#C99A2A;
+  --phil:#A99EFF; --philbg:#231F45; --life:#7CCB8A; --lifebg:#16301C; --logic:#F2A845; --logicbg:#35260F;
+  --feed:#0A0F14; --feedink:#D9E2EA; --feedmuted:#7F8E9C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1318; --surface:#161D25; --sunk:#121820; --ink:#E5EAEF; --muted:#9AA6B3; --line:#2A3440;
+  --accent:#FF6E5C; --ok:#4CC59C; --okbg:#12322A; --warnbg:#3A2716; --mark:#3E3415; --markline:#C99A2A;
+  --phil:#A99EFF; --philbg:#231F45; --life:#7CCB8A; --lifebg:#16301C; --logic:#F2A845; --logicbg:#35260F;
+  --feed:#0A0F14; --feedink:#D9E2EA; --feedmuted:#7F8E9C; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-display);font-size:16px;line-height:1.55;font-variation-settings:"wdth" 100}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h2{font-size:1.65rem;font-weight:800;font-variation-settings:"wdth" 82;letter-spacing:-.01em}
+h3{font-size:1.12rem;font-weight:700}
+p{margin:0}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono)}
+.eyebrow{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+
+/* masthead */
+.feed{margin-top:16px;background:var(--feed);color:var(--feedink);border-radius:6px;padding:22px 24px 26px;position:relative;overflow:hidden}
+.feed::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px)}
+.corner{position:absolute;width:22px;height:22px;border-color:var(--feedmuted);border-style:solid;border-width:0}
+.c1{top:10px;left:10px;border-top-width:2px;border-left-width:2px}.c2{top:10px;right:10px;border-top-width:2px;border-right-width:2px}
+.c3{bottom:10px;left:10px;border-bottom-width:2px;border-left-width:2px}.c4{bottom:10px;right:10px;border-bottom-width:2px;border-right-width:2px}
+.osd{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;color:var(--feedmuted)}
+.rec{color:var(--feedink)}.rec i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#E5483A;margin-right:7px;vertical-align:1px;animation:blink 1.6s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.rec i{animation:none}}
+.feed h1{font-size:clamp(2.1rem,6vw,3.6rem);font-weight:800;font-variation-settings:"wdth" 75;letter-spacing:-.015em;margin:26px 0 8px;text-transform:uppercase;line-height:.98}
+.feed h1 span{color:var(--feedmuted)}
+.feed .sub{max-width:62ch;color:var(--feedink);opacity:.86}
+.idrow{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;position:relative;z-index:1}
+.idrow label{display:flex;flex-direction:column;gap:4px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--feedmuted);flex:1 1 200px}
+.idrow input{background:transparent;border:0;border-bottom:1px solid var(--feedmuted);padding:6px 2px;color:var(--feedink);font-family:var(--f-display);font-size:1rem;text-transform:none;letter-spacing:0}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);margin-top:16px}
+.nav .wrap{display:flex;align-items:center;gap:6px 18px;flex-wrap:wrap;padding-block:10px}
+.nav a{color:var(--ink);text-decoration:none;font-weight:600;font-size:.92rem;white-space:nowrap}
+.nav a:hover{color:var(--accent)}
+.nav .prog{margin-left:auto;font-family:var(--f-mono);font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* layout */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:36px;align-items:start;padding-block:28px 80px}
+main{display:flex;flex-direction:column;gap:56px;min-width:0}
+section{display:flex;flex-direction:column;gap:18px;scroll-margin-top:72px;min-width:0}
+.lead{color:var(--muted);max-width:68ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px}
+
+/* pre-reading */
+.pre{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pre .panel{display:flex;flex-direction:column;gap:10px;padding:16px}
+.pre p{font-size:.95rem}
+
+/* reading */
+.reading{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:28px clamp(18px,4vw,44px)}
+.reading header{display:flex;flex-direction:column;gap:6px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.reading h3{font-size:1.9rem;font-weight:800;font-variation-settings:"wdth" 80}
+.note{font-size:.82rem;color:var(--muted)}
+.toggles{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+.tog{border:1px solid var(--line);background:var(--sunk);border-radius:999px;padding:5px 12px;font-size:.84rem;cursor:pointer}
+.tog[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--surface)}
+.para{display:grid;grid-template-columns:2.2rem minmax(0,1fr);gap:4px;padding-block:12px}
+.para b.pl{font-family:var(--f-mono);font-weight:500;color:var(--accent);font-size:.95rem;padding-top:4px}
+.para p{font-family:var(--f-read);font-size:1.13rem;line-height:1.72;max-width:66ch}
+.lx{cursor:pointer;border-radius:2px;transition:background .15s}
+.hl .lx{background:var(--mark);box-shadow:inset 0 -2px 0 var(--markline)}
+.gm{text-decoration:none}
+.hg .gm{text-decoration:underline;text-decoration-color:var(--phil);text-decoration-thickness:2px;text-underline-offset:4px}
+.wc-note{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);text-align:right;margin-top:8px}
+
+/* checks */
+.tf{display:flex;flex-direction:column}
+.tf .row{display:grid;grid-template-columns:1.8rem minmax(0,1fr) auto;gap:10px 12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.tf .row:last-child{border-bottom:0}
+.tf .n{font-family:var(--f-mono);color:var(--muted);font-size:.85rem}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.seg button{border:0;background:var(--sunk);padding:6px 11px;font-family:var(--f-mono);font-size:.8rem;cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.fb{grid-column:2 / -1;font-size:.86rem;padding:6px 10px;border-radius:4px}
+.fb.good{background:var(--okbg);color:var(--ok)}
+.fb.bad{background:var(--warnbg);color:var(--logic)}
+.vic{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 22px}
+.vic label{display:flex;flex-direction:column;gap:6px;font-size:.93rem}
+.vic .pref{font-family:var(--f-mono);font-size:.75rem;color:var(--accent)}
+.vic input{border:1px solid var(--line);background:var(--sunk);border-radius:4px;padding:8px 10px}
+.vic input.good{border-color:var(--ok);background:var(--okbg)}
+.vic input.bad{border-color:var(--logic);background:var(--warnbg)}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--surface);border-radius:5px;padding:9px 16px;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.score{font-family:var(--f-mono);font-size:.86rem;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* strands */
+.strand{display:flex;flex-direction:column;gap:16px}
+.strand-head{display:flex;flex-direction:column;gap:4px;padding-left:14px;border-left:4px solid var(--sc)}
+.strand-head .uz{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sc)}
+.strand[data-s="phil"]{--sc:var(--phil);--sbg:var(--philbg)}
+.strand[data-s="life"]{--sc:var(--life);--sbg:var(--lifebg)}
+.strand[data-s="logic"]{--sc:var(--logic);--sbg:var(--logicbg)}
+.strand[data-s="final"]{--sc:var(--accent);--sbg:var(--warnbg)}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:72px}
+.q.done{border-color:var(--ok)}
+.qh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.qid{font-family:var(--f-mono);font-size:.8rem;font-weight:500;color:var(--sc);background:var(--sbg);padding:2px 7px;border-radius:3px}
+.qh h3{flex:1 1 220px}
+.pill{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--sunk);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.q.done .pill{background:var(--okbg);color:var(--ok);border-color:var(--ok)}
+.prompt{font-family:var(--f-read);font-size:1.06rem;line-height:1.65;max-width:68ch}
+.moves{margin:0;padding-left:1.2rem;color:var(--muted);font-size:.9rem;display:flex;flex-direction:column;gap:2px}
+.req{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.req .lbl{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:5.8rem}
+.chip{display:inline-flex;align-items:center;gap:5px;border:1px dashed var(--muted);border-radius:4px;padding:3px 8px;font-size:.86rem;background:transparent;cursor:pointer;line-height:1.3}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;border:1.5px solid var(--muted)}
+.chip.on{border-style:solid;border-color:var(--ok);background:var(--okbg);color:var(--ok)}
+.chip.on::before{background:var(--ok);border-color:var(--ok)}
+.chip.g{font-family:var(--f-mono);font-size:.78rem}
+textarea{width:100%;min-height:9.5rem;resize:vertical;border:1px solid var(--line);background:var(--sunk);border-radius:5px;padding:12px 14px;font-family:var(--f-read);font-size:1.02rem;line-height:1.6}
+textarea:focus{border-color:var(--sc,var(--accent));outline:none;box-shadow:0 0 0 2px var(--sbg,var(--mark))}
+.pre textarea{min-height:5.5rem;font-size:.95rem}
+.meter{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:.84rem;color:var(--muted)}
+.meter .wc{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.meter .track{flex:0 0 120px;height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.meter .track i{display:block;height:100%;width:0;background:var(--sc,var(--accent));transition:width .2s}
+.meter .bonus{flex:1 1 220px;min-width:0}
+.scaffold{align-self:flex-start;border:1px solid var(--line);background:var(--sunk);border-radius:4px;padding:5px 10px;font-size:.84rem;cursor:pointer}
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;background:var(--sbg);border-radius:5px;padding:14px}
+.calc label{display:flex;flex-direction:column;gap:5px;font-size:.86rem}
+.calc input{border:1px solid var(--line);background:var(--surface);border-radius:4px;padding:7px 9px;font-family:var(--f-mono)}
+.calc input.good{border-color:var(--ok);background:var(--okbg)}
+.calc input.bad{border-color:var(--logic);background:var(--warnbg)}
+.calc .out{grid-column:1/-1;font-size:.88rem}
+
+/* bank */
+.bank{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);max-height:calc(100vh - 80px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.bank-top{display:flex;flex-direction:column;gap:6px}
+.big{font-family:var(--f-display);font-weight:800;font-variation-settings:"wdth" 78;font-size:2rem;line-height:1;font-variant-numeric:tabular-nums}
+.big small{font-size:1rem;color:var(--muted);font-weight:600}
+.bar2{height:6px;background:var(--line);border-radius:3px;overflow:hidden}.bar2 i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s}
+.bgroup{display:flex;flex-direction:column;gap:6px}
+.bgroup .chips{display:flex;flex-wrap:wrap;gap:5px}
+.bgroup .chip{font-size:.8rem;padding:2px 7px}
+.def{background:var(--sunk);border:1px solid var(--line);border-radius:5px;padding:10px 12px;font-size:.88rem}
+.def b{display:block;font-size:.98rem}
+.closebank{display:none}
+.fab{display:none}
+
+/* submit */
+.sumgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.sumgrid a{display:flex;justify-content:space-between;gap:6px;text-decoration:none;color:var(--ink);border:1px solid var(--line);background:var(--surface);border-radius:4px;padding:8px 10px;font-family:var(--f-mono);font-size:.8rem}
+.sumgrid a.done{border-color:var(--ok);background:var(--okbg);color:var(--ok)}
+#copybox{width:100%;min-height:10rem;font-family:var(--f-mono);font-size:.8rem}
+.toast{font-size:.88rem;color:var(--ok)}
+
+@media (max-width:1000px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .bank{position:fixed;left:0;right:0;bottom:0;top:auto;max-height:72vh;border-radius:12px 12px 0 0;z-index:40;transform:translateY(105%);transition:transform .25s;box-shadow:0 -10px 30px rgba(0,0,0,.18);
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  .bank.open{transform:none}
+  .closebank{display:inline-block;align-self:flex-end}
+  .fab{display:inline-flex;position:fixed;z-index:30;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);border:0;border-radius:999px;padding:11px 16px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;font-variant-numeric:tabular-nums}
+}
+@media (max-width:720px){
+  .pre,.vic,.calc{grid-template-columns:minmax(0,1fr)}
+  .tf .row{grid-template-columns:1.6rem minmax(0,1fr)}
+  .tf .seg{grid-column:2}
+  .para{grid-template-columns:1.6rem minmax(0,1fr)}
+  .nav .prog{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="feed">
+    <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+    <div class="osd"><span>CAM 01 · MAIN GATE · LESSON 21</span><span class="rec"><i></i>REC <span id="clock">--:--:--</span></span></div>
+    <h1>Surveillance <span>vs.</span> Security</h1>
+    <p class="sub">E-handout for Year 2, Level B2. Read the text, check your understanding, then answer thirteen thinking questions. Each question asks for specific words from the lesson. The word bank lights up as you use them.</p>
+    <div class="idrow">
+      <label for="f-name">Name<input id="f-name" autocomplete="name"></label>
+      <label for="f-group">Group<input id="f-group"></label>
+    </div>
+  </div>
+</div>
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <a href="#before">1 Before reading</a>
+    <a href="#reading">2 Reading</a>
+    <a href="#check">3 Check</a>
+    <a href="#think">4 Think</a>
+    <a href="#submit">5 Submit</a>
+    <span class="prog" id="prog">0/13 questions · 0 lexis items</span>
+  </div>
+</nav>
+
+<div class="wrap">
+<div class="layout">
+<main>
+
+  <section id="before">
+    <div><span class="eyebrow">Step 1 · 5 minutes</span><h2>Before you read</h2></div>
+    <p class="lead">Short answers are fine. Try to use at least one word from the word bank in each answer.</p>
+    <div class="pre">
+      <div class="panel"><p>The text is called <em>The Camera at the Gate</em>. Who might want the camera, and who might object to it?</p><textarea id="pre-1" aria-label="Before reading, question 1"></textarea></div>
+      <div class="panel"><p>How many cameras do you think saw you today? List the places.</p><textarea id="pre-2" aria-label="Before reading, question 2"></textarea></div>
+      <div class="panel"><p>Finish the sentence: "I feel safer when ..., but I feel watched when ..."</p><textarea id="pre-3" aria-label="Before reading, question 3"></textarea></div>
+    </div>
+  </section>
+
+  <section id="reading">
+    <div><span class="eyebrow">Step 2 · 10 minutes</span><h2>Reading</h2></div>
+    <article class="reading hl" id="text">
+      <header>
+        <span class="eyebrow">Case study</span>
+        <h3>The Camera at the Gate</h3>
+        <p class="note">This text was written for this lesson. Riverside University and the people in it are fictional.</p>
+        <div class="toggles">
+          <button class="tog" id="t-lex" aria-pressed="true">Highlight lesson vocabulary</button>
+          <button class="tog" id="t-gram" aria-pressed="false">Show modal structures</button>
+        </div>
+        <p class="note">Tap a highlighted word to see its meaning.</p>
+      </header>
+
+      <div class="para"><b class="pl">A</b><p>On the first Monday of the spring term, students at Riverside University found a small black camera above the main gate. A notice beside it said: "For your safety, this entrance is under <span class="lx" data-k="constant_surv">constant surveillance</span>." Nobody had been asked. Nobody had been told what the camera recorded, who would watch the footage or how long it would be <span class="lx" data-k="retain">retained</span>.</p></div>
+
+      <div class="para"><b class="pl">B</b><p>By lunchtime, the student union had received forty complaints. Dilnoza Rakhimova, a second-year law student, was among the first to write. "I am not against security," she said. "But a camera that knows my face is not the same as a guard who knows my name. The guard forgets. The software does not." She pointed out that the notice talked about safety but said nothing about <span class="lx" data-k="consent">consent</span>, and that students had no way to <span class="lx" data-k="opt">opt out</span> of being filmed if they wanted to attend their classes.</p></div>
+
+      <div class="para"><b class="pl">C</b><p>The head of security, Mr Tursunov, did not see a problem. Two laptops had been stolen from the library in December, he explained, and a camera was the cheapest <span class="lx" data-k="deterrent">deterrent</span> there was. "Anyone with a <span class="lx" data-k="legit">legitimate purpose</span> on campus has <span class="lx" data-k="nothing_hide">nothing to hide</span> and nothing to fear," he said. "Staff who work late <span class="gm">are entitled to</span> feel safe." He also confirmed that the system used <span class="lx" data-k="facial">facial recognition</span>: every face that passed the gate was compared with a list of people who had been <span class="gm">banned from</span> the campus.</p></div>
+
+      <div class="para"><b class="pl">D</b><p>It was this detail that alarmed the university's data protection officer. In a short memo, she reminded the administration that <span class="lx" data-k="biometric">biometric data</span> is among the most <span class="lx" data-k="sensitive">sensitive</span> information a person has. A password <span class="gm">can be changed</span> after a <span class="lx" data-k="breach">data breach</span>; a face cannot. She asked three questions. Who had <span class="lx" data-k="authorise">authorised</span> the system? Was the data <span class="lx" data-k="encrypt">encrypted</span>? And was there any independent <span class="lx" data-k="oversight">oversight</span>, or was the security office simply checking itself? "Every measure," she wrote, "<span class="gm">has to be</span> <span class="lx" data-k="proportionate">proportionate</span> to the risk it addresses. Scanning ten thousand faces to find two thieves <span class="lx" data-k="wide_net">casts far too wide a net</span>."</p></div>
+
+      <div class="para"><b class="pl">E</b><p>The debate soon moved beyond the gate. A philosophy lecturer reminded her students of a question asked by the Roman poet Juvenal almost two thousand years ago: who will guard the guards themselves? In her view, the real issue was not the camera but <span class="lx" data-k="accountability">accountability</span>. A powerful body that watches everyone, but is watched by no one, will sooner or later find a <span class="lx" data-k="loophole">loophole</span> in its own rules. Others feared a <span class="lx" data-k="slippery">slippery slope</span>: today the gate, tomorrow the corridors, and the day after, the exam halls.</p></div>
+
+      <div class="para"><b class="pl">F</b><p>In the end, the university did not remove the camera, but it did not keep it as it was, either. A committee of staff and students agreed four rules. The footage <span class="gm">must be deleted</span> after thirty days. Recordings <span class="gm">may be viewed</span> only with written permission. The facial-recognition function <span class="gm">must not be used</span> without a court order. And students <span class="gm">do not have to</span> give a reason if they ask to see their own file. Dilnoza was only partly satisfied. "We have <span class="lx" data-k="strike">struck a balance</span>," she said, "but we only struck it because people complained. Next time, the rules <span class="gm">should</span> come first and the camera second."</p></div>
+      <p class="wc-note">≈ 560 words · 6 paragraphs</p>
+    </article>
+  </section>
+
+  <section id="check">
+    <div><span class="eyebrow">Step 3 · 10 minutes</span><h2>Check your understanding</h2></div>
+    <div class="panel">
+      <h3>A. True, False or Not Given?</h3>
+      <p class="lead" style="margin:6px 0 8px">Choose T if the text says it, F if the text says the opposite, NG if the text does not tell us.</p>
+      <div class="tf" id="tf"></div>
+      <div class="btnrow" style="margin-top:14px"><button class="btn" id="tf-check">Check answers</button><span class="score" id="tf-score"></span></div>
+    </div>
+    <div class="panel">
+      <h3>B. Vocabulary in context</h3>
+      <p class="lead" style="margin:6px 0 14px">Find the word or phrase in the paragraph that matches each meaning. Write it in the form used in the text.</p>
+      <div class="vic" id="vic"></div>
+      <div class="btnrow" style="margin-top:14px"><button class="btn" id="vic-check">Check answers</button><span class="score" id="vic-score"></span></div>
+    </div>
+  </section>
+
+  <section id="think">
+    <div><span class="eyebrow">Step 4 · main task</span><h2>Thinking questions</h2></div>
+    <p class="lead">There is no single correct answer to these questions. You get credit for clear reasoning and for using the lesson's language. A question is complete when you reach the word count and use every item under <b>Must use</b> and <b>Grammar</b>. Spelling counts: the checker only recognises a word if it is written correctly.</p>
+    <div id="strands" style="display:flex;flex-direction:column;gap:44px"></div>
+  </section>
+
+  <section id="submit">
+    <div><span class="eyebrow">Step 5</span><h2>Submit your work</h2></div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:14px">
+      <div class="sumgrid" id="sumgrid"></div>
+      <p class="lead">Your answers are saved in this browser as you type. To hand them in, copy them and paste them where your teacher asks (Telegram, e-mail or the course platform).</p>
+      <div class="btnrow">
+        <button class="btn" id="copy">Copy my answers</button>
+        <button class="btn ghost" id="reset">Clear all answers</button>
+        <span class="toast" id="toast" role="status"></span>
+      </div>
+      <textarea id="copybox" hidden readonly aria-label="Your answers as text"></textarea>
+      <p class="lead">Printable version of this handout: <a href="lesson-21/Lesson_21_E-handout_The_Camera_at_the_Gate.pdf">PDF</a> · <a href="lesson-21/Lesson_21_E-handout_The_Camera_at_the_Gate.docx">Word (.docx)</a></p>
+    </div>
+  </section>
+
+</main>
+
+<aside class="bank" id="bank" aria-label="Word bank">
+  <button class="scaffold closebank" id="closebank">Close</button>
+  <div class="bank-top">
+    <span class="eyebrow">Word bank · Handout 1</span>
+    <div class="big" id="lexcount">0 <small>/ 80 used</small></div>
+    <div class="bar2"><i id="lexbar"></i></div>
+    <p class="note">Items turn green when they appear anywhere in your answers. Tap an item to see its meaning.</p>
+  </div>
+  <div class="def" id="def"><b>surveillance</b>close and continuous watching of people or places</div>
+  <div id="groups" style="display:flex;flex-direction:column;gap:14px"></div>
+</aside>
+</div>
+</div>
+
+<button class="fab" id="fab" aria-controls="bank">Word bank · <span id="fabcount">0</span></button>
+
+<script>
+(function(){
+"use strict";
+/* ---------- vocabulary from Handout 1 (Sets A–G, F) ---------- */
+const LEX=[
+ ["Nouns",[
+  ["surveil","surveillance","close and continuous watching of people or places","\\bsurveillance\\b"],
+  ["privacy","privacy","the state of being free from observation by others","\\bprivacy\\b"],
+  ["consent","consent","permission that is freely and knowingly given","\\bconsent(s|ed|ing)?\\b"],
+  ["oversight","oversight","independent supervision of a powerful body","\\boversight\\b"],
+  ["accountability","accountability / accountable","the duty to explain your decisions and accept the consequences","\\baccountab(ility|le)\\b"],
+  ["deterrent","deterrent","something that discourages people from acting","\\bdeter(rent|rents|s|red|ring|rence)?\\b"],
+  ["loophole","loophole","a gap in a rule that lets somebody avoid it legally","\\bloopholes?\\b"],
+  ["breach","(data) breach","an unauthorised access to protected information","\\bbreach(es|ed)?\\b"],
+  ["encrypt","encryption","converting data so that only authorised people can read it","\\bencrypt(ion|ed|s|ing)?\\b"],
+  ["whistle","whistle-blower","an employee who reveals wrongdoing inside an organisation","\\bwhistle[- ]?blow(er|ers|ing)\\b"],
+  ["profiling","profiling","building a picture of a person from collected data","\\bprofil(ing|ed)\\b"],
+  ["civil_liberties","civil liberties","the basic freedoms a citizen is guaranteed","\\bcivil libert(y|ies)\\b"],
+  ["tradeoff","trade-off","a balance in which you gain one thing by losing another","\\btrade[- ]?offs?\\b"],
+  ["safeguard","safeguard","a rule or device that protects against a risk","\\bsafeguard(s|ed|ing)?\\b"],
+  ["biometric","biometrics / biometric data","measurements of the body used to identify a person","\\bbiometrics?\\b"],
+  ["facial","facial recognition","technology that identifies a person from an image of their face","\\b(facial|face)[- ]recognition\\b"]]],
+ ["Verbs",[
+  ["monitor","monitor","to watch and check something over a period of time","\\bmonitor(s|ed|ing)?\\b"],
+  ["track","track","to follow the movements of a person or a device","\\btrack(s|ed|ing|er|ers)?\\b"],
+  ["log","log","to make an official record of an event","\\blog(s|ged|ging)?\\b"],
+  ["retain","retain (data)","to keep data for a period of time","\\bretain(s|ed|ing)?\\b|\\bretention\\b"],
+  ["disclose","disclose","to make information known officially","\\bdisclos(e|es|ed|ing|ure|ures)\\b"],
+  ["leak","leak","to release secret information unofficially","\\bleak(s|ed|ing)?\\b"],
+  ["anonymise","anonymise","to remove the details that identify a person","\\banonymi[sz](e|es|ed|ing|ation)\\b"],
+  ["comply","comply with","to obey a rule or a law","\\bcompl(y|ies|ied|ying|iance)\\b"],
+  ["enforce","enforce","to make people obey a rule","\\benforc(e|es|ed|ing|ement)\\b"],
+  ["authorise","authorise","to give official permission for something","\\bauthori[sz](e|es|ed|ing|ation)\\b"],
+  ["waive","waive a right","to give up a right voluntarily","\\bwaiv(e|es|ed|ing|er)\\b"],
+  ["infringe","infringe (on)","to limit or break somebody's right","\\binfring(e|es|ed|ing|ement)\\b"],
+  ["justify","justify","to give a good reason for something","\\bjustif(y|ies|ied|ying|ication|iable|iably)\\b"],
+  ["weigh_up","weigh sth up","to consider the advantages and disadvantages carefully","\\bweigh(s|ed|ing)?\\b(\\s+[\\w'’-]+){0,4}?\\s+up\\b"],
+  ["opt","opt in / opt out","to choose to take part / to choose not to take part","\\bopt(s|ed|ing)?[- ](in|out)\\b"]]],
+ ["Adjectives",[
+  ["intrusive","intrusive","going too far into private life","\\bintrusi(ve|on)\\b"],
+  ["proportionate","(dis)proportionate","reasonable / unreasonable in relation to the risk","\\b(dis)?proportionate(ly)?\\b"],
+  ["covert","covert / overt","hidden / open","\\b(covert|overt)(ly)?\\b"],
+  ["anonymous","anonymous","without a name; nobody knows who it is","\\banonym(ous|ously|ity)\\b"],
+  ["mandatory","mandatory","compulsory","\\bmandatory\\b"],
+  ["voluntary","voluntary","done by choice, not because you must","\\bvoluntar(y|ily)\\b"],
+  ["sensitive","sensitive (data)","private and likely to cause harm if made public","\\bsensitive\\b"],
+  ["transparent","transparent","open to inspection","\\btransparen(t|cy)\\b"]]],
+ ["Phrasal verbs",[
+  ["keep_tabs","keep tabs on","to watch somebody closely","\\b(keep|keeps|keeping|kept)\\s+tabs\\s+on\\b"],
+  ["look_into","look into","to investigate","\\b(look|looks|looked|looking)\\s+into\\b"],
+  ["crack_down","crack down on","to act strictly against something","\\bcrack(s|ed|ing)?\\s+down\\s+on\\b|\\bcrackdown\\b"],
+  ["give_away","give sth away","to reveal without meaning to","\\b(give|gives|gave|given|giving)\\b(\\s+[\\w'’-]+){0,4}?\\s+away\\b"],
+  ["sign_up","sign up for","to agree to join a service","\\b(sign|signs|signed|signing)\\s+up\\b"],
+  ["come_up","come up against","to meet a difficulty or opposition","\\b(come|comes|came|coming)\\s+up\\s+against\\b"],
+  ["get_away","get away with","to do something wrong without punishment","\\b(get|gets|got|getting|gotten)\\s+away\\s+with\\b"],
+  ["rule_out","rule sth out","to exclude a possibility","\\b(rule|rules|ruled|ruling)\\b(\\s+[\\w'’-]+){0,4}?\\s+out\\b"],
+  ["put_up","put up with","to tolerate something unpleasant","\\b(put|puts|putting)\\s+up\\s+with\\b"],
+  ["hand_over","hand sth over","to give something to an authority","\\b(hand|hands|handed|handing)\\b(\\s+[\\w'’-]+){0,4}?\\s+over\\b"],
+  ["break_into","break into","to enter illegally (also: to hack)","\\b(break|breaks|broke|broken|breaking)\\s+into\\b"]]],
+ ["Idioms",[
+  ["big_brother","Big Brother is watching","said when a state or an organisation watches everybody all the time","\\bbig brother\\b"],
+  ["nothing_hide","nothing to hide, nothing to fear","the argument that only guilty people object to being watched","\\bnothing to hide\\b"],
+  ["slippery","a slippery slope","a first step that leads gradually to something much worse","\\bslippery slope\\b"],
+  ["thin_end","the thin end of the wedge","a small change that will lead to a much bigger and unwanted one","\\bthin end of the wedge\\b"],
+  ["draw_line","draw the line at","to set the limit of what you will accept","\\b(draw|draws|drew|drawn|drawing)\\s+(the|a|my|our|this|that)\\s+line\\b"],
+  ["strike","strike a balance","to find a fair position between two competing things","\\b(strike|strikes|struck|striking)\\s+(a|the|an)\\s+([\\w-]+\\s+)?balance\\b"],
+  ["wide_net","cast too wide a net","to include far more people than the purpose requires","\\bcast(s|ing)?\\b[^.!?]{0,25}\\bwide\\b[^.!?]{0,8}\\bnet\\b"],
+  ["wraps","keep sth under wraps","to keep something secret","\\bunder wraps\\b"]]],
+ ["Collocations",[
+  ["mass_surv","mass surveillance","watching a whole population, not only suspects","\\bmass surveillance\\b"],
+  ["invasion","an invasion of privacy","entering someone's private life without the right to","\\binvasions? of (my |our |their |your |his |her )?privacy\\b"],
+  ["breach_trust","a breach of trust","breaking the confidence someone placed in you","\\bbreach(es)? of trust\\b"],
+  ["raise_concerns","raise privacy concerns","to say publicly that privacy may be at risk","\\brais(e|es|ed|ing)\\s+(serious\\s+|real\\s+)?privacy concerns?\\b"],
+  ["expectation","a reasonable expectation of privacy","the privacy a person can fairly expect in a place","\\bexpectation of privacy\\b"],
+  ["informed","informed consent","consent given with full knowledge of what happens","\\binformed consent\\b"],
+  ["prop_response","a proportionate response","a reaction that matches the size of the risk","\\bproportionate (response|measure|reaction)s?\\b"],
+  ["legit","a legitimate purpose","a reason that is fair and lawful","\\blegitimate (purpose|reason|aim)s?\\b"],
+  ["constant_surv","under constant surveillance","watched all the time","\\bunder constant surveillance\\b"]]],
+ ["Phrases (Set F)",[
+  ["granted","Granted, ...","conceding a point before you disagree","\\bgranted\\s*,"],
+  ["nobody_deny","Nobody is denying that ...","conceding","\\b(nobody|no one)\\s+(is|would be|can be)\\s+denying\\b|\\bnobody denies\\b"],
+  ["see_arg","I can see the argument for ...","conceding","\\bi can see the argument\\b"],
+  ["fair_concern","That is a fair concern, and yet ...","conceding","\\bthat(\\s+is|['’]s)\\s+a fair concern\\b"],
+  ["precisely","That is precisely the problem.","objecting","\\b(that|this)(\\s+is|['’]s)\\s+precisely\\b"],
+  ["where_line","Where do you draw the line?","objecting","\\bwhere do (you|we) draw the line\\b"],
+  ["whatif","What if we required ...?","proposing a compromise","\\bwhat if we\\b"],
+  ["suppose","Suppose we limited it to ...","proposing a compromise","\\bsuppose we\\b"],
+  ["onbalance","On balance, ...","weighing up","\\bon balance\\b"],
+  ["tradeoff_is","The trade-off is that ...","weighing up","\\bthe trade[- ]?off is\\b"],
+  ["atleast","At the very least, ...","stating a rule firmly","\\bat the very least\\b"],
+  ["under_no","Under no circumstances should ...","stating a rule firmly","\\bunder no circumstances\\b"],
+  ["changed_mind","What changed my mind is that ...","explaining a change of position","\\bwhat changed my mind\\b"]]]
+];
+const GRAM=[
+  ["must","must","obligation: the speaker's own rule","\\bmust\\b(?!\\s+not\\b)"],
+  ["mustnt","mustn't / must not","prohibition: it is forbidden","\\bmustn['’]?t\\b|\\bmust not\\b"],
+  ["have_to","have to / has to","obligation from an outside rule","\\b(have|has)\\s+to\\b"],
+  ["had_to","had to","past obligation (must has no past form)","\\bhad\\s+to\\b"],
+  ["dont_have","don't have to","no obligation: it is optional","\\b(don|doesn|didn)['’]?t\\s+(have|need)\\s+to\\b|\\b(do|does|did)\\s+not\\s+(have|need)\\s+to\\b"],
+  ["neednt","needn't","no obligation","\\bneedn['’]?t\\b|\\bneed not\\b"],
+  ["may","may / may not","formal permission / prohibition","\\bmay\\b"],
+  ["allowed","be allowed to","permission","\\ballowed\\s+to\\b"],
+  ["permitted","be permitted to","formal permission","\\bpermitted\\s+to\\b"],
+  ["required","be required to","formal obligation","\\brequired\\s+to\\b"],
+  ["obliged","be obliged to","formal obligation","\\bobliged\\s+to\\b"],
+  ["entitled","be entitled to","having the right to","\\bentitled\\s+to\\b"],
+  ["banned","be banned from + -ing","prohibition","\\b(banned|prohibited)\\s+from\\b|\\bforbidden\\s+to\\b"],
+  ["should","should / ought to","recommendation","\\bshould(n['’]?t)?\\b|\\bought\\s+to\\b"],
+  ["modal_passive","modal passive","modal + be + past participle: must be deleted","\\b(must|may|might|can|could|should|will|would|has to|have to|had to)\\s+(not\\s+)?be\\s+(?!(open|often|even|green|seven|eleven|hidden\\s+away)\\b)([a-z]+(ed|en|wn)|kept|sent|built|held|told|sold|left|made|put|set|cut|read|found|bought|caught|taught|brought|paid|said|heard|done|shut|lost|won)\\b"],
+  ["condition","condition: provided that / unless / on condition that","adds a condition to a rule","\\bprovided\\s+that\\b|\\bproviding\\s+that\\b|\\bprovided\\b|\\bunless\\b|\\bon\\s+(the\\s+)?condition\\s+that\\b|\\bas\\s+long\\s+as\\b"]
+];
+const D={}; const LEXIDS=[]; const PHRASEIDS=[];
+LEX.forEach(([g,items])=>items.forEach(([id,t,d,r])=>{D[id]={id,t,d,g,re:new RegExp(r,"i")};LEXIDS.push(id);if(g.startsWith("Phrases"))PHRASEIDS.push(id);}));
+GRAM.forEach(([id,t,d,r])=>{D[id]={id,t,d,g:"Grammar",re:new RegExp(r,"i"),gram:true};});
+const GRAMIDS=GRAM.map(x=>x[0]);
+
+/* ---------- reading checks ---------- */
+const TF=[
+ ["Students were asked for their opinion before the camera was installed.","F","A","“Nobody had been asked.”"],
+ ["The notice explained how long the recordings would be kept.","F","A","Nobody had been told how long the footage would be retained."],
+ ["Dilnoza thinks a camera and a human guard remember people in the same way.","F","B","“The guard forgets. The software does not.”"],
+ ["More than half of the students complained about the camera.","NG","B","We know of forty complaints, but not how many students there are."],
+ ["Mr Tursunov liked the camera partly because it was inexpensive.","T","C","“a camera was the cheapest deterrent there was”"],
+ ["The data protection officer argued that, unlike a password, a face cannot be replaced after a breach.","T","D","“A password can be changed after a data breach; a face cannot.”"],
+ ["The philosophy lecturer has written a book about surveillance.","NG","E","The text does not mention any book."],
+ ["Under the new rules, students must explain why they want to see their own file.","F","F","Students “do not have to give a reason”."],
+ ["The camera was eventually removed from the gate.","F","F","“the university did not remove the camera”"],
+ ["Dilnoza believes rules should be agreed before cameras are installed.","T","F","“the rules should come first and the camera second”"]
+];
+const VIC=[
+ ["A","kept for a period of time (1 word)",["retained"]],
+ ["B","to choose not to take part (2 words)",["opt out"]],
+ ["C","something that discourages people from acting (1 word)",["deterrent"]],
+ ["C","a reason that is fair and lawful (2 words)",["legitimate purpose"]],
+ ["D","gave official permission for (1 word)",["authorised","authorized"]],
+ ["D","independent supervision of a powerful body (1 word)",["oversight"]],
+ ["E","a gap in a rule that lets somebody avoid it (1 word)",["loophole"]],
+ ["F","found a fair position between two competing things (3 words)",["struck a balance"]]
+];
+
+/* ---------- thinking questions ---------- */
+const ANYF={any:["granted","nobody_deny","see_arg","fair_concern","precisely","where_line","whatif","suppose","onbalance","tradeoff_is","atleast","under_no","changed_mind"],label:"any Set F phrase"};
+const STRANDS=[
+ {s:"phil",uz:"Falsafiy · Philosophical",title:"Big questions",intro:"These questions have no single right answer. Take a clear position, give a reason, and consider the other side.",qs:[
+  {id:"P1",title:"The ring and the camera",prompt:"In Plato's <em>Republic</em>, Glaucon tells the story of a shepherd who finds a ring that makes him invisible, and asks whether anyone would stay honest if nobody could ever see them. Now reverse the story. Imagine a city where every person is under constant surveillance. Would people become more moral, or only more careful? If you behave well only because a camera is watching, is it still a moral choice?",
+   moves:["Decide: is a good act done out of fear still a good act?","Give one example from everyday life: an exam, a road, a shop.","Finish with a rule: what should a good society rely on, cameras or character?"],
+   lex:["constant_surv","deterrent","justify","big_brother"],gram:[["should"],["dont_have","neednt"]],min:80},
+  {id:"P2",title:"Who guards the guards?",prompt:"Paragraph E mentions Juvenal's old question: who will guard the guards themselves? The security office watches the students, and a committee watches the security office. Who watches the committee? Can this chain ever end, or must it end in something that is not a camera, such as trust, law or the public?",
+   moves:["Describe the chain of watchers in your own words.","Say where, in your view, the chain should stop, and why.","Propose one rule that makes the last watcher answerable."],
+   lex:["oversight","accountability","loophole","transparent"],gram:[["required","obliged"],["modal_passive"]],min:80},
+  {id:"P3",title:"Caring or watching?",prompt:"In a close family or a small neighbourhood, people often know a great deal about each other's lives, and many people value this. Is privacy a universal human need, or is it a modern, individual idea? Where does caring about someone end and watching them begin?",
+   moves:["Give one situation where knowing about someone is care.","Give one where the same knowledge becomes control.","Name the difference between the two situations."],
+   lex:["privacy","keep_tabs","intrusive","draw_line"],gram:[["mustnt"],["may","allowed","permitted"]],min:90},
+  {id:"P4",title:"Consent you cannot refuse",prompt:"Dilnoza says students had no way to opt out of being filmed if they wanted to attend their classes (paragraph B). If saying ‘no’ would cost you your education or your job, is your ‘yes’ still real consent? When, if ever, is it fair to make consent a condition of entry?",
+   moves:["Define real consent in one sentence.","Test your definition on the camera at the gate.","Suggest an alternative for people who refuse."],
+   lex:["informed","opt","waive","voluntary"],gram:[{any:["dont_have","neednt","entitled"]},["condition"]],min:90}]},
+ {s:"life",uz:"Hayotiy · From your life",title:"Your own experience",intro:"Start from your own life. Concrete details make an argument stronger than general statements.",qs:[
+  {id:"L1",title:"Your phone knows",prompt:"Think about the applications on your own phone. Which of them know where you are, who your contacts are, or what your face looks like? When you signed up for them, what did you give away without reading the agreement? Was everything you had to accept really necessary for the service? Describe one app and decide whether the deal was fair.",
+   moves:["Name the app and what it collects.","Say what you had to accept and what you got in return.","Decide what the app should change."],
+   lex:["give_away","sign_up","track","retain"],gram:[["had_to"],["should"]],min:80},
+  {id:"L2",title:"The parent and the fifteen-year-old",prompt:"You are the parent of a fifteen-year-old who often comes home late. A friend recommends an app that shows your child's location at every moment. Write two short paragraphs: first as the parent, then as the teenager. Each voice must propose one condition. Which voice do you find more convincing, and why?",
+   moves:["Parent: what are you afraid of, and what would you accept?","Teenager: what would you accept, and where is your limit?","Your own verdict in one or two sentences."],
+   lex:["monitor","tradeoff","consent","thin_end"],gram:[["should"],["condition"]],min:100},
+  {id:"L3",title:"The screenshot",prompt:"A screenshot from your private group chat is shared with people outside the group. Nothing illegal was said, but you feel exposed. Who is responsible: the person who took the screenshot, the person who shared it, or the app? What unwritten rules should a group chat have?",
+   moves:["Rank the three for responsibility and explain your order.","Write two rules for the group chat.","Say what you would do next."],
+   lex:["leak","breach_trust","disclose","put_up"],gram:[["mustnt"],["allowed","permitted"]],min:80},
+  {id:"L4",title:"Both sides of the desk",prompt:"Imagine your first job. Your employer installs software that records every keystroke and reads work e-mails. First, decide what you would accept as an employee. Then imagine you are the manager ten years later. Would your rules change? Write the policy you would be prepared to sign from both sides of the desk.",
+   moves:["As an employee: what is acceptable, what is not?","As a manager: what risk are you trying to control?","The policy: two or three rules both sides could sign."],
+   lex:["comply","proportionate","legit","infringe"],gram:[["required","obliged"],["may"]],min:90}]},
+ {s:"logic",uz:"Mantiqiy · Logical",title:"Test the reasoning",intro:"Here you examine arguments. Find hidden premises, check the numbers and look for other explanations before you accept a conclusion.",qs:[
+  {id:"M1",title:"Nothing to hide?",prompt:"Mr Tursunov says: “Anyone with a legitimate purpose has nothing to hide and nothing to fear” (paragraph C). Rewrite this as a formal argument: Premise 1, Premise 2, Conclusion. Which premise is hidden, never said but needed? Is it true? Give one counter-example: a person who has done nothing wrong but still has good reason to fear being watched.",
+   moves:["Use the scaffold button to lay out the argument.","Find the hidden premise and test it.","Give a counter-example, then concede what is right in the argument."],
+   lex:["nothing_hide","justify","profiling","civil_liberties"],gram:[{any:["granted","precisely","nobody_deny","fair_concern"],label:"Granted / That is precisely the problem / Nobody is denying that"},["must"]],min:100,
+   scaffold:"Premise 1: \nPremise 2: \nConclusion: \nHidden premise: \nIs it true? \nCounter-example: \n"},
+  {id:"M2",title:"The numbers problem",prompt:"A hypothetical case; the numbers are invented for this exercise. A university uses facial recognition in its exam halls. 10,000 students sit the exams and 10 of them really cheat. The software catches all 10 cheaters, but it also wrongly flags 1 in every 100 honest students. Work out the three numbers below. Then explain what they mean for an honest student who has been flagged, and what rule follows.",
+   moves:["Work out the numbers first.","Explain why a ‘99% accurate’ system can still be unfair.","Propose a rule for what must happen after a student is flagged."],
+   lex:["facial","rule_out","safeguard"],gram:[["modal_passive"],["condition"]],min:80,calc:true},
+  {id:"M3",title:"Did the camera work?",prompt:"“After the camera was installed, no laptops were stolen for three months. Therefore the camera works.” Is this conclusion logically safe? List at least two other explanations for the same fact. Then design a fair test: what would the committee have to look into before deciding that the camera is a real deterrent?",
+   moves:["Name the reasoning error in your own words.","Give two other explanations.","Describe the evidence that would convince you."],
+   lex:["deterrent","look_into","weigh_up"],gram:[["should"],{any:["onbalance","whatif","suppose"],label:"On balance / What if we / Suppose we"}],min:80},
+  {id:"M4",title:"Slope or warning?",prompt:"Some people fear a slippery slope: today the gate, tomorrow the corridors, then the exam halls (paragraph E). Is this a weak argument or a reasonable warning? Explain the difference between a slope that is only imagined and one with a real mechanism behind it. Then propose one safeguard that would stop the slide, and say who would enforce it.",
+   moves:["When is a slippery-slope argument weak?","What would make this particular slope real?","One safeguard and who enforces it."],
+   lex:["slippery","safeguard","enforce","wide_net"],gram:[["condition"],["mustnt","banned"]],min:90}]},
+ {s:"final",uz:"Yakuniy · Final position",title:"Your verdict",intro:"Bring the lesson together in one rule.",qs:[
+  {id:"F1",title:"Rule number five",prompt:"The committee in paragraph F agreed four rules. Write a fifth rule that you think is missing. Then defend it in three or four sentences, and answer the strongest objection someone could make to it.",
+   moves:["State the rule in one sentence.","Defend it.","Quote the strongest objection and answer it."],
+   lex:[],gram:[ANYF,{any:["must","mustnt","may","allowed","permitted","required","banned","dont_have","neednt"],label:"any modal of obligation, permission or prohibition"},["condition"]],min:70,minLex:3}]}
+];
+const QS=[];STRANDS.forEach(s=>s.qs.forEach(q=>{q.s=s.s;QS.push(q);}));
+
+/* ---------- state ---------- */
+const KEY="l21-ehandout-v1";
+let S={a:{},pre:{},tf:{},vic:{},calc:{},name:"",group:""};
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw));}catch(e){}
+let saveT;function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}},300);}
+const $=s=>document.querySelector(s);
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;};
+const wc=t=>(t.trim().match(/[A-Za-z0-9'’-]+/g)||[]).length;
+function analyze(t){const u=new Set();if(!t)return u;for(const id in D){if(D[id].re.test(t))u.add(id);}return u;}
+function reqItems(r){return Array.isArray(r)?{any:r,label:r.map(i=>D[i].t).join(" / ")}:{any:r.any,label:r.label||r.any.map(i=>D[i].t).join(" / ")};}
+
+/* ---------- definition popover ---------- */
+function showDef(id){const d=D[id];if(!d)return;$("#def").innerHTML="";const b=el("b");b.textContent=d.t;$("#def").append(b,document.createTextNode(d.d));}
+
+/* ---------- word bank ---------- */
+const bankChips={};
+LEX.forEach(([g,items])=>{const box=el("div","bgroup");box.append(el("span","eyebrow",g));const c=el("div","chips");items.forEach(([id,t])=>{const b=el("button","chip");b.type="button";b.textContent=t;b.addEventListener("click",()=>showDef(id));c.append(b);bankChips[id]=b;});box.append(c);$("#groups").append(box);});
+{const box=el("div","bgroup");box.append(el("span","eyebrow","Grammar (Handout 2)"));const c=el("div","chips");GRAM.forEach(([id,t])=>{const b=el("button","chip g");b.type="button";b.textContent=t;b.addEventListener("click",()=>showDef(id));c.append(b);bankChips[id]=b;});box.append(c);$("#groups").append(box);}
+$("#lexcount").innerHTML=`0 <small>/ ${LEXIDS.length} used</small>`;
+
+/* ---------- reading toggles ---------- */
+document.querySelectorAll(".lx").forEach(s=>{s.tabIndex=0;s.setAttribute("role","button");const f=()=>{showDef(s.dataset.k);if(innerWidth<=1000)openBank(true);};s.addEventListener("click",f);s.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f();}});});
+function tog(btn,cls){btn.addEventListener("click",()=>{const on=btn.getAttribute("aria-pressed")!=="true";btn.setAttribute("aria-pressed",String(on));$("#text").classList.toggle(cls,on);});}
+tog($("#t-lex"),"hl");tog($("#t-gram"),"hg");
+
+/* ---------- pre-reading ---------- */
+["1","2","3"].forEach(n=>{const t=$("#pre-"+n);t.value=S.pre[n]||"";t.addEventListener("input",()=>{S.pre[n]=t.value;save();updateGlobal();});});
+
+/* ---------- TFNG ---------- */
+TF.forEach(([st],i)=>{const r=el("div","row");r.append(el("span","n",String(i+1)));const p=el("span");p.textContent=st;r.append(p);const seg=el("div","seg");seg.setAttribute("role","group");["T","F","NG"].forEach(v=>{const b=el("button");b.type="button";b.textContent=v;b.setAttribute("aria-pressed",String(S.tf[i]===v));b.addEventListener("click",()=>{S.tf[i]=v;seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));const fb=r.querySelector(".fb");if(fb)fb.remove();save();});seg.append(b);});r.append(seg);$("#tf").append(r);});
+$("#tf-check").addEventListener("click",()=>{let sc=0;document.querySelectorAll("#tf .row").forEach((r,i)=>{const old=r.querySelector(".fb");if(old)old.remove();const [,ans,par,why]=TF[i];const g=S.tf[i];if(!g)return;const ok=g===ans;if(ok)sc++;const fb=el("div","fb "+(ok?"good":"bad"));fb.textContent=(ok?"Correct. ":"Not quite: the answer is "+ans+". ")+"Paragraph "+par+": "+why;r.append(fb);});$("#tf-score").textContent=`Score: ${sc} / ${TF.length}`;S.tfScore=sc;save();});
+
+/* ---------- vocab in context ---------- */
+const norm=s=>s.toLowerCase().replace(/[^a-z\s-]/g,"").replace(/\s+/g," ").trim();
+VIC.forEach(([p,m],i)=>{const l=el("label");l.htmlFor="vic-"+i;l.innerHTML=`<span class="pref">${i+1} · Paragraph ${p}</span>`;l.append(document.createTextNode(m));const inp=el("input");inp.id="vic-"+i;inp.autocomplete="off";inp.value=S.vic[i]||"";inp.addEventListener("input",()=>{S.vic[i]=inp.value;inp.classList.remove("good","bad");save();});l.append(inp);$("#vic").append(l);});
+$("#vic-check").addEventListener("click",()=>{let sc=0;VIC.forEach(([,,ans],i)=>{const inp=$("#vic-"+i);const v=norm(inp.value);inp.classList.remove("good","bad");if(!v)return;const ok=ans.includes(v);if(ok)sc++;inp.classList.add(ok?"good":"bad");if(!ok)inp.title="Look again at the paragraph.";});$("#vic-score").textContent=`Score: ${sc} / ${VIC.length}`;S.vicScore=sc;save();});
+
+/* ---------- questions ---------- */
+const QUI={};
+STRANDS.forEach(st=>{const wrap=el("div","strand");wrap.dataset.s=st.s;const h=el("div","strand-head");h.append(el("span","uz",st.uz),el("h3",null,st.title));const ip=el("p","lead");ip.textContent=st.intro;h.append(ip);wrap.append(h);
+ st.qs.forEach(q=>{const a=el("article","q");a.id="q-"+q.id;
+  const qh=el("div","qh");qh.append(el("span","qid",q.id));const h3=el("h3");h3.textContent=q.title;qh.append(h3);const pill=el("span","pill","In progress");qh.append(pill);a.append(qh);
+  a.append(el("p","prompt",q.prompt));
+  const ol=el("ol","moves");q.moves.forEach(m=>{const li=el("li");li.textContent=m;ol.append(li);});a.append(ol);
+  const chips=[];
+  if(q.lex.length){const r=el("div","req");r.append(el("span","lbl","Must use"));q.lex.forEach(id=>{const c=el("button","chip");c.type="button";c.textContent=D[id].t;c.addEventListener("click",()=>showDef(id));r.append(c);chips.push({any:[id],c});});a.append(r);}
+  if(q.minLex){const r=el("div","req");r.append(el("span","lbl","Must use"));const c=el("span","chip");c.textContent=`any ${q.minLex} glossary items`;r.append(c);chips.push({minLex:q.minLex,c});a.append(r);}
+  const rg=el("div","req");rg.append(el("span","lbl","Grammar"));q.gram.forEach(g=>{const it=reqItems(g);const c=el("button","chip g");c.type="button";c.textContent=it.label;c.addEventListener("click",()=>showDef(it.any[0]));rg.append(c);chips.push({any:it.any,c});});a.append(rg);
+  if(q.calc){const cb=el("div","calc");cb.innerHTML=`<label for="c1">How many honest students are wrongly flagged?<input id="c1" inputmode="decimal"></label><label for="c2">How many students are flagged in total?<input id="c2" inputmode="decimal"></label><label for="c3">Of the flagged students, what percentage really cheated?<input id="c3" inputmode="decimal" placeholder="%"></label><div class="out"><button type="button" class="scaffold" id="c-check">Check my numbers</button> <span id="c-out"></span></div>`;a.append(cb);}
+  if(q.scaffold){const b=el("button","scaffold","Insert argument scaffold");b.type="button";b.addEventListener("click",()=>{const t=QUI[q.id].ta;if(!t.value.includes("Premise 1:")){t.value=q.scaffold+(t.value?"\n"+t.value:"");t.dispatchEvent(new Event("input"));}t.focus();});a.append(b);}
+  const ta=el("textarea");ta.id="a-"+q.id;ta.setAttribute("aria-label",q.id+" "+q.title);ta.placeholder="Write your answer here.";ta.value=S.a[q.id]||"";a.append(ta);
+  const m=el("div","meter");const w=el("span","wc");const tr=el("span","track");const bar=el("i");tr.append(bar);const bonus=el("span","bonus");m.append(w,tr,bonus);a.append(m);
+  QUI[q.id]={a,pill,chips,ta,w,bar,bonus,done:false};
+  ta.addEventListener("input",()=>{S.a[q.id]=ta.value;save();updateQ(q);updateGlobal();});
+  wrap.append(a);});
+ $("#strands").append(wrap);});
+
+/* calculator for M2 */
+(function(){const ids=["c1","c2","c3"];ids.forEach(i=>{const x=$("#"+i);x.value=S.calc[i]||"";x.addEventListener("input",()=>{S.calc[i]=x.value;x.classList.remove("good","bad");save();});});
+ $("#c-check").addEventListener("click",()=>{const v=ids.map(i=>parseFloat(String($("#"+i).value).replace(",",".").replace("%","")));const ok=[v[0]>=99&&v[0]<=100,v[1]>=109&&v[1]<=110,v[2]>=8.5&&v[2]<=9.5];ids.forEach((i,k)=>{const x=$("#"+i);x.classList.remove("good","bad");if(!isNaN(v[k]))x.classList.add(ok[k]?"good":"bad");});
+  $("#c-out").textContent=ok.every(Boolean)?"All three correct. 9,990 honest students × 1/100 ≈ 100 false alarms; 100 + 10 = 110 flagged; 10 ÷ 110 ≈ 9%. So about 10 out of every 11 flagged students are innocent.":"Not yet. Start with the honest students: 10,000 − 10 = 9,990. One in every 100 of them is flagged.";});})();
+
+function updateQ(q){const u=QUI[q.id];const t=u.ta.value;const used=analyze(t);const n=wc(t);let all=true;
+ u.chips.forEach(ch=>{let on;if(ch.minLex){const k=LEXIDS.filter(i=>used.has(i)).length;on=k>=ch.minLex;ch.c.textContent=`any ${ch.minLex} glossary items (${Math.min(k,ch.minLex)}/${ch.minLex})`;}else on=ch.any.some(i=>used.has(i));ch.c.classList.toggle("on",on);if(!on)all=false;});
+ const enough=n>=q.min;if(!enough)all=false;
+ u.w.textContent=`${n} / ${q.min} words`;u.bar.style.width=Math.min(100,n/q.min*100)+"%";
+ const req=new Set();u.chips.forEach(ch=>ch.any&&ch.any.forEach(i=>req.add(i)));
+ const extra=LEXIDS.filter(i=>used.has(i)&&!req.has(i)).map(i=>D[i].t);
+ u.bonus.textContent=extra.length?"Also used: "+extra.join(", "):"";
+ u.done=all;u.a.classList.toggle("done",all);u.pill.textContent=all?"Complete":(n?"In progress":"Not started");}
+
+function allText(){return [S.pre[1],S.pre[2],S.pre[3],...QS.map(q=>S.a[q.id])].filter(Boolean).join("\n");}
+function updateGlobal(){const used=analyze(allText());let k=0;
+ for(const id in bankChips){const on=used.has(id);bankChips[id].classList.toggle("on",on);if(on&&!D[id].gram)k++;}
+ $("#lexcount").innerHTML=`${k} <small>/ ${LEXIDS.length} used</small>`;$("#lexbar").style.width=(k/LEXIDS.length*100)+"%";$("#fabcount").textContent=k+"/"+LEXIDS.length;
+ const done=QS.filter(q=>QUI[q.id].done).length;$("#prog").textContent=`${done}/${QS.length} questions · ${k} lexis items`;
+ const sg=$("#sumgrid");sg.innerHTML="";QS.forEach(q=>{const a=el("a",QUI[q.id].done?"done":"");a.href="#q-"+q.id;a.innerHTML=`<span>${q.id}</span><span>${QUI[q.id].done?"✓":wc(S.a[q.id]||"")+"w"}</span>`;sg.append(a);});
+ return {k,done};}
+
+/* ---------- name/group ---------- */
+[["f-name","name"],["f-group","group"]].forEach(([i,k])=>{const x=$("#"+i);x.value=S[k]||"";x.addEventListener("input",()=>{S[k]=x.value;save();});});
+
+/* ---------- copy / reset ---------- */
+function buildText(){const g=updateGlobal();const L=[];
+ L.push("LESSON 21 · SURVEILLANCE VS. SECURITY · E-HANDOUT");L.push("Name: "+(S.name||"—")+"   Group: "+(S.group||"—"));
+ L.push(`Questions complete: ${g.done}/${QS.length} · Lexis items used: ${g.k}/${LEXIDS.length}`);
+ L.push("Reading A (T/F/NG): "+(S.tfScore!=null?S.tfScore+"/"+TF.length:"not checked")+" · Reading B (vocabulary): "+(S.vicScore!=null?S.vicScore+"/"+VIC.length:"not checked"));
+ L.push("");L.push("— BEFORE READING —");["1","2","3"].forEach(n=>L.push(n+". "+(S.pre[n]||"—")));
+ STRANDS.forEach(st=>{L.push("");L.push("— "+st.uz.toUpperCase()+" —");st.qs.forEach(q=>{const t=S.a[q.id]||"";L.push("");L.push(`[${q.id}] ${q.title} · ${wc(t)} words · ${QUI[q.id].done?"complete":"incomplete"}`);if(q.calc)L.push(`Numbers: ${S.calc.c1||"—"} / ${S.calc.c2||"—"} / ${S.calc.c3||"—"}%`);L.push(t||"—");});});
+ return L.join("\n");}
+$("#copy").addEventListener("click",()=>{const txt=buildText();const box=$("#copybox");box.value=txt;
+ const fallback=()=>{box.hidden=false;box.focus();box.select();$("#toast").textContent="Copy was blocked here. The text is selected below: copy it yourself.";};
+ try{navigator.clipboard.writeText(txt).then(()=>{box.hidden=true;$("#toast").textContent="Copied. Paste it where your teacher asks.";},fallback);}catch(e){fallback();}});
+let armed=false;$("#reset").addEventListener("click",()=>{const b=$("#reset");if(!armed){armed=true;b.textContent="Click again to erase everything";setTimeout(()=>{armed=false;b.textContent="Clear all answers";},4000);return;}
+ try{localStorage.removeItem(KEY);}catch(e){}location.reload();});
+
+/* ---------- mobile bank ---------- */
+function openBank(on){$("#bank").classList.toggle("open",on);}
+$("#fab").addEventListener("click",()=>openBank(!$("#bank").classList.contains("open")));
+$("#closebank").addEventListener("click",()=>openBank(false));
+
+/* ---------- clock ---------- */
+const pad=n=>String(n).padStart(2,"0");function tick(){const d=new Date();$("#clock").textContent=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;}tick();setInterval(tick,1000);
+
+QS.forEach(updateQ);updateGlobal();
+})();
+</script>
+
+</body>
+</html>
