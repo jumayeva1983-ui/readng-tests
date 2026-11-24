@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Australia Reading Tests P20</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: night-sky header band, tab bar, then IELTS-style split view (passage | questions) for each test. */
+:root{
+  --bg:#F3F5F1; --surface:#FFFFFF; --ink:#1B2623; --muted:#59665F; --line:#D7DDD6;
+  --accent:#2C6A5B; --accent-ink:#FFFFFF; --ochre:#A8731F; --ochre-soft:#F4E7CF;
+  --good:#2C7A47; --good-soft:#E2F1E6; --bad:#B03F2C; --bad-soft:#F7E3DE;
+  --night:#14212A; --night-ink:#EEF2EE; --night-muted:#A9B8B4; --star:#E6B65C;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-read:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-ui:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E1417; --surface:#151D21; --ink:#E4E9E5; --muted:#9AA7A1; --line:#283338;
+  --accent:#70B8A4; --accent-ink:#0E1417; --ochre:#E2AF58; --ochre-soft:#3A2F1C;
+  --good:#6CC08A; --good-soft:#18301F; --bad:#E58069; --bad-soft:#3A201B;
+  --night:#0A1116; --night-ink:#EEF2EE; --night-muted:#93A39F; --star:#E6B65C; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#0E1417; --surface:#151D21; --ink:#E4E9E5; --muted:#9AA7A1; --line:#283338;
+  --accent:#70B8A4; --accent-ink:#0E1417; --ochre:#E2AF58; --ochre-soft:#3A2F1C;
+  --good:#6CC08A; --good-soft:#18301F; --bad:#E58069; --bad-soft:#3A201B;
+  --night:#0A1116; --night-ink:#EEF2EE; --night-muted:#93A39F; --star:#E6B65C; color-scheme:dark; }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-ui);}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ochre);outline-offset:2px}
+
+/* header */
+.hero{background:var(--night);color:var(--night-ink);margin-top:calc(-1 * env(safe-area-inset-top, 0px));padding-top:calc(env(safe-area-inset-top, 0px) + 28px);padding-bottom:26px;position:relative;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+.eyebrow{font:500 12px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--night-muted)}
+.hero h1{font-size:clamp(28px,4.2vw,46px);font-weight:700;margin-top:10px;max-width:22ch}
+.hero p{color:var(--night-muted);margin:10px 0 0;max-width:62ch}
+.cross{width:120px;height:120px;flex:none}
+.cross circle{fill:var(--star)}
+.student{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.student label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--night-muted);letter-spacing:.04em}
+.student input{background:transparent;border:0;border-bottom:1px solid var(--night-muted);color:var(--night-ink);padding:4px 2px;width:190px;max-width:100%}
+
+/* tabs */
+.tabs{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--bg)}
+.tabs .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tab{border:0;background:none;padding:14px 12px 12px;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap;border-bottom:3px solid transparent;display:flex;align-items:center;gap:8px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ochre)}
+.tab .chip{font:500 11px/1 var(--f-mono);padding:3px 6px;border-radius:4px;background:var(--line);color:var(--muted)}
+.tab .chip.done{background:var(--good-soft);color:var(--good)}
+
+main{padding-block:26px 60px}
+.panel[hidden]{display:none!important}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:18px}
+.sec-head h2{font-size:clamp(22px,3vw,30px)}
+.kicker{font:500 12px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ochre);margin-bottom:8px}
+.lead{color:var(--muted);max-width:70ch;margin:6px 0 0}
+
+/* overview */
+.overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
+.ov{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left}
+.ov:hover{border-color:var(--accent)}
+.ov h3{font-size:18px}
+.ov .meta{font:500 12px/1.3 var(--f-mono);color:var(--muted)}
+.ov p{margin:0;color:var(--muted);font-size:14px}
+.note{border-left:3px solid var(--ochre);background:var(--ochre-soft);padding:12px 14px;border-radius:0 6px 6px 0;font-size:14px;max-width:80ch}
+
+/* vocab */
+.vgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:18px}
+.vcard{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;min-width:0}
+.vcard h3{font-size:18px;margin-bottom:4px}
+.vrow{display:grid;grid-template-columns:1fr 76px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
+.vrow b{font-weight:600}
+.deflist{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.deflist b{color:var(--ink);font-family:var(--f-mono);font-weight:500;margin-right:6px}
+
+/* test split view */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.timer{font:500 20px/1 var(--f-mono);font-variant-numeric:tabular-nums;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);min-width:92px;text-align:center}
+.timer.low{color:var(--bad);border-color:var(--bad)}
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+.pane{background:var(--surface);border:1px solid var(--line);border-radius:8px;min-width:0}
+.passage{padding:22px 26px;position:sticky;top:calc(env(safe-area-inset-top, 0px) + 58px);max-height:calc(100vh - 80px);overflow:auto}
+.passage h3{font-size:24px;margin-bottom:6px}
+.passage .intro{font-size:13px;color:var(--muted);margin:0 0 14px}
+.para{display:grid;grid-template-columns:28px 1fr;gap:6px;font:17px/1.65 var(--f-read);margin:0 0 14px;max-width:68ch;border-radius:4px;transition:background .4s}
+.para .L{font:600 13px/1.9 var(--f-mono);color:var(--ochre)}
+.para.flash{background:var(--ochre-soft)}
+.qpane{padding:20px 22px}
+.qgroup{padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+.qgroup:last-child{border-bottom:0;margin-bottom:0}
+.qgroup h4{font:600 13px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px;color:var(--accent)}
+.qgroup .instr{font-size:14px;color:var(--muted);margin:0 0 10px}
+.box{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:0 0 12px;font-size:14px}
+.box strong{display:block;font-family:var(--f-display);font-size:15px;margin-bottom:4px}
+.box ol{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.box ol b{font-family:var(--f-mono);font-weight:500;display:inline-block;min-width:34px;color:var(--ochre)}
+.q{display:grid;grid-template-columns:34px 1fr;gap:8px;padding:9px 8px;border-radius:6px;margin:0 -8px}
+.q .n{font:600 13px/1.8 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.q .body{min-width:0;display:flex;flex-direction:column;gap:8px}
+.q.ok{background:var(--good-soft)} .q.ok .n{color:var(--good)}
+.q.no{background:var(--bad-soft)} .q.no .n{color:var(--bad)}
+.q select,.q input[type=text]{border:1px solid var(--line);background:var(--bg);border-radius:5px;padding:6px 8px;max-width:100%}
+.q input[type=text]{width:220px}
+.inline{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.choices{display:grid;gap:4px}
+.choices label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;font-size:14.5px}
+.choices input{margin-top:4px}
+.why{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.why b{color:var(--ink)}
+.why a{color:var(--accent);cursor:pointer;text-decoration:underline}
+.result{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px;padding:12px 14px;border-radius:6px;background:var(--bg);border:1px solid var(--line)}
+.result .score{font:600 22px/1 var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* discussion */
+.dl{display:grid;gap:12px;max-width:80ch;padding-left:22px;margin:0}
+.dl li{padding-left:4px}
+textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:8px 10px;resize:vertical}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:18px;margin-top:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;min-width:0}
+.card h3{font-size:18px;margin-bottom:10px}
+.sources{font-size:13px;color:var(--muted);padding-left:20px;display:grid;gap:4px;overflow-wrap:anywhere}
+footer{color:var(--muted);font-size:13px;padding-bottom:30px}
+
+@media (max-width: 900px){
+  .split{grid-template-columns:1fr}
+  .passage{position:static;max-height:none}
+  .hero .wrap{grid-template-columns:1fr}
+  .cross{display:none}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;scroll-behavior:auto!important} }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow" id="h-eyebrow"></div>
+      <h1 id="h-title"></h1>
+      <p id="h-sub"></p>
+      <div class="student">
+        <label for="st-name">Name<input id="st-name" type="text" autocomplete="name"></label>
+        <label for="st-group">Group<input id="st-group" type="text"></label>
+        <label for="st-date">Date<input id="st-date" type="text" placeholder="dd.mm.yyyy"></label>
+      </div>
+    </div>
+    <svg class="cross" viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="62" cy="14" r="5"/><circle cx="58" cy="104" r="6"/><circle cx="22" cy="58" r="4.5"/><circle cx="94" cy="52" r="5"/><circle cx="76" cy="72" r="2.6"/>
+    </svg>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections"><div class="wrap" role="tablist" id="tabs"></div></nav>
+
+<main class="wrap" id="main"></main>
+
+<footer class="wrap" id="foot"></footer>
+
+<script>
+const DATA = {"meta": {"course": "Country Study (MAM2304)", "lesson": "Lesson P20", "title": "Australia: The Dreaming, the Land and the Economy", "subtitle": "Electronic handout with three reading tests", "level": "B2 / C1"}, "vocab": [{"id": "va", "title": "Set A. The economy", "instr": "Match each word (1–8) with its definition (a–h).", "defs": [["a", "a country that a nation regularly trades with"], ["b", "the total value of goods and services a country produces"], ["c", "a good or service sold to another country"], ["d", "a deal between countries that reduces trade barriers"], ["e", "the part of the economy providing services rather than goods"], ["f", "a raw material or primary product that can be bought or sold"], ["g", "a tax on imported or exported goods"], ["h", "when a country exports more than it imports"]], "items": [["export", "c"], ["commodity", "f"], ["trade surplus", "h"], ["trading partner", "a"], ["free trade agreement", "d"], ["GDP", "b"], ["service sector", "e"], ["tariff", "g"]]}, {"id": "vb", "title": "Set B. Culture and land", "instr": "Match each word (1–6) with its definition (a–f).", "defs": [["a", "a route across the land that is remembered through a sequence of songs"], ["b", "a person who has the right and the duty to look after a story, place or tradition"], ["c", "legal recognition that Indigenous people hold rights to land under their own laws and customs"], ["d", "a creator figure, often in animal or human form, who shaped the land and made the Law"], ["e", "the body of knowledge, law and stories about how the world was made and how people should live"], ["f", "the land, water and sky to which a person belongs and for which they are responsible"]], "items": [["the Dreaming", "e"], ["Country", "f"], ["songline", "a"], ["ancestral being", "d"], ["custodian", "b"], ["native title", "c"]]}], "tests": [{"id": "t1", "no": 1, "title": "Everywhen: Understanding the Dreaming", "kicker": "Reading Test 1 · Culture and belief", "minutes": 20, "intro": "You should spend about 20 minutes on Questions 1–13, which are based on the reading passage below.", "paragraphs": [["A", "Aboriginal peoples have lived on the Australian continent for at least 50,000 years, and some archaeologists argue for more than 65,000. Their cultures are therefore among the oldest continuous cultures on Earth. When the British established a colony at Sydney Cove in 1788, more than 250 distinct Aboriginal languages were spoken across the continent, together with hundreds of dialects. Yet within this great diversity, most Aboriginal societies shared a way of understanding the world that English speakers have come to call <em>the Dreaming<\/em>."], ["B", "The words “Dreaming” and “Dreamtime” are English, not Aboriginal. They date from the 1890s, when Francis Gillen, the telegraph station-master at Alice Springs, and the biologist Baldwin Spencer tried to translate a word from the Arrernte language of Central Australia, <em>altyerre<\/em> (written <em>alcheringa<\/em> in their books). Other nations have their own terms: the Warlpiri speak of <em>Jukurrpa<\/em>, and the Aṉangu of the Uluru region of <em>Tjukurpa<\/em>. Linguists have long argued that “dream” is a poor translation, and many Aboriginal people prefer “the Dreaming” to “Dreamtime”, because the second suggests something that happened long ago, or something unreal, like a dream at night. The anthropologist W. E. H. Stanner, writing in the 1950s, suggested the word <em>everywhen<\/em>: the Dreaming belongs to the past, but it is also present now and continues into the future."], ["C", "At the heart of the Dreaming are the ancestral beings. In many stories the land was at first flat and without form. Then ancestral beings rose from the earth, came out of the sea or descended from the sky. Some had the shape of animals such as the kangaroo, the emu or the snake; others had human or partly human form. As they travelled, they hunted, fought, sang, gave birth and died, and every action left a mark on the land. A hill may be the body of a sleeping ancestor, a waterhole the place where a serpent came out of the ground, and a line of rocks the trail of a long journey. When their work was finished, the ancestors did not disappear. They went back into the land, the sky and the water, where they are believed to remain present."], ["D", "The Dreaming is not only an account of creation; it is also the Law. The ancestral beings set down rules for how people should live: whom they may marry, how food must be shared, which places may be visited and by whom, and how ceremonies must be performed. Through a system of totems, each person is linked to particular ancestral beings, animals, plants and places, and the link brings responsibilities. A person whose totem is the emu, for example, may have special duties to protect emus and the sites connected with the Emu ancestor. In this sense the Dreaming works at the same time as religion, history, geography and a legal code."], ["E", "This explains the deep meaning of the word <em>Country<\/em> in Aboriginal English. Country is not simply land that can be owned, bought or sold. People say that they belong to their Country, rather than the other way round, and that they must care for it. The journeys of the ancestors are remembered as <em>songlines<\/em>, or Dreaming tracks: routes across the land that are recorded in long sequences of songs. Each verse names landmarks, waterholes and food sources in the right order, so a person who knows the song can travel hundreds of kilometres through the desert. Some songlines cross the territories of many language groups. The Seven Sisters songline, for instance, runs across the Western Desert, and in 2017 the National Museum of Australia built a major exhibition around it together with Aboriginal communities. Songlines also served as trade routes, along which ochre, stone tools and stories were exchanged."], ["F", "Knowledge of the Dreaming was passed on without writing: through stories, songs, dance, ceremony, body painting, rock art and drawings in the sand. Not all of this knowledge is open to everyone. Some stories are told to children; others are revealed only to initiated adults, and some belong only to men or only to women. Custodians have the right, and the duty, to decide who may hear a story and where it may be told. For this reason the managers of Uluru-Kata Tjuta National Park ask visitors not to retell certain Aṉangu stories and not to photograph some sensitive sites. In 1971 at Papunya, in the Northern Territory, a group of Aboriginal men began, with the encouragement of the art teacher Geoffrey Bardon, to paint Dreaming stories in acrylic paint on board. Over time, artists used dots and symbols in ways that allowed them to share public versions of stories while keeping sacred details hidden. The Western Desert art movement that grew from these beginnings is now known around the world."], ["G", "Because the Dreaming ties people to particular places, it has been at the centre of modern conflicts over land and resources. In 1966 Gurindji stockmen, led by Vincent Lingiari, walked off the Wave Hill cattle station in protest against poor pay and conditions; their strike became a nine-year struggle for the return of their land. In 1992 the High Court's <em>Mabo<\/em> decision rejected the idea that Australia had been <em>terra nullius<\/em>, “nobody's land”, and the <em>Native Title Act 1993<\/em> followed. Yet the tension between sacred places and the mining economy has not disappeared. In May 2020 the mining company Rio Tinto legally blasted two rock shelters at Juukan Gorge in the Pilbara region of Western Australia to expand an iron ore mine. The shelters held evidence of 46,000 years of the history of the Puutu Kunti Kurrama and Pinikura peoples. Public anger led to a parliamentary inquiry, whose interim report was titled <em>Never Again<\/em>, and the company's chief executive stepped down. For many Australians the event showed that the Dreaming is not a story about the past, but a living system of law that the national economy has to respect."]], "groups": [{"range": "Questions 1–6", "type": "select", "instr": "The reading passage has seven paragraphs, A–G. Choose the correct heading for paragraphs B–G from the list of headings below. Write the correct number, i–ix.", "example": "Example: Paragraph A — ix", "list_title": "List of Headings", "list": [["i", "A word borrowed from one language"], ["ii", "Rules for living set down by the ancestors"], ["iii", "Why dreams at night are important"], ["iv", "Knowledge that is shared with care"], ["v", "Singing one's way across the land"], ["vi", "How the landscape got its shape"], ["vii", "Sacred land and the modern economy"], ["viii", "The arrival of the first Europeans"], ["ix", "An ancient and diverse people"]], "options": "list", "questions": [{"n": 1, "q": "Paragraph B", "a": "i", "why": "Paragraph B explains that “Dreaming” comes from a translation of the Arrernte word <em>altyerre<\/em>."}, {"n": 2, "q": "Paragraph C", "a": "vi", "why": "The actions of the ancestral beings “left a mark on the land”: hills, waterholes, lines of rocks."}, {"n": 3, "q": "Paragraph D", "a": "ii", "why": "“The Dreaming is &lt;...&gt; also the Law”: rules about marriage, food, places and ceremonies."}, {"n": 4, "q": "Paragraph E", "a": "v", "why": "Songlines: “a person who knows the song can travel hundreds of kilometres”."}, {"n": 5, "q": "Paragraph F", "a": "iv", "why": "Not all knowledge is open to everyone; custodians decide who may hear a story."}, {"n": 6, "q": "Paragraph G", "a": "vii", "why": "Wave Hill, Mabo and Juukan Gorge: conflicts between sacred places and mining."}]}, {"range": "Questions 7–10", "type": "select", "instr": "Do the following statements agree with the information given in the reading passage? Choose TRUE if the statement agrees with the information, FALSE if the statement contradicts the information, NOT GIVEN if there is no information on this.", "options": [["TRUE", "TRUE"], ["FALSE", "FALSE"], ["NOT GIVEN", "NOT GIVEN"]], "questions": [{"n": 7, "q": "The English word “Dreamtime” first appeared in an attempt to translate a word from the Arrernte language.", "a": "TRUE", "why": "Paragraph B: Gillen and Spencer “tried to translate a word from the Arrernte language”."}, {"n": 8, "q": "W. E. H. Stanner believed that the Dreaming belongs only to the distant past.", "a": "FALSE", "why": "Paragraph B: Stanner's <em>everywhen<\/em> means the Dreaming “is also present now and continues into the future”."}, {"n": 9, "q": "All ancestral beings in the Dreaming stories had the shape of animals.", "a": "FALSE", "why": "Paragraph C: “others had human or partly human form”."}, {"n": 10, "q": "The Seven Sisters songline is the longest songline in Australia.", "a": "NOT GIVEN", "why": "Paragraph E says that it runs across the Western Desert, but it does not compare its length with other songlines."}]}, {"range": "Questions 11–13", "type": "text", "instr": "Complete the sentences below. Choose NO MORE THAN TWO WORDS from the passage for each answer.", "questions": [{"n": 11, "q": "Aboriginal people say that they belong to their ____ and must care for it.", "a": "Country", "accept": ["country", "their country"], "why": "Paragraph E: “People say that they belong to their Country”."}, {"n": 12, "q": "Along the songlines, people exchanged ochre, stone tools and ____.", "a": "stories", "accept": ["stories"], "why": "Paragraph E, last sentence."}, {"n": 13, "q": "The rock shelters at Juukan Gorge were destroyed to expand an ____ mine.", "a": "iron ore", "accept": ["iron ore", "iron-ore"], "why": "Paragraph G: “to expand an iron ore mine”."}]}]}, {"id": "t2", "no": 2, "title": "Stories in Water, Stone and Stars", "kicker": "Reading Test 2 · Legends of the First Australians", "minutes": 20, "intro": "You should spend about 20 minutes on Questions 1–13, which are based on the reading passage below.", "paragraphs": [["A", "Aboriginal stories are not fairy tales invented for entertainment. Each story belongs to a particular people and Country, and it is looked after by custodians who decide how and where it may be told. The same ancestral being may appear in many versions across the continent, and some versions are sacred and never shared with outsiders. The stories below are short, simplified retellings of versions that Aboriginal communities and public institutions have chosen to share in books, museums and school programmes. Read together, they show that a legend can carry law, history and practical knowledge about survival in a difficult land."], ["B", "One of the most widespread ancestral beings is the Rainbow Serpent. It appears in stories from Arnhem Land in the north to the south-west of the continent, under many names: it is Ngalyod in parts of western Arnhem Land, and the Waugal (also written Wagyl) to the Noongar people of the Perth region, who say that its winding body carved the course of the Swan River, Derbarl Yerrigan, and other waterways. Almost everywhere the serpent is connected with water. It creates rivers and waterholes, brings rain and gives life, but it can also be dangerous: in many stories it sends floods and storms to punish people who break the Law. For this reason people are often warned not to disturb certain deep waterholes where the serpent is believed to rest. The rainbow that appears in the sky after rain is a sign of its presence."], ["C", "A story told in south-eastern Australia describes Tiddalik, a frog who woke up one morning with a terrible thirst. He drank and drank until every billabong, creek and river was empty. Plants died, and the other animals had nothing to drink. They met to decide what to do and agreed that if Tiddalik could be made to laugh, the water would come out of his mouth. The kookaburra told his funniest stories, the kangaroo jumped about, and the lizard waddled up and down, but the frog did not even smile. At last the eel began to dance, twisting its long body into knots. Tiddalik laughed so much that the water poured out of him and filled the rivers again. The story warns against greed in a dry land where water must be shared. Interestingly, Australia has a real “water-holding frog”, which survives drought by storing water in its body underground, and in desert areas people traditionally knew how to dig it up as an emergency source of water."], ["D", "In the Western Desert, the Pitjantjatjara call the Seven Sisters <em>Kungkarangkalpa<\/em>. In this story a group of sisters is pursued across the land by a man, called Wati Nyiru in some Western Desert versions, who wants to take the eldest sister as his wife. The sisters flee for thousands of kilometres. They use clever tricks to escape, while he changes his shape to deceive them, and the places where they rested, camped and hid became features of the landscape. In the end the sisters rise into the sky and become the star cluster that Europeans call the Pleiades; in many versions the man becomes part of the constellation Orion, still following them across the night. The story carries Law about respect and proper relationships. In 2017 the National Museum of Australia opened the exhibition <em>Songlines: Tracking the Seven Sisters<\/em>, created together with Aṉangu, Martu and Ngaanyatjarra communities."], ["E", "Europeans join stars together to make pictures, but many Aboriginal peoples also read the dark spaces between them. Along the Milky Way they see an emu formed by dark clouds of dust: its head is the dark patch near the Southern Cross that astronomers call the Coalsack, and its neck and body stretch along the bright band of stars. The Gamilaraay (Kamilaroi) people of New South Wales call it Gawarrgay. The position of the sky emu changes during the year, and it matches the life of real emus. In autumn the whole emu can be seen in the evening sky and it appears to be running, at the time when real emus are breeding. Some months later the sky emu seems to be sitting, and people know that the birds are on their nests and that it is time to collect eggs. In many accounts only some eggs were taken, so that the emu population would survive. The sky was a calendar."], ["F", "In south-western Victoria the Gunditjmara people tell how the ancestral being Budj Bim revealed himself in the landscape as a volcano. The lava that flowed from it shaped the land, and the Gunditjmara used the volcanic stone to build a system of channels, weirs and ponds to trap, store and harvest <em>kooyang<\/em>, the short-finned eel. Parts of this system are at least 6,600 years old, which makes it one of the oldest and most extensive aquaculture systems in the world. Eels could be preserved by smoking, and the remains of stone houses show that people lived in the area for long periods. This evidence challenges the old European belief that all Aboriginal people were wandering hunter-gatherers without permanent settlements. In July 2019 the Budj Bim Cultural Landscape became the first place in Australia to be included in the UNESCO World Heritage List only for its Aboriginal cultural values."], ["G", "Today these stories are also part of the Australian economy. Uluru, which is central to many Aṉangu Tjukurpa stories, was handed back to its Traditional Owners on 26 October 1985, and the national park is now managed jointly by Aṉangu and Parks Australia. At the request of the Traditional Owners, climbing Uluru was closed exactly 34 years later, on 26 October 2019; visitors still come in large numbers, and many join walks and tours led by Aṉangu guides. Aboriginal art, Indigenous ranger programmes that combine traditional knowledge with modern science to care for Country, and bush foods are other examples. All of them raise the same question that the stories themselves raise: who has the right to tell, sell and use knowledge that belongs to a people and its Country?"]], "groups": [{"range": "Questions 1–6", "type": "select", "instr": "The reading passage has seven paragraphs, A–G. Which paragraph contains the following information? Choose the correct letter, A–G. You may use any letter more than once.", "options": [["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"], ["E", "E"], ["F", "F"], ["G", "G"]], "questions": [{"n": 1, "q": "a story in which the characters escape from a pursuer by moving into the sky", "a": "D", "why": "The sisters “rise into the sky and become the star cluster &lt;...&gt; the Pleiades”."}, {"n": 2, "q": "a description of an engineering system built from volcanic stone", "a": "F", "why": "Channels, weirs and ponds built from the stone of the Budj Bim lava flows."}, {"n": 3, "q": "a reference to an animal that really stores water in its body", "a": "C", "why": "The real “water-holding frog”."}, {"n": 4, "q": "a warning that stories exist in different versions and belong to particular people", "a": "A", "why": "“Each story belongs to a particular people and Country &lt;...&gt; may appear in many versions”."}, {"n": 5, "q": "a figure in the sky that is made by darkness rather than by light", "a": "E", "why": "The emu is “formed by dark clouds of dust”."}, {"n": 6, "q": "the end of a popular tourist activity", "a": "G", "why": "Climbing Uluru was closed on 26 October 2019."}]}, {"range": "Questions 7–10", "type": "mcq", "instr": "Choose the correct letter, A, B, C or D.", "questions": [{"n": 7, "q": "According to paragraph B, the Rainbow Serpent is connected above all with", "choices": [["A", "fire and dry seasons."], ["B", "water, both life-giving and dangerous."], ["C", "the stars of the Milky Way."], ["D", "hunting and the kangaroo."]], "a": "B", "why": "“Almost everywhere the serpent is connected with water &lt;...&gt; but it can also be dangerous”."}, {"n": 8, "q": "In the Tiddalik story, the water returns to the rivers because", "choices": [["A", "the Rainbow Serpent sends rain."], ["B", "the animals dig a new waterhole."], ["C", "the frog laughs at the eel's dance."], ["D", "the kookaburra frightens the frog."]], "a": "C", "why": "“Tiddalik laughed so much that the water poured out of him”."}, {"n": 9, "q": "The writer describes the Emu in the Sky as “a calendar” because it", "choices": [["A", "shows people when to collect emu eggs."], ["B", "was used to count the years of a person's life."], ["C", "appears in the sky only once every seven years."], ["D", "helped travellers find the Southern Cross."]], "a": "A", "why": "Its changing position tells people “that it is time to collect eggs”."}, {"n": 10, "q": "What makes the Budj Bim Cultural Landscape especially important, according to paragraph F?", "choices": [["A", "It is the largest volcano in Australia."], ["B", "It contains the oldest rock art on the continent."], ["C", "It is evidence of long-term settlement and ancient aquaculture."], ["D", "It was the first Australian site on the UNESCO World Heritage List."]], "a": "C", "why": "Eel traps at least 6,600 years old and stone houses. Option D is wrong: it was the first site listed <em>only<\/em> for Aboriginal cultural values, not the first Australian site."}]}, {"range": "Questions 11–13", "type": "select", "instr": "Match each story with the lesson or knowledge it carries, according to the passage. Choose the correct letter, A–F.", "list_title": "Lessons and knowledge", "list": [["A", "Greed with a shared resource harms everyone."], ["B", "Rules about respect and proper relationships must be followed."], ["C", "Certain water places must be treated with care."], ["D", "Hard work always brings wealth."], ["E", "Strangers should always be welcomed."], ["F", "Fire must be used to manage the land."]], "options": "list", "questions": [{"n": 11, "q": "Tiddalik the Frog", "a": "A", "why": "“The story warns against greed in a dry land where water must be shared”."}, {"n": 12, "q": "The Rainbow Serpent", "a": "C", "why": "“People are often warned not to disturb certain deep waterholes”."}, {"n": 13, "q": "The Seven Sisters", "a": "B", "why": "“The story carries Law about respect and proper relationships”."}]}]}, {"id": "t3", "no": 3, "title": "From the Sheep's Back to the Lecture Hall", "kicker": "Reading Test 3 · How Australia earns its living", "minutes": 20, "intro": "You should spend about 20 minutes on Questions 1–14, which are based on the reading passage below. Note: an Australian financial year runs from 1 July to 30 June and is written 2025–26; A$ means Australian dollars.", "paragraphs": [["A", "Long before 1788, Aboriginal peoples had economies of their own. Red ochre, stone axe heads, shells and <em>pituri<\/em>, a plant chewed as a stimulant, travelled hundreds of kilometres along trade routes, and in western Victoria the Gunditjmara farmed eels in stone channels. The colonial economy that replaced these systems was built first on wool. Sheep spread across the grasslands in the nineteenth century, and wool became so important to national income that Australia was said to “ride on the sheep's back”. In 1851 gold was found in New South Wales and then in Victoria; the gold rushes brought people from all over the world, including China, and greatly increased the population."], ["B", "Today Australia is a high-income economy. In the financial year 2024–25 its gross domestic product (GDP) was A$2.78 trillion, or A$101,438 per person. The World Bank estimates its GDP in 2025 at US$1.80 trillion, which places it fifteenth among the economies with data for that year, even though the population is under 28 million. The economy is also open: exports of goods and services were equal to 23.2 per cent of GDP in 2025. Between 1991 and 2020 Australia went almost three decades without a recession, a run that ended only when the COVID-19 pandemic arrived."], ["C", "The country is a world leader in minerals. According to Geoscience Australia, in 2024 it was the world's largest producer of iron ore, with 38 per cent of world production, and of lithium, with 43 per cent; it was also the second-largest producer of bauxite and the third-largest producer of gold. Most iron ore comes from the Pilbara region of Western Australia, and production reached 954 million tonnes in 2024. Mining was the largest single industry by total factor income in 2024–25, with 10.2 per cent of the total. Yet in February 2026 it employed only about 312,000 people, or 2.1 per cent of all workers. Modern mining is capital-intensive: giant machines, railways and ports produce enormous value with relatively few employees."], ["D", "Four products dominate merchandise exports: iron ore, gold, coal and natural gas. In 2025–26 they made up 58.4 per cent of all goods exported, and iron ore alone earned A$118.8 billion. Their value can change sharply from year to year, mainly because world prices change. Coal exports rose from A$39.2 billion in 2020–21 to A$127.4 billion in 2022–23 and then fell to A$67.4 billion in 2025–26, while gold reached a record A$69.7 billion. Economists therefore watch the <em>terms of trade<\/em>, the ratio of export prices to import prices, very closely."], ["E", "Although resources dominate exports, most Australians work in services. The World Bank estimates that services produced 67.5 per cent of value added in 2025, and the largest employer is health care and social assistance, with 16.2 per cent of all jobs. In 2024–25 Australia exported services worth A$134.3 billion, about one fifth of all exports. The largest single services export is international education: the fees and living costs of international students, counted as an export because the money comes from abroad, reached A$53.6 billion in 2024–25, almost as much as the country earned from natural gas. China and India were the largest markets. Tourism is the other main source of such income, with 8.94 million short-term visitor arrivals in 2025, still below the 9.47 million of 2019."], ["F", "Agriculture has a small economic weight but a huge footprint. In 2024–25 agriculture, forestry and fishing produced only 2.5 per cent of total factor income and employed 2.0 per cent of workers, yet farmland covers 47.3 per cent of Australia's land area. Crops are grown mainly where there is enough rain, for example in the Wheatbelt of Western Australia. Farmers produce far more food than the population can eat. In 2025–26 beef was the largest agricultural export, at A$20.8 billion, followed by wheat (A$8.7 billion), barley (A$3.9 billion) and wool (A$3.0 billion). Wool, once the symbol of the national economy, now earns less than barley."], ["G", "Australia's trade geography has changed completely since the days of the British Empire. In 2025–26 China bought 35.1 per cent of Australia's merchandise exports, Japan 11.2 per cent and the Republic of Korea 8.1 per cent; together these three North-East Asian economies took more than half. Australia helped to build regional institutions: the first Asia-Pacific Economic Cooperation (APEC) meeting was held in Canberra in November 1989. It has also signed a wide network of free trade agreements, including AANZFTA with the ASEAN members and New Zealand (in force since 2010), KAFTA with Korea (2014), JAEPA with Japan (2015) and ChAFTA with China (2015). It belongs to the Regional Comprehensive Economic Partnership (RCEP), signed by 15 economies on 15 November 2020 and in force since 1 January 2022, and to the Comprehensive and Progressive Agreement for Trans-Pacific Partnership (CPTPP), which the United Kingdom joined in December 2024."], ["H", "Dependence on a few commodities and one large market brings risks. By the end of 2020 China had imposed heavy duties on Australian barley, and by 2021 on Australian wine. Australia took both disputes to the World Trade Organization, and they were settled by agreement in 2023 and 2024. Looking ahead, demand for lithium and other critical minerals used in batteries and electric vehicles offers new opportunities. Much of this mineral wealth, however, lies on the Country of Aboriginal peoples, and the destruction of the Juukan Gorge rock shelters in 2020 showed how costly it can be when companies ignore Traditional Owners. The future of the economy may depend not only on what lies under the ground, but also on how fairly the benefits of the land are shared."]], "groups": [{"range": "Questions 1–5", "type": "text", "instr": "Complete the notes below. Choose ONE WORD AND/OR A NUMBER from the passage for each answer.", "notes_title": "Australia's economy: key facts", "questions": [{"n": 1, "q": "Mining's share of total factor income in 2024–25: ____ per cent", "a": "10.2", "accept": ["10.2", "10,2"], "why": "Paragraph C."}, {"n": 2, "q": "Australia's share of world lithium production in 2024: ____ per cent", "a": "43", "accept": ["43"], "why": "Paragraph C."}, {"n": 3, "q": "The largest single services export: international ____", "a": "education", "accept": ["education"], "why": "Paragraph E: A$53.6 billion in 2024–25."}, {"n": 4, "q": "The largest agricultural export in 2025–26: ____", "a": "beef", "accept": ["beef"], "why": "Paragraph F: A$20.8 billion."}, {"n": 5, "q": "Share of Australia's land area covered by farmland: ____ per cent", "a": "47.3", "accept": ["47.3", "47,3"], "why": "Paragraph F."}]}, {"range": "Questions 6–10", "type": "select", "instr": "Do the following statements agree with the information given in the reading passage? Choose TRUE, FALSE or NOT GIVEN.", "options": [["TRUE", "TRUE"], ["FALSE", "FALSE"], ["NOT GIVEN", "NOT GIVEN"]], "questions": [{"n": 6, "q": "Mining employs more people than any other industry in Australia.", "a": "FALSE", "why": "Paragraph C: mining employs only 2.1 per cent of workers; paragraph E: health care employs 16.2 per cent."}, {"n": 7, "q": "Australia earned more from coal exports in 2022–23 than in 2025–26.", "a": "TRUE", "why": "Paragraph D: A$127.4 billion in 2022–23, A$67.4 billion in 2025–26."}, {"n": 8, "q": "Most international students in Australia study business and management.", "a": "NOT GIVEN", "why": "Paragraph E gives the value and the main markets, but not the subjects students study."}, {"n": 9, "q": "Wool still earns Australia more export income than barley.", "a": "FALSE", "why": "Paragraph F: “Wool &lt;...&gt; now earns less than barley”."}, {"n": 10, "q": "By 2025 the number of short-term visitors to Australia had returned to its 2019 level.", "a": "FALSE", "why": "Paragraph E: 8.94 million arrivals in 2025, “still below the 9.47 million of 2019”."}]}, {"range": "Questions 11–14", "type": "select", "instr": "Match each name with the correct description, A–F, according to the passage.", "list_title": "Descriptions", "list": [["A", "a bilateral agreement with Australia's largest export market"], ["B", "an agreement signed by 15 economies and in force since 2022"], ["C", "an agreement that the United Kingdom joined in December 2024"], ["D", "a regional forum whose first meeting took place in Canberra"], ["E", "an agreement with the ASEAN members and New Zealand"], ["F", "an agreement that ended the dispute over barley"]], "options": "list", "questions": [{"n": 11, "q": "ChAFTA", "a": "A", "why": "Paragraph G: ChAFTA with China (2015); China bought 35.1 per cent of exports."}, {"n": 12, "q": "RCEP", "a": "B", "why": "Signed 15 November 2020, in force 1 January 2022."}, {"n": 13, "q": "CPTPP", "a": "C", "why": "“which the United Kingdom joined in December 2024”."}, {"n": 14, "q": "APEC", "a": "D", "why": "“the first &lt;...&gt; APEC meeting was held in Canberra in November 1989”."}]}]}], "discussion": ["Why might it be risky for a country's economy to depend heavily on exporting raw materials like iron ore and coal?", "Why do you think Australia signs free trade agreements with so many different countries and regional groups?", "What are the benefits and risks of having one country (China) as your largest trading partner?", "Mining brings Australia huge export income. Who should decide whether a sacred site may be mined: the company, the government or the Traditional Owners? Give reasons.", "The Emu in the Sky and the Tiddalik story carry practical knowledge about food and water. Do the legends of your own country carry similar knowledge?", "Compare Australia's economy with the economy of your own country. What are the main similarities and differences?"], "exit": ["One new fact I learned today:", "One question I still have:"], "homework": "Write a short paragraph (120–150 words) comparing Australia's economy with the economy of the USA, Canada or your own country. Use at least three words from today's vocabulary lists. Option B: retell one Aboriginal story from Test 2 in your own words (100–120 words) and explain what knowledge or law it carries.", "culture_note": "The Aboriginal stories in this handout are short, simplified retellings of versions that communities and public institutions have chosen to share. Stories differ between nations, and some knowledge is restricted. Do not present these retellings as the only or the complete version of a story.", "sources": ["AIATSIS. Living Languages. URL: https://aiatsis.gov.au/explore/living-languages (accessed: 23.11.2026).", "“Dreamtime” and “the Dreaming”: who dreamed up these terms? // The Conversation. URL: https://theconversation.com/dreamtime-and-the-dreaming-who-dreamed-up-these-terms-20835 (accessed: 23.11.2026).", "Stanner W. E. H. White Man Got No Dreaming: Essays 1938–1973. Canberra: Australian National University Press, 1979.", "Parks Australia. Uluru-Kata Tjuta National Park: Kuniya and Liru stories; Kuniya walk and Mutitjulu Waterhole. URL: https://parksaustralia.gov.au/uluru/ (accessed: 23.11.2026).", "National Museum of Australia. Songlines: Tracking the Seven Sisters (exhibition, 2017). URL: https://www.nma.gov.au (accessed: 23.11.2026).", "National Museum of Australia. Defining Moments: Budj Bim Cultural Landscape. URL: https://www.nma.gov.au/defining-moments/resources/budj-bim-cultural-landscape (accessed: 23.11.2026).", "UNESCO World Heritage Centre. Budj Bim Cultural Landscape (No. 1577). URL: https://whc.unesco.org/en/list/1577 (accessed: 23.11.2026).", "Parliament of Australia. Joint Standing Committee on Northern Australia. Never Again: Interim Report on the Inquiry into the Destruction of 46,000 Year Old Caves at the Juukan Gorge, December 2020. URL: https://www.aph.gov.au (accessed: 23.11.2026).", "National Museum of Australia. Defining Moments: Wave Hill walk-off; Mabo decision. URL: https://www.nma.gov.au/defining-moments (accessed: 23.11.2026).", "Australian Bureau of Statistics. Australian System of National Accounts, 2024–25; International Trade in Goods, August 2026; International Trade: Supplementary Information, 2024–25; Labour Force, Australia, Detailed, March 2026; Overseas Arrivals and Departures, August 2026. URL: https://www.abs.gov.au (accessed: 22.10.2026).", "World Bank. World Development Indicators: Australia. URL: https://data.worldbank.org/country/australia (accessed: 22.10.2026).", "Geoscience Australia. Australia&#x27;s Identified Mineral Resources 2025: World Rankings; Commodity Summaries. URL: https://www.ga.gov.au/aimr2025 (accessed: 22.10.2026).", "World Trade Organization. Regional Trade Agreements Database: Australia; DS598 and DS602. URL: https://www.wto.org (accessed: 22.10.2026)."]};
+
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem("p20:"+k); return v===null? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem("p20:"+k, JSON.stringify(v)); }catch(e){} }
+};
+const $ = (s, el=document) => el.querySelector(s);
+const qcount = t => t.groups.reduce((s,g)=>s+g.questions.length,0);
+const h = (tag, attrs={}, html="") => { const e=document.createElement(tag); for(const [k,v] of Object.entries(attrs)){ if(k==="class") e.className=v; else e.setAttribute(k,v);} if(html) e.innerHTML=html; return e; };
+
+/* header */
+$("#h-eyebrow").textContent = DATA.meta.course + " · " + DATA.meta.lesson + " · " + DATA.meta.level;
+$("#h-title").textContent = DATA.meta.title;
+$("#h-sub").textContent = DATA.meta.subtitle + ": the Dreaming, Aboriginal legends and the real economy. 40 questions in all, a 20-minute timer for each test. Answers are checked on the page.";
+["st-name","st-group","st-date"].forEach(id=>{ const el=$("#"+id); el.value=store.get(id,""); el.addEventListener("input",()=>store.set(id,el.value)); });
+
+/* tabs */
+const VIEWS = [["start","Start"],["vocab","Vocabulary"]].concat(DATA.tests.map(t=>["test-"+t.no,"Test "+t.no])).concat([["discuss","Discussion & exit"]]);
+const tabs = $("#tabs");
+VIEWS.forEach(([id,label])=>{
+  const b = h("button",{class:"tab",role:"tab",id:"tab-"+id,"aria-controls":"view-"+id,"aria-selected":"false",type:"button"}, label);
+  if(id.startsWith("test-")) b.appendChild(h("span",{class:"chip",id:"chip-"+id},"–/"+qcount(DATA.tests[+id.slice(5)-1])));
+  b.addEventListener("click",()=>{ location.hash = id; });
+  tabs.appendChild(b);
+});
+function show(id){
+  if(!VIEWS.some(v=>v[0]===id)) id="start";
+  VIEWS.forEach(([v])=>{ $("#view-"+v).hidden = v!==id; $("#tab-"+v).setAttribute("aria-selected", v===id?"true":"false"); });
+  window.scrollTo({top:0});
+}
+
+const main = $("#main");
+
+/* START view */
+(function(){
+  const v = h("section",{class:"panel",id:"view-start",role:"tabpanel"});
+  v.innerHTML = `<div class="kicker">How to use this handout</div>
+  <div class="sec-head"><div><h2>Three reading tests about Australia</h2>
+  <p class="lead">Begin with the vocabulary, then do the tests in order. Press <b>Start timer</b> when you begin a test and <b>Check answers</b> when you finish. Your answers stay in this browser until you reset them.</p></div></div>`;
+  const ov = h("div",{class:"overview"});
+  const blurbs = ["Where the words “Dreaming” and “Dreamtime” come from, ancestral beings, Law, Country, songlines, and why sacred sites matter to the mining economy.",
+                  "The Rainbow Serpent, Tiddalik the Frog, the Seven Sisters, the Emu in the Sky and Budj Bim: stories that carry law and survival knowledge.",
+                  "From Aboriginal trade routes and wool to iron ore, lithium, international education and free trade agreements in Asia, with ABS and World Bank figures."];
+  DATA.tests.forEach((t,i)=>{
+    const c = h("button",{class:"ov",type:"button"});
+    c.innerHTML = `<span class="meta">TEST ${t.no} · ${qcount(t)} QUESTIONS · ${t.minutes} MIN</span><h3>${t.title}</h3><p>${blurbs[i]}</p><span class="meta" id="ovs-${t.id}">Not checked yet</span>`;
+    c.addEventListener("click",()=>{ location.hash="test-"+t.no; });
+    ov.appendChild(c);
+  });
+  v.appendChild(ov);
+  const n = h("p",{class:"note",style:"margin-top:20px"}, "<b>A note on the stories.</b> "+DATA.culture_note);
+  v.appendChild(n);
+  v.appendChild(h("p",{class:"lead",style:"margin-top:16px"}, 'Printable versions: <a href="P20_Reading_Exam_Paper.pdf">exam paper (PDF)</a> · <a href="P20_Reading_Exam_Answer_Key.pdf">answer key (PDF)</a> · <a href="P20_Australia_Reading_Tests.docx">handout (DOCX)</a>'));
+  main.appendChild(v);
+})();
+
+/* VOCAB view */
+(function(){
+  const v = h("section",{class:"panel",id:"view-vocab",role:"tabpanel"});
+  v.innerHTML = `<div class="kicker">Warm-up</div><div class="sec-head"><div><h2>Key vocabulary</h2><p class="lead">These words appear in the three reading tests.</p></div></div>`;
+  const grid = h("div",{class:"vgrid"});
+  DATA.vocab.forEach(set=>{
+    const c = h("div",{class:"vcard"});
+    c.appendChild(h("h3",{},set.title));
+    c.appendChild(h("p",{class:"lead",style:"margin:0 0 8px"},set.instr));
+    set.items.forEach((it,i)=>{
+      const id = set.id+"-"+(i+1);
+      const row = h("div",{class:"vrow q",id:"row-"+id});
+      const sel = h("select",{id:"in-"+id,"aria-label":it[0]});
+      sel.appendChild(h("option",{value:""},"–"));
+      set.defs.forEach(d=>sel.appendChild(h("option",{value:d[0]},d[0])));
+      sel.value = store.get(id,"");
+      sel.addEventListener("change",()=>{ store.set(id,sel.value); row.classList.remove("ok","no"); });
+      row.innerHTML = `<span><span class="n" style="display:inline-block;width:26px">${i+1}.</span><b>${it[0]}</b></span>`;
+      row.style.gridTemplateColumns="1fr 76px";
+      row.appendChild(sel);
+      c.appendChild(row);
+    });
+    const dl = h("ul",{class:"deflist"});
+    set.defs.forEach(d=>dl.appendChild(h("li",{},`<b>${d[0]}</b>${d[1]}`)));
+    c.appendChild(dl);
+    const res = h("div",{class:"result"});
+    const sc = h("span",{class:"score",id:"score-"+set.id},"–/"+set.items.length);
+    const chk = h("button",{class:"btn primary",type:"button"},"Check");
+    const rst = h("button",{class:"btn",type:"button"},"Reset");
+    chk.addEventListener("click",()=>{
+      let ok=0;
+      set.items.forEach((it,i)=>{ const id=set.id+"-"+(i+1); const r=$("#row-"+id); const good=$("#in-"+id).value===it[1]; if(good) ok++; r.classList.toggle("ok",good); r.classList.toggle("no",!good); });
+      sc.textContent = ok+"/"+set.items.length;
+      if(ok<set.items.length) sc.textContent += "  ·  key: "+set.items.map((it,i)=>(i+1)+it[1]).join(" ");
+    });
+    rst.addEventListener("click",()=>{ set.items.forEach((it,i)=>{ const id=set.id+"-"+(i+1); $("#in-"+id).value=""; store.set(id,""); $("#row-"+id).classList.remove("ok","no"); }); sc.textContent="–/"+set.items.length; });
+    res.append(chk,rst,sc);
+    c.appendChild(res);
+    grid.appendChild(c);
+  });
+  v.appendChild(grid);
+  main.appendChild(v);
+})();
+
+/* TEST views */
+const norm = s => (s||"").toLowerCase().replace(/per\s*cent|percent|%/g,"").replace(/,/g,".").replace(/[“”"'’.!?;:]+$/g,"").replace(/^(the|an|a)\s+/,"").replace(/\s+/g," ").trim();
+const timers = {};
+
+DATA.tests.forEach(t=>{
+  const vid = "test-"+t.no;
+  const v = h("section",{class:"panel",id:"view-"+vid,role:"tabpanel"});
+  const head = h("div",{class:"sec-head"});
+  head.innerHTML = `<div><div class="kicker">${t.kicker}</div><h2>${t.title}</h2></div>`;
+  const tb = h("div",{class:"toolbar"});
+  const tm = h("span",{class:"timer",id:"timer-"+t.id,role:"timer","aria-live":"off"}, String(t.minutes).padStart(2,"0")+":00");
+  const tstart = h("button",{class:"btn",type:"button",id:"tstart-"+t.id},"Start timer");
+  const treset = h("button",{class:"btn",type:"button"},"Reset timer");
+  tb.append(tm,tstart,treset);
+  head.appendChild(tb);
+  v.appendChild(head);
+
+  const split = h("div",{class:"split"});
+  const pas = h("article",{class:"pane passage","aria-label":"Reading passage"});
+  pas.innerHTML = `<h3>${t.title}</h3><p class="intro">${t.intro}</p>`;
+  t.paragraphs.forEach(([L,txt])=>{ pas.appendChild(h("p",{class:"para",id:`p-${t.id}-${L}`},`<span class="L">${L}</span><span>${txt}</span>`)); });
+  split.appendChild(pas);
+
+  const qp = h("div",{class:"pane qpane"});
+  t.groups.forEach(g=>{
+    const gd = h("div",{class:"qgroup"});
+    gd.appendChild(h("h4",{},g.range));
+    gd.appendChild(h("p",{class:"instr"},g.instr));
+    if(g.list){
+      const b = h("div",{class:"box"});
+      b.innerHTML = `<strong>${g.list_title}</strong><ol>${g.list.map(x=>`<li><b>${x[0]}</b>${x[1]}</li>`).join("")}</ol>`;
+      gd.appendChild(b);
+    }
+    if(g.example) gd.appendChild(h("p",{class:"instr",style:"font-style:italic"},g.example));
+    if(g.notes_title) gd.appendChild(h("p",{style:"font-family:var(--f-display);font-weight:700;margin:0 0 4px"},g.notes_title));
+    g.questions.forEach(q=>{
+      const key = t.id+"-q"+q.n;
+      const row = h("div",{class:"q",id:"q-"+key});
+      row.appendChild(h("span",{class:"n"},q.n));
+      const body = h("div",{class:"body"});
+      if(g.type==="select"){
+        const opts = g.options==="list" ? g.list.map(x=>[x[0],x[0]]) : g.options;
+        const line = h("div",{class:"inline"});
+        line.appendChild(h("label",{for:"in-"+key},q.q));
+        const sel = h("select",{id:"in-"+key});
+        sel.appendChild(h("option",{value:""},"choose"));
+        opts.forEach(o=>sel.appendChild(h("option",{value:o[0]},o[1])));
+        sel.value = store.get(key,"");
+        sel.addEventListener("change",()=>{ store.set(key,sel.value); row.classList.remove("ok","no"); });
+        line.appendChild(sel);
+        body.appendChild(line);
+      } else if(g.type==="mcq"){
+        body.appendChild(h("span",{},q.q));
+        const ch = h("div",{class:"choices",role:"radiogroup"});
+        const saved = store.get(key,"");
+        q.choices.forEach(c=>{
+          const id = "in-"+key+"-"+c[0];
+          const lab = h("label",{for:id});
+          const r = h("input",{type:"radio",name:"in-"+key,id:id,value:c[0]});
+          if(saved===c[0]) r.checked=true;
+          r.addEventListener("change",()=>{ store.set(key,c[0]); row.classList.remove("ok","no"); });
+          lab.append(r, h("span",{},`<b>${c[0]}</b>&nbsp; ${c[1]}`));
+          ch.appendChild(lab);
+        });
+        body.appendChild(ch);
+      } else {
+        const parts = q.q.split("____");
+        const line = h("div",{class:"inline"});
+        line.appendChild(h("label",{for:"in-"+key},parts[0]));
+        const inp = h("input",{type:"text",id:"in-"+key,autocomplete:"off",spellcheck:"false"});
+        inp.value = store.get(key,"");
+        inp.addEventListener("input",()=>{ store.set(key,inp.value); row.classList.remove("ok","no"); });
+        line.appendChild(inp);
+        if(parts[1]) line.appendChild(h("span",{},parts[1]));
+        body.appendChild(line);
+      }
+      const why = h("div",{class:"why",id:"why-"+key,hidden:""});
+      why.innerHTML = `<b>Answer: ${q.a}.</b> ${q.why.replace(/Paragraphs? ([A-H])/g,(m,L)=>`<a data-p="p-${t.id}-${L}">${m}</a>`)}`;
+      body.appendChild(why);
+      row.appendChild(body);
+      gd.appendChild(row);
+    });
+    qp.appendChild(gd);
+  });
+
+  const res = h("div",{class:"result"});
+  const chk = h("button",{class:"btn primary",type:"button"},"Check answers");
+  const showA = h("button",{class:"btn",type:"button"},"Show explanations");
+  const rst = h("button",{class:"btn",type:"button"},"Reset answers");
+  const N = qcount(t);
+  const sc = h("span",{class:"score",id:"score-"+t.id},"–/"+N);
+  res.append(chk,showA,rst,sc);
+  qp.appendChild(res);
+  split.appendChild(qp);
+  v.appendChild(split);
+  main.appendChild(v);
+
+  const all = t.groups.flatMap(g=>g.questions.map(q=>({g,q})));
+  function answerOf(g,q){
+    const key=t.id+"-q"+q.n;
+    if(g.type==="mcq"){ const r=document.querySelector(`input[name="in-${key}"]:checked`); return r?r.value:""; }
+    return $("#in-"+key).value;
+  }
+  function isRight(g,q,a){
+    if(g.type==="text") return (q.accept||[q.a]).map(norm).includes(norm(a));
+    return a===q.a;
+  }
+  function check(silent){
+    let ok=0;
+    all.forEach(({g,q})=>{
+      const a=answerOf(g,q), good=isRight(g,q,a); if(good) ok++;
+      const r=$("#q-"+t.id+"-q"+q.n); r.classList.toggle("ok",good); r.classList.toggle("no",!good);
+    });
+    sc.textContent = ok+"/"+all.length;
+    const chip=$("#chip-"+vid); chip.textContent=ok+"/"+N; chip.classList.add("done");
+    $("#ovs-"+t.id).textContent = "Last check: "+ok+"/"+N;
+    store.set(t.id+"-checked",true);
+    return ok;
+  }
+  chk.addEventListener("click",()=>check());
+  showA.addEventListener("click",()=>{
+    const open = showA.dataset.open!=="1";
+    all.forEach(({q})=>{ $("#why-"+t.id+"-q"+q.n).hidden=!open; });
+    showA.dataset.open = open?"1":"0";
+    showA.textContent = open? "Hide explanations" : "Show explanations";
+  });
+  rst.addEventListener("click",()=>{
+    all.forEach(({g,q})=>{
+      const key=t.id+"-q"+q.n; store.set(key,"");
+      if(g.type==="mcq") document.querySelectorAll(`input[name="in-${key}"]`).forEach(r=>r.checked=false); else $("#in-"+key).value="";
+      $("#q-"+key).classList.remove("ok","no");
+    });
+    sc.textContent="–/"+N; const chip=$("#chip-"+vid); chip.textContent="–/"+N; chip.classList.remove("done");
+    $("#ovs-"+t.id).textContent="Not checked yet"; store.set(t.id+"-checked",false);
+  });
+  qp.addEventListener("click",e=>{
+    const a=e.target.closest("a[data-p]"); if(!a) return;
+    const p=document.getElementById(a.dataset.p); if(!p) return;
+    p.scrollIntoView({block:"center",behavior:"smooth"}); p.classList.add("flash"); setTimeout(()=>p.classList.remove("flash"),1600);
+  });
+  if(store.get(t.id+"-checked",false)) check(true);
+
+  /* timer */
+  const T = timers[t.id] = {left:t.minutes*60, id:null};
+  const paint=()=>{ const m=Math.floor(T.left/60), s=T.left%60; tm.textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0"); tm.classList.toggle("low",T.left<=120); };
+  tstart.addEventListener("click",()=>{
+    if(T.id){ clearInterval(T.id); T.id=null; tstart.textContent="Resume timer"; return; }
+    tstart.textContent="Pause timer";
+    T.id=setInterval(()=>{ T.left=Math.max(0,T.left-1); paint(); if(T.left===0){ clearInterval(T.id); T.id=null; tstart.textContent="Time is up"; } },1000);
+  });
+  treset.addEventListener("click",()=>{ if(T.id) clearInterval(T.id); T.id=null; T.left=t.minutes*60; paint(); tstart.textContent="Start timer"; });
+});
+
+/* DISCUSSION view */
+(function(){
+  const v = h("section",{class:"panel",id:"view-discuss",role:"tabpanel"});
+  v.innerHTML = `<div class="kicker">After reading</div><div class="sec-head"><div><h2>Discussion in groups</h2></div></div>`;
+  const ol = h("ol",{class:"dl"});
+  DATA.discussion.forEach(d=>ol.appendChild(h("li",{},d)));
+  v.appendChild(ol);
+  const two = h("div",{class:"two"});
+  const ex = h("div",{class:"card"}); ex.appendChild(h("h3",{},"Exit ticket"));
+  DATA.exit.forEach((e,i)=>{
+    const id="exit-"+i;
+    ex.appendChild(h("label",{for:id,style:"display:block;margin:6px 0 4px;font-weight:500"},e));
+    const ta=h("textarea",{id:id}); ta.value=store.get(id,""); ta.addEventListener("input",()=>store.set(id,ta.value)); ex.appendChild(ta);
+  });
+  const hw = h("div",{class:"card"}); hw.innerHTML=`<h3>Homework</h3><p style="margin:0 0 10px">${DATA.homework}</p>`;
+  const ta=h("textarea",{id:"hw",style:"min-height:150px","aria-label":"Homework draft"}); ta.value=store.get("hw","");
+  const wc=h("p",{class:"lead",style:"font-size:13px"},"");
+  const count=()=>{ const n=(ta.value.trim().match(/\S+/g)||[]).length; wc.textContent=n+" words"; };
+  ta.addEventListener("input",()=>{ store.set("hw",ta.value); count(); }); count();
+  hw.append(ta,wc);
+  two.append(ex,hw);
+  v.appendChild(two);
+  const src = h("div",{class:"card",style:"margin-top:20px"});
+  src.innerHTML = `<h3>Sources of the reading texts</h3><p class="lead" style="font-size:13px;margin:0 0 8px">The passages were written for this lesson on the basis of the sources below; the economic figures follow Topic 20 of the course textbook.</p><ol class="sources">${DATA.sources.map(s=>`<li>${s}</li>`).join("")}</ol>`;
+  v.appendChild(src);
+  main.appendChild(v);
+})();
+
+$("#foot").textContent = DATA.meta.course+" · "+DATA.meta.lesson+" · Electronic handout";
+
+window.addEventListener("hashchange",()=>show(location.hash.slice(1)));
+show(location.hash.slice(1));
+</script>
+
+</html>
